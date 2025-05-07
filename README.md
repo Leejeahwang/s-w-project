@@ -1,1 +1,1 @@
-# s-w-project
+# SW project
