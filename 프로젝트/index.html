@@ -8,39 +8,24 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 20px;
       background-color: #f5f5f5;
     }
 
-    header {
+    /* header를 두 개로 분리: 제목 따로, 버튼 따로 */
+    .header-top {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      padding: 20px;
-      background-color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 1.8em;
-    }
-
-    .top-controls {
+    .auth-buttons {
       display: flex;
-      align-items: center;
       gap: 10px;
     }
 
-    .top-controls input[type="text"] {
-      padding: 8px 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      width: 220px;
-      box-sizing: border-box;
-    }
-
-    .top-controls button {
+    .auth-buttons button {
       padding: 8px 16px;
       background-color: #4caf50;
       color: white;
@@ -50,12 +35,34 @@
       font-size: 0.9em;
     }
 
-    .top-controls button:hover {
+    .auth-buttons button:hover {
       background-color: #45a045;
     }
 
+    .header-title {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+
+    .search-bar {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .search-bar input[type="text"] {
+      padding: 10px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
     .note-grid {
-      padding: 20px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
@@ -105,14 +112,20 @@
 </head>
 <body>
 
-  <header>
-    <h1>요약 노트 공유 게시판</h1>
-    <div class="top-controls">
-      <input type="text" placeholder="과목명, 교수명, 이수 구분...">
+  <div class="header-top">
+    <div class="auth-buttons">
       <button onclick="location.href='signup.html'">회원가입</button>
       <button onclick="location.href='login.html'">로그인</button>
     </div>
-  </header>
+  </div>
+
+  <div class="header-title">
+    <h1>요약 노트 공유 게시판</h1>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="과목명, 교수명, 이수 구분...">
+  </div>
 
   <div class="note-grid">
     <!-- 예시 카드 1 -->
