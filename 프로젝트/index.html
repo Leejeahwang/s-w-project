@@ -26,6 +26,27 @@
             width: 300px;
             border: 1px solid #ccc;
             border-radius: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .auth-buttons {
+            margin-top: 10px;
+        }
+
+        .auth-buttons button {
+            margin: 5px;
+            padding: 8px 16px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .auth-buttons button:hover {
+            background-color: #45a045;
         }
 
         .note-grid {
@@ -74,7 +95,6 @@
             color: inherit;
             text-decoration: none;
         }
-
     </style>
 </head>
 <body>
@@ -83,21 +103,23 @@
 
     <div class="search-bar">
         <input type="text" placeholder="과목명, 교수명, 이수 구분...">
-        회원가입 / 로그인
+        <div class="auth-buttons">
+            <button onclick="location.href='signup.html'">회원가입</button>
+            <button onclick="location.href='login.html'">로그인</button>
+        </div>
     </div>
 
     <div class="note-grid">
-    <!-- 예시 카드 1 -->
+        <!-- 예시 카드 1 -->
         <div class="note-card">
             <a href="/note_detail">
                 <h3>자료구조 중간 정리</h3>
             </a>
             <p>연결 리스트, 스택/큐 위주 요약</p>
             <div class="note-footer">컴퓨터공학과 | 홍길동 | 2024-2학기</div>
-        <!--<button>다운로드</button>-->
         </div>
 
-    <!-- 예시 카드 2 -->
+        <!-- 예시 카드 2 -->
         <div class="note-card">
             <h3>운영체제 핵심 정리</h3>
             <p>프로세스, 스케줄링, 세마포어 요약</p>
@@ -105,8 +127,8 @@
             <button>다운로드</button>
         </div>
 
-    <!-- 더 많은 카드들 ... -->
-  </div>
+        <!-- 더 많은 카드 추가 가능 -->
+    </div>
 
 </body>
 </html>
