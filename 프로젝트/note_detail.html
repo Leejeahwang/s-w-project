@@ -97,6 +97,25 @@
       font-size: 0.9em;
       color: #666;
     }
+
+    .download-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .download-btn:hover {
+      background-color: #45a045;
+    }
+
   </style>
 </head>
 <body>
@@ -131,7 +150,7 @@
     <div class="right-panel">
       <div class="download-box">
         <h3>다운로드</h3>
-        <button>PDF 다운로드</button>
+        <a href="files/data_structure_mid_summary.pdf" download class="download-btn">PDF 다운로드</a>
         <div class="file-info">
           파일명: data_structure_mid_summary.pdf<br>
           용량: 1.8MB<br>
