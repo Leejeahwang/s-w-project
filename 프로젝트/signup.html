@@ -90,6 +90,7 @@
   <script>
     document.getElementById('signupForm').addEventListener('submit', function(e) {
       e.preventDefault();
+  
       const data = {
         name: document.getElementById('name').value,
         studentId: document.getElementById('studentId').value,
@@ -97,10 +98,31 @@
         id: document.getElementById('id').value,
         pw: document.getElementById('pw').value
       };
-      console.log('회원가입 데이터:', data);
-      window.location.href = "index.html"; // 가입 완료 후 메인 이동
+  
+      // fetch로 서버에 POST 요청
+      fetch('/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(data)
+      })
+      .then(response => {
+        if (response.redirected) {
+          window.location.href = response.url;  // 서버가 리다이렉트하면 이동
+        } else {
+          return response.text();
+        }
+      })
+      .then(result => {
+        if (result) alert(result);  // 실패했을 경우 메시지 띄우기
+      })
+      .catch(err => {
+        console.error('회원가입 에러', err);
+      });
     });
   </script>
+  
 
 </body>
 </html>
