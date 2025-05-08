@@ -1,136 +1,205 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>노트 공유 업로드</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-
-    h1 {
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>노트 공유 업로드</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        h1 {
             text-align: center;
-    }
+        }
 
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+        .box-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+       
+        .box-container h3, p {
+            margin-bottom: 10px;
+            margin-top: -3px;
+        }
 
-    input[type="text"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      box-sizing: border-box;
-    }
+        p {
+            color: #666;
+        }
 
-    textarea {
-      height: 200px;
-      resize: vertical;
-    }
+        .category-group {
+            display: flex;
+            gap: 20px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+        
+        select {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+        
 
-    .buttons {
-      margin-top: 20px;
-      text-align: right;
-    }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 8px 12px;
+            resize: vertical;
+            
+        }
 
-    .buttons button {
-      padding: 8px 16px;
-      margin-left: 10px;
-    }
-    
-  </style>
+        textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .buttons {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .buttons button {
+            padding: 8px 16px;
+            margin-left: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .buttons button:hover {
+            background-color: #45a045;
+        }
+    </style>
 </head>
 
 <body>
-  <h1>요약 노트 공유 게시판</h1>
+    <!-- 카테고리 수정? 필요? -->
+    <h1>요약 노트 공유 게시판</h1>
 
     <form id="uploadForm" action="#" method="post" enctype="multipart/form-data">
-    <!-- 1. 제목 -->
-    <label for="title">제목</label>
-    <input type="text" id="title" name="title" required />
 
-    <!-- 2. 카테고리(이수구분 > 학년 > 과목) -->
-    <label>카테고리</label>
-    <div style="display: flex; gap: 8px;">
-      <select name="division" id="division" required>
-        <option value="">이수구분</option>
-        <option value="전공">전공</option>
-        <option value="교양">교양</option>
-        <option value="기타">기타</option>
-      </select>
-      <select name="grade" id="grade" required>
-        <option value="">학년</option>
-        <option value="1">1학년</option>
-        <option value="2">2학년</option>
-        <option value="3">3학년</option>
-        <option value="4">4학년</option>
-      </select>
-      <select name="subject" id="subject" required>
-        <option value="">과목</option>
-        <option value="OS">운영체제</option>
-        <option value="Net">컴퓨터네트워크</option>
-        <option value="PL">프로그래밍언어론</option>
-        <!-- 필요에 따라 추가 -->
-      </select>
-    </div>
+        <!-- 제목 -->
+        <div class="box-container">
+            <h3>제목</h3>
+            <input type="text" id="title" name="title" required />
+        </div>
 
-    <!-- 3. 파일 업로드 -->
-    <label for="file">파일 업로드 (jpg, png, pdf, pptx 등)</label>
-    <input type="file" id="file" name="file" accept=".jpg,.png,.pdf,.pptx" required />
+        <!-- 카테고리 -->
+        <div class="box-container">
+            <div class="category-group">
+                <!-- 이수구분 -->
+                <div>
+                    <h3>이수구분</h3>
+                    <select name="division" id="division" required>
+                        <option value="">선택</option>
+                        <option value="전공">전공필수</option>
+                        <option value="전공">전공선택</option>
+                        <option value="전공">전공기초</option>
+                        <option value="교양">필수교양</option>
+                        <option value="교양">중핵교양</option>
+                        <option value="교양">토대교양</option>
+                        <option value="교양">공학교양</option>
+                        <option value="자유">자유선택</option>
+                        <option value="기타">기타</option>
+                    </select>
+                </div>
+            
+                <!-- 학년 -->
+                <div>
+                    <h3>학년</h3>
+                    <select name="grade" id="grade" required>
+                        <option value="">선택</option>
+                        <option value="1학년">1학년</option>
+                        <option value="2학년">2학년</option>
+                        <option value="3학년">3학년</option>
+                        <option value="4학년">4학년</option>
+                    </select>
+                </div>
+            
+                <!-- 교과목 -->
+                <div>
+                    <h3>교과목</h3>
+                    <select name="subject" id="subject" required>
+                        <option value="">선택</option>
+                        <option value="운영체제">운영체제</option>
+                        <option value="프로그래밍언어론">프로그래밍언어론</option>
+                        <option value="SW시스템개발및설계I">SW시스템개발및설계I</option>
+                        <option value="컴퓨터네트워크">컴퓨터네트워크</option>
+                    </select>
+                </div>
+            </div>    
+        </div>
+        
+        <div class="box-container">
+            <!-- 파일 업로드 -->
+            <h3>파일 업로드</h3>
+            <p>(pdf, jpg, png, pptx)</p>
+            <input type="file" id="file" name="file" accept=".jpg,.png,.pdf,.pptx" required />
+        
+        </div>
 
-    <!-- 4. 텍스트 내용 -->
-    <label for="content">내용</label>
-    <textarea id="content" name="content" placeholder="여기에 노트 내용을 입력하세요..." required></textarea>
+        <div class="box-container">
+            <!-- 텍스트 내용 넣기-->
+            <h3>내용</h3>
+            <textarea id="content" name="content" placeholder="노트 내용을 입력하세요..." required></textarea>
+        
+            <!-- 저장, 업로드 버튼 -->
+            <div class="buttons">
+                <button type="button" onclick="saveDraft()">임시 저장</button>
+                <button type="submit">업로드</button>
+        
+            </div>
+        </div>
 
-    <!-- 버튼 -->
-    <div class="buttons">
-      <button type="button" onclick="saveDraft()">취소(임시저장)</button>
-      <button type="submit">업로드</button>
-    </div>
-  </form>
+    </form>
 
-  <script>
-    // 업로드 확인
-    document.getElementById('uploadForm').addEventListener('submit', function(e) {
-      if (!confirm('업로드 하시겠습니까?')) {
-        e.preventDefault(); // 취소 시 제출 막기
-      } else {
-        // TODO: 실제로 서버에 파일 경로랑 메타데이터 저장하는 로직 추가
-      }
-    });
+    <script>
+        // 업로드 확인
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        if (!confirm('업로드 하시겠습니까?')) {
+            e.preventDefault(); // 취소 시 제출 막기
+        } else {
+            // TODO: 실제로 서버에 파일 경로랑 메타데이터 저장하는 로직 추가
+        }
+        });
 
-    // 임시저장 버튼 예시 (로컬스토리지에 저장)
-    function saveDraft() {
-      const draft = {
-        title: document.getElementById('title').value,
-        division: document.getElementById('division').value,
-        grade: document.getElementById('grade').value,
-        subject: document.getElementById('subject').value,
-        content: document.getElementById('content').value,
-      };
-      localStorage.setItem('noteDraft', JSON.stringify(draft));
-      alert('임시저장 되었습니다!');
-    }
+        // 임시저장 버튼 예시 (로컬스토리지에 저장)
+        function saveDraft() {
+        const draft = {
+            title: document.getElementById('title').value,
+            division: document.getElementById('division').value,
+            grade: document.getElementById('grade').value,
+            subject: document.getElementById('subject').value,
+            content: document.getElementById('content').value,
+        };
+        localStorage.setItem('noteDraft', JSON.stringify(draft));
+        alert('임시저장 되었습니다!');
+        }
 
-    // 로드 시 임시저장 불러오기
-    window.addEventListener('load', () => {
-      const draft = JSON.parse(localStorage.getItem('noteDraft') || '{}');
-      if (draft.title) {
-        document.getElementById('title').value = draft.title;
-        document.getElementById('division').value = draft.division;
-        document.getElementById('grade').value = draft.grade;
-        document.getElementById('subject').value = draft.subject;
-        document.getElementById('content').value = draft.content;
-      }
-    });
-  </script>
+        // 로드 시 임시저장 불러오기
+        window.addEventListener('load', () => {
+        const draft = JSON.parse(localStorage.getItem('noteDraft') || '{}');
+        if (draft.title) {
+            document.getElementById('title').value = draft.title;
+            document.getElementById('division').value = draft.division;
+            document.getElementById('grade').value = draft.grade;
+            document.getElementById('subject').value = draft.subject;
+            document.getElementById('content').value = draft.content;
+        }
+        });
+    </script>
 </body>
 </html>
