@@ -101,26 +101,29 @@
         pw: document.getElementById('loginPw').value
       };
   
-      fetch('/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams(data)
-      })
-      .then(response => {
-        if (response.redirected) {
-          window.location.href = response.url; // 로그인 성공하면 메인으로 이동
-        } else {
-          return response.text();
-        }
-      })
-      .then(result => {
-        if (result) alert(result);  // 실패 메시지 띄우기
-      })
-      .catch(err => {
-        console.error('로그인 에러', err);
-      });
+    fetch('/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  },
+  body: new URLSearchParams(data)
+})
+.then(response => {
+  if (response.redirected) {
+    // 로그인 성공하면 사용자 ID를 localStorage에 저장
+    localStorage.setItem('loginUser', data.id);
+    window.location.href = response.url;
+  } else {
+    return response.text();
+  }
+})
+.then(result => {
+  if (result) alert(result);
+})
+.catch(err => {
+  console.error('로그인 에러', err);
+});
+
     });
   </script>
   
