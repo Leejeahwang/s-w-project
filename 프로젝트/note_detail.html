@@ -1,144 +1,92 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>노트 상세 보기</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>노트 상세보기</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
       margin: 0;
-      padding: 20px;
-      background-color: #f9f9f9;
+      padding: 40px 20px;
     }
 
     .container {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .left-panel {
-      flex: 3;
-      min-width: 300px;
-    }
-
-    .right-panel {
-      flex: 1;
-      min-width: 250px;
-      background-color: #fff;
-      padding: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      height: fit-content;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
 
-    .pdf-preview {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
+    h1 {
+      margin-top: 0;
+      font-size: 1.8em;
     }
 
-    .note-description {
-      background-color: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+    .meta {
+      color: #666;
+      font-size: 0.95em;
+      margin-bottom: 10px;
     }
 
-    .comments {
-      background-color: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    .summary {
+      margin-top: 20px;
+      line-height: 1.6;
     }
 
-    .comment {
-      border-bottom: 1px solid #eee;
-      padding: 8px 0;
-    }
-
-    .comment:last-child {
-      border-bottom: none;
-    }
-
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      resize: vertical;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .download-box {
-      text-align: center;
-    }
-
-    .download-box button {
-      margin-top: 12px;
-      padding: 10px 16px;
+    .download-btn {
+      margin-top: 30px;
+      padding: 12px 20px;
       background-color: #4caf50;
       color: white;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
       font-size: 1em;
+      cursor: pointer;
     }
 
-    .download-box button:hover {
+    .download-btn:hover {
       background-color: #45a045;
     }
 
-    .file-info {
-      margin-top: 10px;
-      font-size: 0.9em;
-      color: #666;
+    a.back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #4caf50;
+      text-decoration: none;
+    }
+
+    a.back-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
-  <h1>자료구조 중간 정리</h1>
-
   <div class="container">
-    <!-- Left Panel -->
-    <div class="left-panel">
-      <!-- PDF 첫 장 미리보기 -->
-      <img src="pdf-first-page.jpg" alt="PDF 첫 장 미리보기" class="pdf-preview">
+    <a href="/" class="back-link">← 목록으로 돌아가기</a>
 
-      <!-- 글쓴이 내용 -->
-      <div class="note-description">
-        <h3>노트 설명</h3>
-        <p>연결 리스트, 스택, 큐를 중심으로 정리했습니다. 시험에 자주 나오는 부분 위주로 요약했고, 그림과 함께 정리되어 있어서 보기 쉽습니다.</p>
-      </div>
+    <h1>자료구조 중간 정리</h1>
+    <div class="meta">컴퓨터공학과 | 홍길동 | 2024-2학기</div>
 
-      <!-- 댓글 -->
-      <div class="comments">
-        <h3>댓글</h3>
-
-        <div class="comment"><strong>이영희:</strong> 너무 잘 정리되어 있어요. 감사합니다!</div>
-        <div class="comment"><strong>박철수:</strong> 시험 전에 큰 도움이 됐습니다.</div>
-
-        <textarea placeholder="댓글을 입력하세요..."></textarea>
-        <button style="margin-top: 10px;">댓글 작성</button>
-      </div>
+    <div class="summary">
+      이 요약 노트는 자료구조 수업의 중간고사를 대비하여 작성되었습니다.<br />
+      주요 내용은 다음과 같습니다:
+      <ul>
+        <li>연결 리스트 종류 및 구현 방법</li>
+        <li>스택과 큐의 차이점 및 응용</li>
+        <li>시간복잡도 비교 및 정리</li>
+        <li>자료구조별 삽입/삭제 알고리즘 요약</li>
+      </ul>
+      수업에서 다룬 예제를 중심으로 핵심 개념을 요약했습니다.
     </div>
 
-    <!-- Right Panel -->
-    <div class="right-panel">
-      <div class="download-box">
-        <h3>다운로드</h3>
-        <button>PDF 다운로드</button>
-        <div class="file-info">
-          파일명: data_structure_mid_summary.pdf<br>
-          용량: 1.8MB<br>
-          업로드: 2025-04-30
-        </div>
-      </div>
-    </div>
+    <button class="download-btn" onclick="alert('다운로드 기능은 아직 구현되지 않았습니다.')">
+      PDF 다운로드
+    </button>
   </div>
 
 </body>
