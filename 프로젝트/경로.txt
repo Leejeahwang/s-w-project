@@ -6,11 +6,11 @@
   │     ├── pdf.js
   │     └── pdf.worker.js
   ├── public/
-  │	    ├── files
-  │ 	├── style
-  │     ├── js
+  │	    ├── files/
+  │ 	  ├── style/
+  │     ├── js/
   │	    │    ├── board.js
-  │	    │	 └── pdf_viewer.js
+  │	    │	   └── pdf_viewer.js
   │     ├── board.html
   │     ├── index.html
   │     ├── login.html
