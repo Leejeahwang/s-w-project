@@ -44,10 +44,8 @@
       <div class="right-panel">
         <div class="download-box">
           <h3>다운로드</h3>
-          <!-- 파일을 동적으로 관리 -->
-          <a id = "downloadLink" href="#" download class="download-btn">PDF 다운로드</a>
-          <div id = "fileInfo" class="file-info">
-            <!-- 파일 정보가 여기에 들어감 -->
+          <a href="files/data_structure_mid_summary.pdf" download class="download-btn">PDF 다운로드</a>
+          <div class="file-info">
             파일명: data_structure_mid_summary.pdf<br>
             용량: 1.8MB<br>
             업로드: 2025-04-30
