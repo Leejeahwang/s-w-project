@@ -12,7 +12,7 @@
     <!-- Left Panel -->
     <div class="left-panel">
       <!-- PDF 첫 장 미리보기 -->
-      <img src="pdf-first-page.jpg" alt="PDF 첫 장 미리보기" class="pdf-preview">
+      <canvas id="pdf-canvas" width="400"></canvas>
 
       <!-- 글쓴이 내용 -->
       <div class="note-description">
@@ -46,9 +46,48 @@
       <div class="like-download-stats">
         <button id="likeBtn">👍 좋아요 (<span id="likeCount">0</span>)</button>
         <p>📥 다운로드 수: <span id="downloadCount">0</span></p>
-      </div>      
+      </div>
     </div>
   </div>
+
+  <script>
+    let likeCount = 0;
+    let downloadCount = 0;
+
+    document.getElementById("likeBtn").addEventListener("click", function() {
+      likeCount++;
+      document.getElementById("likeCount").textContent = likeCount;
+    });
+    document.querySelector('.download-btn').addEventListener('click', function () {
+      downloadCount++;
+      document.getElementById('downloadCount').textContent = downloadCount;
+    });
+  </script>
+
+  <script type="module">
+    import * as pdfjsLib from './pdfjs/pdf.mjs';
+
+    const url = './files/data_structure_mid_summary.pdf';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = './pdfjs/pdf.worker.mjs';
+
+    pdfjsLib.getDocument(url).promise.then(function (pdfDoc) {
+      return pdfDoc.getPage(1);
+    }).then(function (page) {
+      const scale = 1.5;
+      const viewport = page.getViewport({ scale: scale });
+
+      const canvas = document.getElementById('pdf-canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport
+      };
+      page.render(renderContext);
+    });
+  </script>
 
 </body>
 </html>

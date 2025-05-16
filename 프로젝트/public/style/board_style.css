@@ -26,6 +26,14 @@ body {
     height: fit-content;
   }
 
+  #pdf-canvas {
+    max-width: 100%;
+    width: 3000px;
+    height: auto;
+    display: block;
+    margin-bottom: 20px;
+  }
+
   .pdf-preview {
     width: 100%;
     border-radius: 8px;
