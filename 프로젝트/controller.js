@@ -1,122 +1,98 @@
-const fs = require('fs');
-const http = require('http');
+const express = require('express');
+const session = require('express-session');
 const mysql = require('mysql2');
+const path = require('path');
 
+const app = express();
+app.use(express.urlencoded({ extended: true }));
+
+// 세션 설정
+app.use(session({
+  secret: 'mySecretKey123',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 } // 1시간
+}));
+
+// DB 연결
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',    // 너의 MySQL 유저명
-    password: '1234', // 너의 MySQL 비번
-    database: 'userdb' // 사용할 데이터베이스 이름
+  host: 'localhost',
+  user: 'root',
+  password: '1234',
+  database: 'userdb'
 });
 
-// 연결 확인
-db.connect((err) => {
-    if (err) {
-        console.error('DB 연결 실패:', err);
-        return;
-    }
-    console.log('DB 연결 성공!');
+db.connect(err => {
+  if (err) console.error('DB 연결 실패:', err);
+  else console.log('DB 연결 성공!');
 });
 
-const server = http.createServer((req, res) => {
-    if (req.url === '/' && req.method === 'GET') {
-        fs.readFile('./index.html', (err, data) => {
-            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(err ? '페이지 로드 오류' : data);
-        });
-    }
+// 정적 파일 제공
+app.use(express.static(__dirname));
 
-    else if (req.url === '/note_detail' && req.method === 'GET') {
-        fs.readFile('./note_detail.html', (err, data) => {
-            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(err ? '페이지 로드 오류' : data);
-        });
-    }
-
-    else if (req.url === '/signup.html' && req.method === 'GET') {
-        fs.readFile('./signup.html', (err, data) => {
-            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(err ? '페이지 로드 오류' : data);
-        });
-    }
-
-    else if (req.url === '/login.html' && req.method === 'GET') {
-        fs.readFile('./login.html', (err, data) => {
-            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(err ? '페이지 로드 오류' : data);
-        });
-    }
-
-    else if (req.url === '/signup' && req.method === 'POST') {
-        let body = '';
-        req.on('data', (chunk) => {
-            body += chunk;
-        });
-    
-        req.on('end', () => {
-            const params = new URLSearchParams(body);
-            const username = params.get('id');
-            const password = params.get('pw');
-            const name = params.get('name');
-            const studentId = params.get('studentId');
-            const grade = params.get('grade');
-    
-            db.query('INSERT INTO users (username, password, name, studentId, grade) VALUES (?, ?, ?, ?, ?)',
-                [username, password, name, studentId, grade],
-                (err, results) => {
-                    if (err) {
-                        console.error('회원가입 실패:', err);
-                        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end('회원가입 실패');
-                        return;
-                    }
-                    res.writeHead(302, { Location: '/' });
-                    res.end();
-                }
-            );
-        });
-    }
-
-    else if (req.url === '/login' && req.method === 'POST') {
-        let body = '';
-        req.on('data', (chunk) => {
-            body += chunk;
-        });
-    
-        req.on('end', () => {
-            const params = new URLSearchParams(body);
-            const username = params.get('id');
-            const password = params.get('pw');
-    
-            db.query('SELECT * FROM users WHERE username = ? AND password = ?', 
-                [username, password], 
-                (err, results) => {
-                    if (err) {
-                        console.error('로그인 실패:', err);
-                        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end('로그인 실패');
-                        return;
-                    }
-    
-                    if (results.length > 0) {
-                        res.writeHead(302, { Location: '/' });
-                        res.end();
-                    } else {
-                        res.writeHead(401, { 'Content-Type': 'text/plain; charset=utf-8' });
-                        res.end('로그인 실패: 아이디 또는 비밀번호 불일치');
-                    }
-                }
-            );
-        });
-    }
-    
-    else {
-        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-        res.end('페이지를 찾을 수 없습니다.');
-    }
-
+// 메인
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-server.listen(3000, () => {
-    console.log('http://localhost:3000 에서 서버 실행 중');
+// 회원가입 GET
+app.get('/signup.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'signup.html'));
+});
+
+// 회원가입 POST
+app.post('/signup', (req, res) => {
+  const { id, pw, name, studentId, grade } = req.body;
+
+  db.query('INSERT INTO users (username, password, name, studentId, grade) VALUES (?, ?, ?, ?, ?)',
+    [id, pw, name, studentId, grade],
+    (err) => {
+      if (err) {
+        console.error('회원가입 오류:', err);
+        return res.status(500).send('회원가입 실패');
+      }
+      res.redirect('/login.html');
+    }
+  );
+});
+
+// 로그인 GET
+app.get('/check-login', (req, res) => {
+  res.json({
+    loggedIn: !!req.session.user,
+    id: req.session.user?.id || null
+  });
+});
+
+
+// 로그인 POST
+app.post('/login', (req, res) => {
+  const { id, pw } = req.body;
+
+  db.query('SELECT * FROM users WHERE username = ? AND password = ?', [id, pw], (err, results) => {
+    if (err) return res.status(500).send('로그인 오류');
+
+    if (results.length > 0) {
+      req.session.user = { id };
+      res.redirect('/');
+    } else {
+      res.send('<script>alert("로그인 실패"); window.location="/login.html";</script>');
+    }
+  });
+});
+
+// 로그아웃
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
+});
+
+app.get('/check-login', (req, res) => {
+  res.json({ loggedIn: !!req.session.user });
+});
+
+// 서버 실행
+app.listen(3000, () => {
+  console.log('http://localhost:3000 에서 실행 중');
 });

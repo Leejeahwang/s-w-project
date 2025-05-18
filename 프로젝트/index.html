@@ -142,34 +142,47 @@
   </div>
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const topControls = document.querySelector('.auth-buttons');
-      const loginUser = localStorage.getItem('loginUser');
+  window.addEventListener('DOMContentLoaded', () => {
+    const topControls = document.querySelector('.auth-buttons');
 
-      topControls.innerHTML = ''; // 초기화
+    fetch('/check-login')
+      .then(res => res.json())
+      .then(data => {
+        topControls.innerHTML = '';
 
-      if (loginUser) {
-        const logoutButton = document.createElement('button');
-        logoutButton.textContent = '로그아웃';
-        logoutButton.onclick = () => {
-          localStorage.removeItem('loginUser');
-          window.location.reload();
-        };
-        topControls.appendChild(logoutButton);
-      } else {
-        const signupButton = document.createElement('button');
-        signupButton.textContent = '회원가입';
-        signupButton.onclick = () => location.href = 'signup.html';
+        if (data.loggedIn) {
+          // ✨ 환영 메시지 생성
+          const welcomeText = document.createElement('span');
+          welcomeText.textContent = `환영합니다! ${data.id}님`;
+          welcomeText.style.marginRight = '10px';
+          welcomeText.style.fontWeight = 'bold';
 
-        const loginButton = document.createElement('button');
-        loginButton.textContent = '로그인';
-        loginButton.onclick = () => location.href = 'login.html';
+          // 로그아웃 버튼 생성
+          const logoutButton = document.createElement('button');
+          logoutButton.textContent = '로그아웃';
+          logoutButton.onclick = () => location.href = '/logout';
 
-        topControls.appendChild(signupButton);
-        topControls.appendChild(loginButton);
-      }
-    });
-  </script>
+          // 추가
+          topControls.appendChild(welcomeText);
+          topControls.appendChild(logoutButton);
+        } else {
+          const signupButton = document.createElement('button');
+          signupButton.textContent = '회원가입';
+          signupButton.onclick = () => location.href = 'signup.html';
+
+          const loginButton = document.createElement('button');
+          loginButton.textContent = '로그인';
+          loginButton.onclick = () => location.href = 'login.html';
+
+          topControls.appendChild(signupButton);
+          topControls.appendChild(loginButton);
+        }
+      })
+      .catch(err => {
+        console.error('로그인 상태 확인 실패:', err);
+      });
+  });
+</script>
 
 </body>
 </html>

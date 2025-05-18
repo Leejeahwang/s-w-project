@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>노트 게시판</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-right: 20px; /* 오른쪽 여백 추가 */
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center; /* 환영 메시지와 버튼 정렬 */
+    }
+
+    .auth-buttons button, .create-btn, .filter-btn { /* 공통 버튼 스타일 */
+      padding: 8px 16px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    .filter-btn { /* 필터 버튼만 다른 색 */
+        background-color: #e0e0e0;
+        color: black;
+    }
+
+    .auth-buttons button:hover, .create-btn:hover, .filter-btn:hover {
+      opacity: 0.9;
+    }
+    .filter-btn:hover {
+        background-color: #d0d0d0;
+    }
+
+
+    .header-title {
+      text-align: center;
+      margin-bottom: 20px; /* 간격 조정 */
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+
+    .search-controls { /* 검색창, 필터, 노트 추가 버튼을 묶는 컨테이너 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 30px;
+      flex-wrap: wrap; /* 화면 작을 때 줄바꿈 */
+    }
+
+    .search-controls input[type="text"] {
+      padding: 10px;
+      width: 300px; /* 너비 조정 가능 */
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+
+    .filter-panel {
+      max-width: 600px;
+      margin: 0 auto 20px auto;
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      display: none; /* 기본 숨김 */
+      flex-direction: column;
+      gap: 16px;
+    }
+    .filter-panel .filter-section { /* 필터 패널 내부 섹션 */
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .filter-panel select,
+    .filter-panel input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box; /* 패딩 포함하여 너비 계산 */
+    }
+    .filter-panel button { /* 필터 패널 내 검색 버튼 */
+        align-self: flex-end; /* 오른쪽 정렬 */
+    }
+
+
+    .create-form { /* 노트 생성 폼 스타일 */
+      max-width: 600px;
+      margin: 0 auto 20px auto;
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      display: none; /* 기본 숨김 */
+      flex-direction: column;
+      gap: 16px;
+    }
+    .create-form .filter-section { /* 생성 폼 내부 섹션 (클래스명 재활용) */
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .create-form input[type="text"], .create-form select, .create-form textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .create-form textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    .create-form button { /* 생성 폼 내 노트 추가 버튼 */
+        align-self: flex-end;
+    }
+
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 0 10px; /* 좌우 패딩 */
+    }
+
+    .note-card {
+      background-color: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex; /* 내부 요소 정렬을 위해 flex 사용 */
+      flex-direction: column;
+    }
+
+    .note-card h3 {
+      margin: 0 0 10px;
+      font-size: 1.2em; /* 제목 크기 조정 */
+    }
+
+    .note-card p {
+      color: #666;
+      font-size: 0.9em;
+      flex-grow: 1; /* 내용 부분이 남은 공간을 차지하도록 */
+      margin-bottom: 10px;
+    }
+
+    .note-footer {
+      margin-top: 10px;
+      font-size: 0.85em;
+      color: #999;
+      border-top: 1px solid #eee; /* 구분선 */
+      padding-top: 8px;
+    }
+
+    .note-card button { /* 노트 카드 내 버튼 */
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      align-self: flex-start; /* 버튼 왼쪽 정렬 */
+    }
+
+    .note-card button:hover {
+      background-color: #45a045;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    a:hover h3 { /* 제목에 마우스 올리면 효과 */
+        color: #2a752d;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-top">
+    <div class="auth-buttons">
+      <!-- 로그인 상태에 따라 내용이 동적으로 채워짐 -->
+    </div>
+  </div>
+
+  <div class="header-title">
+    <h1>요약 노트 공유 게시판</h1>
+  </div>
+
+  <div class="search-controls">
+    <input type="text" id="main-search" placeholder="과목명, 교수명, 이수 구분..." />
+    <button class="filter-btn" onclick="toggleFilter()">필터</button>
+    <button class="create-btn" id="showCreateNoteFormBtn" onclick="showCreateForm()">노트 추가</button>
+  </div>
+
+  <!-- 필터 패널 -->
+  <div class="filter-panel" id="filterPanel">
+    <div class="filter-section">
+      <label for="filter-subject">교과명</label>
+      <input type="text" id="filter-subject" placeholder="예: 자료구조, 운영체제 등" />
+    </div>
+    <div class="filter-section">
+      <label for="filter-professor">교수명</label>
+      <input type="text" id="filter-professor" placeholder="예: 김교수" />
+    </div>
+    <div class="filter-section">
+      <label for="filter-category">이수 구분</label>
+      <select id="filter-category">
+        <option value="">전체</option>
+        <option value="전공필수">전공필수</option>
+        <option value="전공선택">전공선택</option>
+        <option value="교양">교양</option>
+      </select>
+    </div>
+    <button class="filter-btn" onclick="applyFilter()">필터 적용</button>
+  </div>
+
+  <!-- 노트 생성 폼 -->
+  <div class="create-form" id="createForm">
+    <div class="filter-section"> <!-- 클래스명 재활용 -->
+      <label for="new-subject">교과명</label>
+      <input type="text" id="new-subject" placeholder="예: 자료구조, 운영체제 등" />
+    </div>
+    <div class="filter-section">
+      <label for="new-professor">교수명</label>
+      <input type="text" id="new-professor" placeholder="예: 김교수" />
+    </div>
+    <div class="filter-section">
+      <label for="new-category">이수 구분</label>
+      <select id="new-category">
+        <option value="전공필수">전공필수</option>
+        <option value="전공선택">전공선택</option>
+        <option value="교양">교양</option>
+      </select>
+    </div>
+    <div class="filter-section">
+      <label for="new-summary">요약</label>
+      <textarea id="new-summary" placeholder="요약 내용을 작성하세요..."></textarea>
+    </div>
+    <button class="create-btn" onclick="createNote()">노트 작성 완료</button>
+  </div>
+
+  <div class="note-grid">
+    <!-- 예시 카드 (실제로는 main.js나 서버에서 데이터를 받아 동적으로 생성) -->
+    <div class="note-card" data-subject="자료구조" data-professor="홍길동" data-category="전공필수">
+      <a href="/note_detail?id=1"> <!-- 예시로 id 파라미터 추가 -->
+        <h3>자료구조 중간 정리</h3>
+      </a>
+      <p>연결 리스트, 스택/큐 위주 요약. 시간 복잡도 분석 포함.</p>
+      <div class="note-footer">작성자: 홍길동 | 이수구분: 전공필수</div>
+      <button>상세보기</button> <!-- 버튼 텍스트 변경 -->
+    </div>
+
+    <div class="note-card" data-subject="운영체제" data-professor="이영희" data-category="전공선택">
+      <a href="/note_detail?id=2">
+        <h3>운영체제 핵심 정리</h3>
+      </a>
+      <p>프로세스, 스케줄링, 교착상태, 세마포어 및 뮤텍스 개념 요약.</p>
+      <div class="note-footer">작성자: 이영희 | 이수구분: 전공선택</div>
+      <button>상세보기</button>
+    </div>
+    <!-- 노트 카드들이 여기에 추가됨 -->
+  </div>
+
+  <script src="/public/main.js"></script>
+  <script>
+  // 로그인 상태 확인 및 UI 업데이트
+  window.addEventListener('DOMContentLoaded', () => {
+    const authButtonsContainer = document.querySelector('.auth-buttons');
+    const showCreateNoteFormBtn = document.getElementById('showCreateNoteFormBtn');
+
+    fetch('/check-login')
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        authButtonsContainer.innerHTML = ''; // 기존 내용 초기화
+
+        if (data.loggedIn && data.id) {
+          const welcomeText = document.createElement('span');
+          welcomeText.textContent = `환영합니다, ${data.id}님!`;
+          welcomeText.style.marginRight = '15px';
+          welcomeText.style.fontWeight = 'bold';
+
+          const logoutButton = document.createElement('button');
+          logoutButton.textContent = '로그아웃';
+          logoutButton.onclick = () => location.href = '/logout';
+
+          authButtonsContainer.appendChild(welcomeText);
+          authButtonsContainer.appendChild(logoutButton);
+
+          // 로그인 시 "노트 추가" 버튼 활성화 (또는 항상 보이게 하고, createNote에서 로그인 체크)
+          if(showCreateNoteFormBtn) showCreateNoteFormBtn.style.display = 'inline-block';
+
+        } else {
+          const signupButton = document.createElement('button');
+          signupButton.textContent = '회원가입';
+          signupButton.onclick = () => location.href = 'signup.html';
+
+          const loginButton = document.createElement('button');
+          loginButton.textContent = '로그인';
+          loginButton.onclick = () => location.href = 'login.html';
+
+          authButtonsContainer.appendChild(signupButton);
+          authButtonsContainer.appendChild(loginButton);
+
+          // 로그아웃 시 "노트 추가" 버튼 숨기기 (선택적)
+          if(showCreateNoteFormBtn) showCreateNoteFormBtn.style.display = 'none';
+        }
+      })
+      .catch(err => {
+        console.error('로그인 상태 확인 실패:', err);
+        authButtonsContainer.innerHTML = '<span style="color:red;">로그인 상태를 불러올 수 없습니다.</span>';
+        if(showCreateNoteFormBtn) showCreateNoteFormBtn.style.display = 'none';
+      });
+
+      // 초기 노트 로드 (예시: 실제로는 서버에서 가져와야 함)
+      // loadInitialNotes(); // main.js에 이 함수가 정의되어 있다고 가정
+  });
+</script>
+
+</body>
+</html>
