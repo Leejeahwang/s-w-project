@@ -1,9 +1,10 @@
+// 사용자 동작 처리 + 서버 요청(fetch)
 const noteId = 1; // 디버깅용
 
-// 다운로드 수 버튼, 좋아요 수 버튼 누르면 +1 되는 JS
 let likeCount = 0;
 let downloadCount = 0;
 
+// 좋아요 수 버튼 누르면 +1
 document.getElementById("likeBtn").addEventListener("click", async function() {
     likeCount++;
     document.getElementById("likeCount").textContent = likeCount;
@@ -15,6 +16,7 @@ document.getElementById("likeBtn").addEventListener("click", async function() {
     document.getElementById("likeCount").textContent = note.like_count;
 });
 
+// 다운로드 수 버튼 누르면 +1
 document.querySelector('.download-btn').addEventListener('click', async function () {
     downloadCount++;
     document.getElementById('downloadCount').textContent = downloadCount;
