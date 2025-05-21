@@ -10,7 +10,12 @@
   <form method="POST" action="/notes">
     <input name="subject"    placeholder="교과명"   required />
     <input name="professor"  placeholder="교수명"   />
-    <input name="category"   placeholder="카테고리" />
+    <label for="category">이수 구분</label>
+    <select name="category" id="category">
+      <option value="전공필수">전공필수</option>
+      <option value="전공선택">전공선택</option>
+      <option value="교양">교양</option>
+    </select>
     <textarea name="summary" placeholder="요약" required></textarea>
     <button type="submit">저장</button>
   </form>

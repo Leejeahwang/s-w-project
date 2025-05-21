@@ -10,10 +10,14 @@
   <form method="POST" action="/notes/<%= note.id %>/edit">
     <input name="subject"    value="<%= note.subject %>"    required />
     <input name="professor"  value="<%= note.professor %>"  />
-    <input name="category"   value="<%= note.category %>"   />
+    <select name="category" id="note.category">
+      <option value="전공필수">전공필수</option>
+      <option value="전공선택">전공선택</option>
+      <option value="교양">교양</option>
+    </select>
     <textarea name="summary" required><%= note.summary %></textarea>
     <button type="submit">저장</button>
   </form>
-  <a href="/notes/<%= note.id %>">상세로 돌아가기</a>
+  <a href="/notes">목록으로 돌아가기</a>
 </body>
 </html>

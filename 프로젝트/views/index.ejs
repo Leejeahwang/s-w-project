@@ -22,7 +22,9 @@
       <input name="professor"  placeholder="교수명"   value="<%= filters.professor %>" />
       <select name="category">
         <option value="" <%= filters.category === '' ? 'selected' : '' %>>전체</option>
-        <option value="algorithm" <%= filters.category==='algorithm'? 'selected':'' %>>Algorithm</option>
+        <option value="전공필수" <%= filters.category==='전공필수'? 'selected':'' %>>전공필수</option>
+        <option value="전공선택" <%= filters.category==='전공선택'? 'selected':'' %>>전공선택</option>
+        <option value="교양"     <%= filters.category==='교양'?     'selected':'' %>>교양</option>
       </select>
       <button type="submit">적용</button>
     </form>
@@ -36,8 +38,10 @@
       <% notes.forEach(n => { %>
         <article class="note-card">
           <h3><a href="/notes/<%= n.id %>"><%= n.subject %></a></h3>
-          <p><%= n.summary %></p>
-          <small>작성자: <%= n.authorName %></small>
+          <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
+          <small>
+            작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
+          </small>
         </article>
       <% }) %>
     <% } else { %>
