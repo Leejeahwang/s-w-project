@@ -1,0 +1,69 @@
+CREATE DATABASE IF NOT EXISTS myboard;
+USE myboard;
+
+CREATE TABLE IF NOT EXISTS posts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE posts
+ADD COLUMN category VARCHAR(50),
+ADD COLUMN subject VARCHAR(100),
+ADD COLUMN year VARCHAR(10),
+ADD COLUMN semester VARCHAR(20);
+
+CREATE TABLE categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE subjects (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE years (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE semesters (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(20) NOT NULL
+);
+
+
+-- categories 테이블에 데이터 추가
+INSERT INTO categories (name) VALUES
+('전공필수'),
+('전공선택'),
+('교양'),
+('기타');
+
+-- subjects 테이블에 데이터 추가
+INSERT INTO subjects (name) VALUES
+('자료구조'),
+('운영체제'),
+('알고리즘'),
+('컴파일러');
+
+-- years 테이블에 데이터 추가
+INSERT INTO years (name) VALUES
+('1학년'),
+('2학년'),
+('3학년'),
+('4학년');
+
+-- semesters 테이블에 데이터 추가
+INSERT INTO semesters (name) VALUES
+('2024-1학기'),
+('2024-2학기'),
+('2025-1학기');
+
+
+
+
+select * from posts;
+
