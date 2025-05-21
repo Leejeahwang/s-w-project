@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>게시글 목록</title>
+</head>
+<body>
+  <h1>게시글 목록</h1>
+  <p><a href="/posts/create">새 글 작성</a></p>
+
+  <!-- 필터 폼 -->
+  <form method="GET" action="/posts">
+    <label>카테고리:
+      <select name="category">
+        <option value="전체" <%= (!selected.category || selected.category === '전체') ? 'selected' : '' %>>전체</option>
+        <% categories.forEach(c => { %>
+          <option value="<%= c.name %>" <%= selected.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label>과목:
+      <select name="subject">
+        <option value="전체" <%= (!selected.subject || selected.subject === '전체') ? 'selected' : '' %>>전체</option>
+        <% subjects.forEach(s => { %>
+          <option value="<%= s.name %>" <%= selected.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label>학년:
+      <select name="year">
+        <option value="전체" <%= (!selected.year || selected.year === '전체') ? 'selected' : '' %>>전체</option>
+        <% years.forEach(y => { %>
+          <option value="<%= y.name %>" <%= selected.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label>학기:
+      <select name="semester">
+        <option value="전체" <%= (!selected.semester || selected.semester === '전체') ? 'selected' : '' %>>전체</option>
+        <% semesters.forEach(sm => { %>
+          <option value="<%= sm.name %>" <%= selected.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <button type="submit">필터 적용</button>
+
+
+    <label>검색:
+      <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
+    </label>
+
+    <button type="submit">검색</button>
+  </form>
+
+  <ul>
+    <% if (posts.length === 0) { %>
+      <li>게시물이 없습니다.</li>
+    <% } else { %>
+      <% posts.forEach(post => { %>
+        <li>
+          <strong><%= post.title %></strong>
+          <em>(<%= post.created_at.toISOString().slice(0,19).replace('T',' ') %>)</em>
+          <p><%= post.content %></p>
+          <form action="/posts/delete/<%= post.id %>" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?');" style="display:inline;">
+            <a href="/posts/edit/<%= post.id %>">✏ 수정</a>
+            <button type="submit">🗑 삭제</button>
+          </form>
+        </li>
+      <% }) %>
+    <% } %>
+  </ul>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>게시글 수정</title>
+</head>
+<body>
+  <h1>게시글 수정</h1>
+  <form action="/posts/edit/<%= post.id %>" method="POST">
+    <p>제목:<br><input type="text" name="title" value="<%= post.title %>" required></p>
+    <p>내용:<br><textarea name="content" rows="6" cols="50" required><%= post.content %></textarea></p>
+    <button type="submit">수정 완료</button>
+  </form>
+  <p><a href="/posts">← 목록으로</a></p>
+</body>
+</html>
