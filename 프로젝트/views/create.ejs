@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>노트 작성</title>
+</head>
+<body>
+  <h2>새 노트 작성</h2>
+  <form method="POST" action="/notes">
+    <input name="subject"    placeholder="교과명"   required />
+    <input name="professor"  placeholder="교수명"   />
+    <input name="category"   placeholder="카테고리" />
+    <textarea name="summary" placeholder="요약" required></textarea>
+    <button type="submit">저장</button>
+  </form>
+  <a href="/notes">목록으로 돌아가기</a>
+</body>
+</html>

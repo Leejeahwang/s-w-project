@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>노트 수정</title>
+</head>
+<body>
+  <h2>노트 수정</h2>
+  <form method="POST" action="/notes/<%= note.id %>/edit">
+    <input name="subject"    value="<%= note.subject %>"    required />
+    <input name="professor"  value="<%= note.professor %>"  />
+    <input name="category"   value="<%= note.category %>"   />
+    <textarea name="summary" required><%= note.summary %></textarea>
+    <button type="submit">저장</button>
+  </form>
+  <a href="/notes/<%= note.id %>">상세로 돌아가기</a>
+</body>
+</html>

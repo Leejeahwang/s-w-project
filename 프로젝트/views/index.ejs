@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>노트 목록</title>
+</head>
+<body>
+  <header>
+    <% if (user) { %>
+      <span>안녕하세요, <%= user.username %>님</span>
+      <a href="/logout">로그아웃</a>
+    <% } else { %>
+      <a href="/login">로그인</a> |
+      <a href="/signup">회원가입</a>
+    <% } %>
+  </header>
+
+  <section class="filter-form">
+    <form method="GET" action="/notes">
+      <input name="subject"    placeholder="교과명"   value="<%= filters.subject %>" />
+      <input name="professor"  placeholder="교수명"   value="<%= filters.professor %>" />
+      <select name="category">
+        <option value="" <%= filters.category === '' ? 'selected' : '' %>>전체</option>
+        <option value="algorithm" <%= filters.category==='algorithm'? 'selected':'' %>>Algorithm</option>
+      </select>
+      <button type="submit">적용</button>
+    </form>
+    <% if (user) { %>
+      <a href="/notes/new">노트 추가</a>
+    <% } %>
+  </section>
+
+  <section class="notes">
+    <% if (notes.length) { %>
+      <% notes.forEach(n => { %>
+        <article class="note-card">
+          <h3><a href="/notes/<%= n.id %>"><%= n.subject %></a></h3>
+          <p><%= n.summary %></p>
+          <small>작성자: <%= n.authorName %></small>
+        </article>
+      <% }) %>
+    <% } else { %>
+      <p>표시할 노트가 없습니다.</p>
+    <% } %>
+  </section>
+</body>
+</html>
