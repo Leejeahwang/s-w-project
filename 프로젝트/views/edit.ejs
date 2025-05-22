@@ -11,9 +11,9 @@
     <input name="subject"    value="<%= note.subject %>"    required />
     <input name="professor"  value="<%= note.professor %>"  />
     <select name="category" id="note.category">
-      <option value="전공필수">전공필수</option>
-      <option value="전공선택">전공선택</option>
-      <option value="교양">교양</option>
+      <option value="전공필수" <%= note.category === '전공필수' ? 'selected' : '' %>>전공필수</option>
+      <option value="전공선택" <%= note.category === '전공선택' ? 'selected' : '' %>>전공선택</option>
+      <option value="교양"     <%= note.category === '교양'     ? 'selected' : '' %>>교양</option>
     </select>
     <textarea name="summary" required><%= note.summary %></textarea>
     <button type="submit">저장</button>

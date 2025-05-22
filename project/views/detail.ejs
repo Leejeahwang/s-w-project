@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>노트 상세</title>
+</head>
+<body>
+  <article>
+    <h2><%= note.subject %></h2>
+    <p>교수: <%= note.professor %></p>
+    <p>카테고리: <%= note.category %></p>
+    <div><%= note.summary %></div>
+    <small>
+      작성자: <%= note.authorName %> /
+      작성시간: <%= note.created_at.getFullYear() %>/<%= (note.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= note.created_at.getDate().toString().padStart(2,'0') %> <%= note.created_at.toLocaleTimeString('ko-KR') %>
+    </small>
+  </article>
+
+  <% if (user && note.user_id === user.user_id) { %>
+    <div>
+      <a href="/notes/<%= note.id %>/edit">수정</a>
+      <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+        <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+      </form>
+    </div>
+  <% } %>
+  
+
+  <section class="comments">
+      <h3>댓글 (<%= comments ? comments.length : 0 %>)</h3>
+
+      <% if (comments && comments.length > 0) { %>
+        <ul class="comments-list">
+          <% comments.forEach(c => { %>
+            <li class="comment-item">
+              <% if (editCommentId === c.id) { %>
+                <!-- 인라인 댓글 수정 폼 -->
+                 <!-- ★ EDITED at 2025-05-23 -->
+                  <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST">
+                    <!-- method-override를 body에서 읽도록 hidden 필드 추가 -->
+                    <input type="hidden" name="_method" value="PUT">
+                    <textarea name="content" rows="3" required><%= c.content %></textarea>
+                    <button type="submit">저장</button>
+                    <a href="/notes/<%= note.id %>">취소</a>
+                  </form>
+              <% } else { %>
+                <!-- 일반 댓글 표시 -->
+                <p><strong><%= c.author %>:</strong> <%= c.content %></p>
+                <small>
+                  <em><%= new Date(c.created_at).toLocaleString('ko-KR') %></em>
+                </small>
+
+                <% /* 수정/삭제 버튼: 로그인 & 작성자 본인만 */ %>
+                <% if (user && user.user_id === c.user_id) { %>
+                  <span class="comment-actions">
+                    <a
+                      href="/notes/<%= note.id %>?editCommentId=<%= c.id %>"
+                    >수정</a>
+                     <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST" style="display:inline">
+                        <!-- 여기에도 hidden 필드로 DELETE 지정 -->
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
+                     </form>
+                  </span>
+                <% } %>
+              <% } %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>아직 댓글이 없습니다.</p>
+      <% } %>
+
+      <% /* 새 댓글 작성 폼 */ %>
+      <% if (user) { %>
+        <form action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form">
+          <h4>새 댓글 작성</h4>
+          <textarea
+            name="content"
+            rows="3"
+            placeholder="댓글을 입력하세요"
+            required
+          ></textarea>
+          <button type="submit">등록</button>
+        </form>
+      <% } else { %>
+        <p>
+          댓글을 작성하려면
+          <a href="/login">로그인</a>이 필요합니다.
+        </p>
+      <% } %>
+    </section>
+
+
+  <a href="/notes">목록으로 돌아가기</a>
+</body>
+</html>
