@@ -52,7 +52,6 @@ insert into categories (name) values("전공선택");
 insert into categories (name) values("교양");
 insert into categories (name) values("기타");
 
-
 CREATE TABLE `semesters` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(20) NOT NULL,

@@ -222,7 +222,7 @@ router.post('/:id/comments', async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
   try {
     const noteId = req.params.id;
-    const userId = req.session.user.userId;
+    const userId = req.session.user.user_id;
     const content = req.body.content;
     await db.promise().query(
       'INSERT INTO comments (note_id, user_id, content) VALUES (?, ?, ?)',
