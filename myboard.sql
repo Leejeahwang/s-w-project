@@ -47,11 +47,24 @@ CREATE TABLE `categories` (
   PRIMARY KEY (`id`)
 );
 
+insert into categories (name) values("전공필수");
+insert into categories (name) values("전공선택");
+insert into categories (name) values("교양");
+insert into categories (name) values("기타");
+
+
 CREATE TABLE `semesters` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
 );
+
+select * from semesters;
+
+insert into semesteres (name) values("2024-1학기");
+insert into semesteres (name) values("2024-2학기");
+insert into semesteres (name) values("2025-1학기");
+
 
 CREATE TABLE `subjects` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -59,9 +72,23 @@ CREATE TABLE `subjects` (
   PRIMARY KEY (`id`)
 );
 
+select * from subjects;
+insert into subjects (name) values("자료구조");
+insert into subjects (name) values("운영체제");
+insert into subjects (name) values("알고리즘");
+insert into subjects (name) values("컴파일러");
+insert into subjects (name) values("수치해석");
+
 CREATE TABLE `years` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
 );
+
+select * from years;
+insert into years (name) values("1학년");
+insert into years (name) values("2학년");
+insert into years (name) values("3학년");
+insert into years (name) values("4학년");
+
 -- semesters, subjects, years라는 테이블로 이런식으로 존재함
