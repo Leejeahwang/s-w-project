@@ -1,77 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <title>게시글 목록</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>노트 목록</title>
 </head>
 <body>
-  <h1>게시글 목록</h1>
-  <p><a href="/posts/create">새 글 작성</a></p>
-
-  <!-- 필터 폼 -->
-  <form method="GET" action="/posts">
-    <label>카테고리:
-      <select name="category">
-        <option value="전체" <%= (!selected.category || selected.category === '전체') ? 'selected' : '' %>>전체</option>
-        <% categories.forEach(c => { %>
-          <option value="<%= c.name %>" <%= selected.category === c.name ? 'selected' : '' %>><%= c.name %></option>
-        <% }) %>
-      </select>
-    </label>
-
-    <label>과목:
-      <select name="subject">
-        <option value="전체" <%= (!selected.subject || selected.subject === '전체') ? 'selected' : '' %>>전체</option>
-        <% subjects.forEach(s => { %>
-          <option value="<%= s.name %>" <%= selected.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
-        <% }) %>
-      </select>
-    </label>
-
-    <label>학년:
-      <select name="year">
-        <option value="전체" <%= (!selected.year || selected.year === '전체') ? 'selected' : '' %>>전체</option>
-        <% years.forEach(y => { %>
-          <option value="<%= y.name %>" <%= selected.year === y.name ? 'selected' : '' %>><%= y.name %></option>
-        <% }) %>
-      </select>
-    </label>
-
-    <label>학기:
-      <select name="semester">
-        <option value="전체" <%= (!selected.semester || selected.semester === '전체') ? 'selected' : '' %>>전체</option>
-        <% semesters.forEach(sm => { %>
-          <option value="<%= sm.name %>" <%= selected.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
-        <% }) %>
-      </select>
-    </label>
-
-    <button type="submit">필터 적용</button>
-
-
-    <label>검색:
-      <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
-    </label>
-
-    <button type="submit">검색</button>
-  </form>
-
-  <ul>
-    <% if (posts.length === 0) { %>
-      <li>게시물이 없습니다.</li>
+  <header>
+    <% if (user) { %>
+      <span>안녕하세요, <%= user.user_id %>님</span>
+      <a href="/logout">로그아웃</a>
     <% } else { %>
-      <% posts.forEach(post => { %>
-        <li>
-          <strong><%= post.title %></strong>
-          <em>(<%= post.created_at.toISOString().slice(0,19).replace('T',' ') %>)</em>
-          <p><%= post.content %></p>
-          <form action="/posts/delete/<%= post.id %>" method="POST" onsubmit="return confirm('정말 삭제하시겠습니까?');" style="display:inline;">
-            <a href="/posts/edit/<%= post.id %>">✏ 수정</a>
-            <button type="submit">🗑 삭제</button>
-          </form>
-        </li>
+      <a href="/login">로그인</a> |
+      <a href="/signup">회원가입</a>
+    <% } %>
+  </header>
+
+  <section class="filter-form">
+    <form method="GET" action="/notes">
+      <label>카테고리:
+        <select name="category">
+          <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
+          <% categories.forEach(c => { %>
+            <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <label>과목:
+        <select name="subject">
+          <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
+          <% subjects.forEach(s => { %>
+            <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <label>학년:
+        <select name="year">
+          <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
+          <% years.forEach(y => { %>
+            <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <label>학기:
+        <select name="semester">
+          <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
+          <% semesters.forEach(sm => { %>
+            <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <button type="submit">필터 적용</button>
+    
+      <label>검색:
+        <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
+      </label>
+    
+      <button type="submit">검색</button>
+    </form>
+    <% if (user) { %>
+      <a href="/notes/new">노트 추가</a>
+    <% } %>
+  </section>
+
+  <section class="notes">
+    <% if (notes.length === 0) { %>
+      <p>표시할 노트가 없습니다.</p>
+    <% } else { %>
+      <% notes.forEach(n => { %>
+        <article class="note-card">
+          <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
+          <p>과목: <%= n.subject %></p>
+          <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
+          <small>
+            작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
+          </small>
+        </article>
       <% }) %>
     <% } %>
-  </ul>
+  </section>
 </body>
 </html>

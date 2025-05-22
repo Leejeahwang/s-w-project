@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>게시글 작성</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>노트 작성</title>
 </head>
 <body>
-  <h1>게시글 작성하기</h1>
-  <form action="/posts/create" method="POST">
+  <h2>새 노트 작성</h2>
+  <form method="POST" action="/notes">
     <p>제목: <input type="text" name="title" required /></p>
-    <p>내용: <textarea name="content" required></textarea></p>
-
-    <p>카테고리:
+    <p>내용: <textarea name="summary" placeholder="요약" required></textarea></p>
+    <p>이수 구분:
       <select name="category">
         <% categories.forEach(c => { %>
           <option value="<%= c.name %>"><%= c.name %></option>
         <% }) %>
       </select>
     </p>
-
     <p>과목:
       <select name="subject">
         <% subjects.forEach(s => { %>
@@ -25,7 +24,6 @@
         <% }) %>
       </select>
     </p>
-
     <p>학년:
       <select name="year">
         <% years.forEach(y => { %>
@@ -33,7 +31,6 @@
         <% }) %>
       </select>
     </p>
-
     <p>학기:
       <select name="semester">
         <% semesters.forEach(sm => { %>
@@ -41,8 +38,11 @@
         <% }) %>
       </select>
     </p>
+    <input name="professor"  placeholder="교수명"   />
 
     <button type="submit">작성 완료</button>
   </form>
+  
+  <a href="/notes">목록으로 돌아가기</a>
 </body>
 </html>
