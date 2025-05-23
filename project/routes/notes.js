@@ -2,55 +2,6 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
-// 노트 상세 + 댓글 렌더링 (inline edit 지원)
-router.get('/:id', async (req, res, next) => {
-  try {
-    const noteId = req.params.id;
-    const editCommentId = parseInt(req.query.editCommentId, 10) || null;
-
-    // 노트 조회
-    const [[note]] = await db.promise().query(
-      'SELECT * FROM notes WHERE id = ?', [noteId]
-    );
-    if (!note) return res.redirect('/notes');
-
-    // 댓글 조회
-    const [comments] = await db.promise().query(
-      `SELECT c.id, c.content, c.created_at, c.user_id, u.user_id AS authorName
-       FROM comments c JOIN users u ON c.user_id = u.user_id
-       WHERE c.note_id = ?
-       ORDER BY c.created_at`,
-      [noteId]
-    );
-
-    res.render('detail', { note, comments, editCommentId });
-  } catch (e) {
-    next(e);
-  }
-});
-
-// 1) 목록 + 필터 (GET /notes)
-// router.get('/', async (req, res, next) => {
-//   try {
-//     const { subject = '', professor = '', category = '' } = req.query;
-//     let sql = `
-//       SELECT n.title, n.id, n.subject, n.professor, n.category, n.summary, n.created_at,
-//              n.user_id, u.user_id AS authorName, n.created_at
-//       FROM notes n
-//       JOIN users u ON n.user_id = u.id
-//       WHERE n.subject LIKE ? AND n.professor LIKE ?
-//     `;
-//     const params = [`%${subject}%`, `%${professor}%`];
-//     if (category) {
-//       sql += ' AND n.category = ?';
-//       params.push(category);
-//     }
-//     sql += ' ORDER BY n.created_at DESC';
-//     const [notes] = await db.promise().query(sql, params);
-//     res.render('index', { notes, filters: { subject, professor, category }, user: req.session.user });
-//   } catch (e) { next(e); }
-// });
-
 router.get('/', async (req, res, next) => {
   try {
     const { category, subject, professor, year, semester, keyword } = req.query;
@@ -123,15 +74,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-
-
-
-// 2) 새 노트 작성 폼 및 처리 (로그인 필요)
-// router.get('/new', (req, res) => {
-//   if (!req.session.user) return res.redirect('/login');
-//   res.render('create', { user: req.session.user });
-// });
-
 router.get('/new', async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
   try {
@@ -166,6 +108,34 @@ router.post('/', async (req, res, next) => {
     next(err);
   }
 });
+// 1) 목록 + 필터 (GET /notes)
+// router.get('/', async (req, res, next) => {
+//   try {
+//     const { subject = '', professor = '', category = '' } = req.query;
+//     let sql = `
+//       SELECT n.title, n.id, n.subject, n.professor, n.category, n.summary, n.created_at,
+//              n.user_id, u.user_id AS authorName, n.created_at
+//       FROM notes n
+//       JOIN users u ON n.user_id = u.id
+//       WHERE n.subject LIKE ? AND n.professor LIKE ?
+//     `;
+//     const params = [`%${subject}%`, `%${professor}%`];
+//     if (category) {
+//       sql += ' AND n.category = ?';
+//       params.push(category);
+//     }
+//     sql += ' ORDER BY n.created_at DESC';
+//     const [notes] = await db.promise().query(sql, params);
+//     res.render('index', { notes, filters: { subject, professor, category }, user: req.session.user });
+//   } catch (e) { next(e); }
+// });
+
+
+// 2) 새 노트 작성 폼 및 처리 (로그인 필요)
+// router.get('/new', (req, res) => {
+//   if (!req.session.user) return res.redirect('/login');
+//   res.render('create', { user: req.session.user });
+// });
 
 // 4) 수정 폼 (GET /notes/:id/edit) - 작성자만
 router.get('/:id/edit', async (req, res, next) => {
@@ -222,26 +192,37 @@ router.post('/:id/delete', async (req, res, next) => {
   }
 });
 
-// 3) 상세 조회 (GET /notes/:id)
+// 노트 상세 + 댓글 렌더링 (inline edit 지원)
 router.get('/:id', async (req, res, next) => {
   try {
-    const [[note]] = await db.promise().query(
-      `SELECT n.id, n.subject, n.professor, n.category, n.summary,
-              n.user_id, u.user_id AS authorName, n.created_at
-       FROM notes n JOIN users u ON n.user_id = u.user_id
-       WHERE n.id = ?`,
-      [req.params.id]
-    );
-    if (!note) return res.status(404).send('노트를 찾을 수 없습니다.');
+    const noteId = req.params.id;
+    const editCommentId = parseInt(req.query.editCommentId, 10) || null;
 
-    const [comments] = await db.promise().query(
-      `SELECT c.id, c.content, c.created_at, u.user_id AS author
-       FROM comments c JOIN users u ON c.user_id = u.user_id
-       WHERE c.note_id = ? ORDER BY c.created_at ASC`,
-      [req.params.id]
+    // 노트 조회
+    const [[note]] = await db.promise().query(
+      `SELECT
+        n.*,
+        u.user_id AS authorName
+      FROM notes n
+      JOIN users u ON n.user_id = u.user_id
+      WHERE n.id = ?`,
+      [noteId]
     );
-    res.render('detail', { note, comments, user: req.session.user });
-  } catch (e) { next(e); }
+    if (!note) return res.redirect('/notes');
+
+    // 댓글 조회
+    const [comments] = await db.promise().query(
+      `SELECT c.id, c.content, c.created_at, c.user_id, u.user_id AS authorName
+       FROM comments c JOIN users u ON c.user_id = u.user_id
+       WHERE c.note_id = ?
+       ORDER BY c.created_at`,
+      [noteId]
+    );
+
+    res.render('detail', { note, comments, editCommentId });
+  } catch (e) {
+    next(e);
+  }
 });
 
 // 댓글 작성 (POST /notes/:id/comments) - 로그인 필요
