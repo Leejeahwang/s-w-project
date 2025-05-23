@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/detail_style.css">
+  <title>노트 상세</title>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <article>
+        <h2><%= note.subject %></h2>
+        <p>교수: <%= note.professor %></p>
+        <p>카테고리: <%= note.category %></p>
+        <canvas id="pdf-canvas" width="400"></canvas>
+        <div><%= note.summary %></div>
+        <small>
+          작성자: <%= note.authorName %> /
+          작성시간: <%= note.created_at.getFullYear() %>/<%= (note.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= note.created_at.getDate().toString().padStart(2,'0') %> <%= note.created_at.toLocaleTimeString('ko-KR') %>
+        </small>
+      </article>
+
+      <% if (user && note.user_id === user.user_id) { %>
+        <div>
+          <a href="/notes/<%= note.id %>/edit">수정</a>
+          <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+            <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+          </form>
+        </div>
+      <% } %>
+  
+      <section class="comments">
+        <h3>댓글</h3>
+        <% if (comments.length) { %>
+          <ul>
+            <% comments.forEach(c => { %>
+              <li><strong><%= c.author %>:</strong> <%= c.content %> <em>(<%= c.created_at.toLocaleString() %>)</em></li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p>댓글이 없습니다.</p>
+        <% } %>
+
+        <% if (user) { %>
+          <form method="POST" action="/notes/<%= note.id %>/comments">
+            <textarea name="content" placeholder="댓글 입력" required></textarea>
+            <button type="submit">댓글 작성</button>
+          </form>
+        <% } else { %>
+          <p>댓글을 작성하려면 <a href="/login">로그인</a>이 필요합니다.</p>
+        <% } %>
+      </section>
+      <a href="/notes">목록으로 돌아가기</a>
+    </div>
+
+    <div class="right-panel">
+      <!-- 다운로드 박스 -->
+      <div class="download-box">
+        <h3>다운로드</h3>
+        <a id="downloadLink" href="<%= note.file_path %>" download class="download-btn">
+          PDF 다운로드
+        </a>
+        <div id="fileInfo" class="file-info">
+          파일명: <%= note.file_name %><br>
+          용량: <%= note.file_size %><br>
+          업로드: 
+          <%= note.created_at.getFullYear() %>/
+          <%= (note.created_at.getMonth() + 1).toString().padStart(2, '0') %>/
+          <%= note.created_at.getDate().toString().padStart(2, '0') %>
+        </div>
+      </div>
+
+      <!-- 좋아요 & 다운로드 수 -->
+      <div class="like-download-stats">
+        <form method="POST" action="/notes/<%= note.id %>/like" style="margin-bottom: 10px;">
+          <button id="likeBtn" type="submit">👍 좋아요 (<span id="likeCount"><%= note.like_count %></span>)</button>
+        </form>
+        <p>📥 다운로드 수: <span id="downloadCount"><%= note.download_count %></span></p>
+      </div>
+    </div>
+  </div>
+  <script>
+    const pdfUrl = "<%= note.file_path %>";
+  </script>
+  <script type = "module" src ="/js/pdf_viewer.js"></script>
+
+</body>
+</html>

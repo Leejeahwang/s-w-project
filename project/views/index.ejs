@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/index_style.css">
+  <title>노트 목록</title>
+</head>
+<body>
+  <!-- 상단 헤더 -->
+  <header>
+    <% if (user) { %>
+      <span>안녕하세요, <%= user.user_id %>님</span>
+      <a href="/logout">로그아웃</a>
+    <% } else { %>
+      <a href="/login">로그인</a> |
+      <a href="/signup">회원가입</a>
+    <% } %>
+  </header>
+
+  <!-- 필터 및 검색 폼 -->
+  <section class="filter-form">
+    <form method="GET" action="/notes">
+      <label>카테고리:
+        <select name="category">
+          <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
+          <% categories.forEach(c => { %>
+            <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <label>과목:
+        <select name="subject">
+          <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
+          <% subjects.forEach(s => { %>
+            <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <label>학년:
+        <select name="year">
+          <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
+          <% years.forEach(y => { %>
+            <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <label>학기:
+        <select name="semester">
+          <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
+          <% semesters.forEach(sm => { %>
+            <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+          <% }) %>
+        </select>
+      </label>
+    
+      <button type="submit">필터 적용</button>
+    
+      <label>검색:
+        <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
+      </label>
+    
+      <button type="submit">검색</button>
+    </form>
+
+    <!-- 노트 추가 -->
+    <% if (user) { %>
+      <a href="/notes/new">노트 추가</a>
+    <% } %>
+  </section>
+
+  <!-- 노트 목록 -->
+  <section class="notes">
+    <% if (notes.length === 0) { %>
+      <p>표시할 노트가 없습니다.</p>
+    <% } else { %>
+      <% notes.forEach(n => { %>
+        <article class="note-card">
+          <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
+          <p>과목: <%= n.subject %></p>
+          <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
+          <small>
+            작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
+          </small>
+        </article>
+      <% }) %>
+    <% } %>
+  </section>
+</body>
+</html>

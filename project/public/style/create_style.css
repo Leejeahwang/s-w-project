@@ -1,0 +1,81 @@
+/* 전체 페이지 기본 설정 */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 40px;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* 제목 */
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* 폼 전체 영역 */
+form {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 폼 안 각 항목 */
+form p {
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+/* 입력 박스, 셀렉트 공통 스타일 */
+input[type="text"],
+textarea,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 0.95em;
+  margin-top: 6px;
+}
+
+/* 텍스트박스 사이즈 조정 */
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* 버튼 */
+button[type="submit"] {
+  width: 100%;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 1em;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #135ba1;
+}
+
+/* 목록 돌아가기 링크 */
+a {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  color: #1976d2;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
