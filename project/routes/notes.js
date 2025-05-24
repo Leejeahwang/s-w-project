@@ -199,9 +199,11 @@ router.post('/:id/delete', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const [[note]] = await db.promise().query(
-      `SELECT n.id, n.subject, n.professor, n.category, n.summary,
+      `SELECT n.id, n.title, n.subject, n.professor, n.category, n.summary, n.like_count, n.download_count,
               n.user_id, u.user_id AS authorName, n.created_at
-       FROM notes n JOIN users u ON n.user_id = u.user_id
+       FROM notes n 
+       JOIN users u 
+       ON n.user_id = u.user_id
        WHERE n.id = ?`,
       [req.params.id]
     );
@@ -209,8 +211,11 @@ router.get('/:id', async (req, res, next) => {
 
     const [comments] = await db.promise().query(
       `SELECT c.id, c.content, c.created_at, u.user_id AS author
-       FROM comments c JOIN users u ON c.user_id = u.user_id
-       WHERE c.note_id = ? ORDER BY c.created_at ASC`,
+       FROM comments c 
+       JOIN users u 
+       ON c.user_id = u.user_id
+       WHERE c.note_id = ? 
+       ORDER BY c.created_at ASC`,
       [req.params.id]
     );
     res.render('detail', { note, comments, user: req.session.user });
@@ -230,6 +235,40 @@ router.post('/:id/comments', async (req, res, next) => {
     );
     res.redirect('/notes/' + noteId);
   } catch (e) { next(e); }
+});
+
+// 좋아요 (POST /notes/:id/like) - 로그인 필요
+router.post('/:id/like', async (req, res, next) => {
+  // 1. 로그인 여부 확인
+  // 2. note_likes 테이블에 기록 있는지 확인
+  // 3. 없으면 INSERT + UPDATE
+  if (!req.session.user) {
+    res.status(401).json({ message: '로그인이 필요합니다.' });
+    return res.redirect('/login');
+  }
+  const noteId = req.params.id;
+  const userId = req.session.user.user_id;
+  try {
+    const [rows] = await db.promise().query( // 이미 좋아요 했는지 확인
+      'SELECT * FROM note_likes WHERE note_id = ? AND user_id = ?',
+      [noteId, userId]
+    );
+    if (rows.length > 0) { // 이미 좋아요를 했다면
+      return res.status(400).json({ message: '이미 좋아요를 눌렀습니다.' });
+    }
+    await db.promise().query( // 좋아요 기록 추가
+      'INSERT INTO note_likes (note_id, user_id) VALUES (?, ?)',
+      [noteId, userId]
+    );
+    await db.promise().query( // 좋아요 수 증가
+      'UPDATE notes SET like_count = like_count + 1 WHERE id = ?',
+      [noteId]
+    );
+    res.json({ message: '좋아요 완료' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류' });
+  }
 });
 
 module.exports = router;

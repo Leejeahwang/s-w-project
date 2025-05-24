@@ -1,7 +1,7 @@
 import * as pdfjsLib from '/pdfjs/pdf.mjs';
 
 // const url = window.pdfUrl; // url 동적 처리
-const url = '/files/data_structure_mid_summary.pdf';
+const url = '/files/프언 2014년 중간고사.pdf';
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.mjs';
 
 pdfjsLib.getDocument(url).promise.then(function (pdfDoc) {

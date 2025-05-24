@@ -10,8 +10,9 @@
   <div class="container">
     <div class="left-panel">
       <article>
-        <h2><%= note.subject %></h2>
-        <p>교수: <%= note.professor %></p>
+        <h2><%= note.title %></h2>
+        <p>과목명: <%= note.subject %></p>
+        <p>교수명: <%= note.professor %></p>
         <p>카테고리: <%= note.category %></p>
         <canvas id="pdf-canvas" width="400"></canvas>
         <div><%= note.summary %></div>
@@ -62,8 +63,8 @@
           PDF 다운로드
         </a>
         <div id="fileInfo" class="file-info">
-          파일명: <%= note.file_name %><br>
-          용량: <%= note.file_size %><br>
+          파일명: <%= note.file_name %> <br>
+          용량: <%= note.file_size %> <br>
           업로드: 
           <%= note.created_at.getFullYear() %>/
           <%= (note.created_at.getMonth() + 1).toString().padStart(2, '0') %>/
@@ -73,17 +74,45 @@
 
       <!-- 좋아요 & 다운로드 수 -->
       <div class="like-download-stats">
-        <form method="POST" action="/notes/<%= note.id %>/like" style="margin-bottom: 10px;">
-          <button id="likeBtn" type="submit">👍 좋아요 (<span id="likeCount"><%= note.like_count %></span>)</button>
-        </form>
-        <p>📥 다운로드 수: <span id="downloadCount"><%= note.download_count %></span></p>
+        <% console.log(note); %>
+        <button id="likeBtn" data-note-id="<%= note.id %>" style="margin-bottom: 10px;">
+          👍 좋아요 (<span id="likeCount" style="color: aliceblue;"><%= note.like_count %></span>)
+        </button>
+        <p>📥 다운로드 수: <span id="downloadCount"><%= note.download_count || 0 %></span></p>
       </div>
     </div>
   </div>
+
   <script>
     const pdfUrl = "<%= note.file_path %>";
   </script>
+
   <script type = "module" src ="/js/pdf_viewer.js"></script>
+
+  <script>
+    document.getElementById("likeBtn").addEventListener("click", async function () {
+      const noteId = this.dataset.noteId;
+      try {
+        const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
+        if (res.status === 401) {
+          alert("로그인이 필요합니다.");
+        }
+        if(res.status === 400) {
+          alert("이미 좋아요를 눌렀습니다");
+        }
+        if (res.ok) {
+          const countSpan = document.getElementById("likeCount");
+          const currentCount = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = currentCount + 1;
+        } else {
+          const err = await res.json();
+          alert(err.message || "좋아요 처리 실패");
+        }
+      } catch (e) {
+        console.error("좋아요 에러:", e);
+      }
+    });
+  </script>
 
 </body>
 </html>
