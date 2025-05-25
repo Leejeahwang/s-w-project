@@ -1,6 +1,24 @@
 const express = require('express');
-const db = require('../db');
+const db = require('../db');  // db 설정
 const router = express.Router();
+
+// 파일 저장 위치, 이름등 설정
+const multer = require('multer');
+const path = require('path');
+
+// 저장 위치 및 파일명 설정
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '..', 'public', 'files'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({ storage });
 
 // 1) 목록 + 필터 (GET /notes)
 // router.get('/', async (req, res, next) => {
@@ -126,18 +144,32 @@ router.get('/new', async (req, res, next) => {
 });
 
 // 노트 작성 (POST /notes)
-router.post('/', async (req, res, next) => {
+router.post('/', upload.single('file'), async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
+
   const { title, summary, category, subject, year, semester, professor, file } = req.body;
+  const uploadedFile = req.file; // multer가 채워줌
+
   try {
     const u = req.session.user;
-    await db.promise().query(
+
+    // notes 테이블에 삽입
+    const [noteResult] = await db.promise().query(
       'INSERT INTO notes (user_id, title, summary, category, subject, year, semester, professor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [u.user_id, title, summary, category, subject, year, semester, professor]
     );
-    await db.promise().query(
-      'INSERT INTO files ()'
-    );
+    const noteId = noteResult.insertId;
+
+    // files 테이블에 삽입
+    if (uploadedFile) {
+      await db.promise().query(
+        `INSERT INTO files (note_id, file_name, file_path, file_size, uploaded_at)
+         VALUES (?, ?, ?, ?, NOW())`,
+        [noteId, uploadedFile.originalname, '/files/' + uploadedFile.filename, uploadedFile.size]
+      );
+    }
+
+    // 리다이렉트
     res.redirect('/notes');
   } catch (err) {
     next(err);
