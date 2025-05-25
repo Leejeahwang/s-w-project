@@ -59,12 +59,12 @@
       <!-- 다운로드 박스 -->
       <div class="download-box">
         <h3>다운로드</h3>
-        <a id="downloadLink" href="<%= note.file_path %>" download class="download-btn">
+        <a id="downloadLink" href="<%= file.file_path %>" download class="download-btn">
           PDF 다운로드
         </a>
         <div id="fileInfo" class="file-info">
-          파일명: <%= note.file_name %> <br>
-          용량: <%= note.file_size %> <br>
+          파일명: <%= file.file_name %> <br>
+          용량: <%= file.file_size %></span> <br>
           업로드: 
           <%= note.created_at.getFullYear() %>/
           <%= (note.created_at.getMonth() + 1).toString().padStart(2, '0') %>/
@@ -74,7 +74,7 @@
 
       <!-- 좋아요 & 다운로드 수 -->
       <div class="like-download-stats">
-        <% console.log(note); %>
+      <!-- <% console.log(note); %> -->
         <button id="likeBtn" data-note-id="<%= note.id %>" style="margin-bottom: 10px;">
           👍 좋아요 (<span id="likeCount" style="color: aliceblue;"><%= note.like_count %></span>)
         </button>
@@ -90,6 +90,7 @@
   <script type = "module" src ="/js/pdf_viewer.js"></script>
 
   <script>
+    // 좋아요 관련
     document.getElementById("likeBtn").addEventListener("click", async function () {
       const noteId = this.dataset.noteId;
       try {
@@ -113,6 +114,5 @@
       }
     });
   </script>
-
 </body>
 </html>

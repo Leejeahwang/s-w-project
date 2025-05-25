@@ -147,6 +147,10 @@ router.get('/new', async (req, res, next) => {
 router.post('/', upload.single('file'), async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
 
+  console.log("original name:", req.file.originalname);
+  console.log("filename:", req.file.filename);
+  console.log("size:", req.file.size);
+
   const { title, summary, category, subject, year, semester, professor, file } = req.body;
   const uploadedFile = req.file; // multer가 채워줌
 
@@ -245,6 +249,15 @@ router.get('/:id', async (req, res, next) => {
     );
     if (!note) return res.status(404).send('노트를 찾을 수 없습니다.');
 
+    const [[file]] = await db.promise().query(
+      `SELECT f.file_name, f.file_path, f.file_size
+       FROM files f
+       JOIN notes n
+       ON n.id = f.note_id
+       WHERE n.id = ?`,
+       [req.params.id]
+    )
+
     const [comments] = await db.promise().query(
       `SELECT c.id, c.content, c.created_at, u.user_id AS author
        FROM comments c 
@@ -254,7 +267,22 @@ router.get('/:id', async (req, res, next) => {
        ORDER BY c.created_at ASC`,
       [req.params.id]
     );
-    res.render('detail', { note, comments, user: req.session.user });
+
+    // 파일 사이즈 포맷팅 함수
+    const formatBytes = size => {
+      if (size < 1024) return `${size} B`;
+      if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+      return `${(size / 1024 / 1024).toFixed(1)} MB`;
+    };
+
+    res.render('detail', { note, 
+                           comments,
+                           file: {
+                              file_name: file.file_name,
+                              file_path: file.file_path,
+                              file_size: formatBytes(file.file_size)
+                          },
+                            user: req.session.user });
   } catch (e) { next(e); }
 });
 
