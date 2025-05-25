@@ -39,7 +39,13 @@
         <% }) %>
       </select>
     </p>
-    <input name="professor"  placeholder="교수명"   />
+    <p>교수명: <br>
+      <input name="professor" placeholder="교수명"/>
+    </p>
+    <p>파일 업로드: <br>
+      <span class="sex">(pdf, jpg, png, pptx)</span> <br>
+      <input type="file" id="file" name="file" accept=".jpg,.png,.pdf,.pptx" required>
+    </p>
 
     <button type="submit">작성 완료</button>
   </form>

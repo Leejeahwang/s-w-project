@@ -125,14 +125,18 @@ router.get('/new', async (req, res, next) => {
   }
 });
 
+// 노트 작성 (POST /notes)
 router.post('/', async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
-  const { title, summary, category, subject, year, semester, professor } = req.body;
+  const { title, summary, category, subject, year, semester, professor, file } = req.body;
   try {
     const u = req.session.user;
     await db.promise().query(
       'INSERT INTO notes (user_id, title, summary, category, subject, year, semester, professor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [u.user_id, title, summary, category, subject, year, semester, professor]
+    );
+    await db.promise().query(
+      'INSERT INTO files ()'
     );
     res.redirect('/notes');
   } catch (err) {

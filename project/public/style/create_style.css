@@ -30,9 +30,7 @@ form p {
 }
 
 /* 입력 박스, 셀렉트 공통 스타일 */
-input[type="text"],
-textarea,
-select {
+input[type="text"], textarea, select, input[name="professor"] {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ccc;
@@ -60,6 +58,10 @@ button[type="submit"] {
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+
+.sex {
+  color: #666;
 }
 
 button[type="submit"]:hover {
