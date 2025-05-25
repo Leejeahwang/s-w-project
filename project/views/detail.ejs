@@ -83,14 +83,16 @@
     </div>
   </div>
 
+  <!-- PDF 사진 로드 관련 -->
   <script>
-    const pdfUrl = "<%= note.file_path %>";
+    window.pdfUrl = "<%= file.file_path %>";
   </script>
-
   <script type = "module" src ="/js/pdf_viewer.js"></script>
 
   <script>
-    // 좋아요 관련
+    // PDF 다운로드 버튼
+
+    // 좋아요 수 관련
     document.getElementById("likeBtn").addEventListener("click", async function () {
       const noteId = this.dataset.noteId;
       try {
@@ -113,6 +115,10 @@
         console.error("좋아요 에러:", e);
       }
     });
+
+    // PDF 다운로드 관련 (해야함)
+    // 다운로드 수 수정
+    document.getElementById("downloadLink");
   </script>
 </body>
 </html>

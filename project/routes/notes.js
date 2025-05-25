@@ -147,9 +147,9 @@ router.get('/new', async (req, res, next) => {
 router.post('/', upload.single('file'), async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
 
-  console.log("original name:", req.file.originalname);
-  console.log("filename:", req.file.filename);
-  console.log("size:", req.file.size);
+  // console.log("original name:", req.file.originalname);
+  // console.log("filename:", req.file.filename);
+  // console.log("size:", req.file.size);
 
   const { title, summary, category, subject, year, semester, professor, file } = req.body;
   const uploadedFile = req.file; // multer가 채워줌
@@ -332,6 +332,59 @@ router.post('/:id/like', async (req, res, next) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: '서버 오류' });
+  }
+});
+
+// 다운로드 라우터 (GET /files:/filename)
+router.get('/files/:filename', async (req, res, next) => {
+  // 로그인 여부 확인
+  if(!req.session.user) {
+    return res.send(`
+      <script>
+        alert("다운로드는 로그인 시 가능합니다.);
+        window.location.href = "/login";
+      </script>
+      `);
+  }
+
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '..', 'public', 'files', filename);
+  try{
+    res.download(filePath, filename, async err => {
+      // 에러 처리
+      if(err) {
+        console.error("파일 다운로드 오류: ", err);
+        return res.status(404).send("파일을 찾을 수 없습니다");
+      }
+
+      // 1. notes 테이블에서 note_id 조회
+      const [rows] = await db.promise().query(
+        `SELECT note_id FROM files WHERE file_name = ?`, [filename]
+      );
+
+      if(rows.length === 0) {
+        console.warn("해당 파일에 연결된 노트를 찾을 수 없습니다");
+        return;
+      }
+
+      const noteId = rows[0].note_id;
+      const userId = req.session.user.user_id;
+
+      // 2. notes 테이블의 다운로드 수 +1
+      await db.promise().query(
+          'UPDATE notes SET download_count = download_count + 1 WHERE id = ?',
+          [noteId]
+        );
+
+      // 3. note_downloads 테이블에 기록 추가
+      await db.promise().query(
+        'INSERT INTO note_downloads (note_id, user_id, downloaded_at) VALUES (?, ?, NOW())',
+        [noteId, userId]
+      );
+    });
+  } catch(err) {
+    console.error("다운로드 처리 중 오류: ". err);
+    res.status(500).send("서버 오류");
   }
 });
 
