@@ -7,7 +7,6 @@ const {
 const router = express.Router({ mergeParams: true });
 
 router.get('/',    getComments);
-router.post('/',   createComment);
 
 // 댓글 생성
 router.post('/', commentController.createComment);

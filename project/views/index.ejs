@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/index_style.css">
   <title>노트 목록</title>
 </head>
 <body>
+  <!-- 상단 헤더 -->
   <header>
     <% if (user) { %>
       <span>안녕하세요, <%= user.user_id %>님</span>
@@ -16,6 +18,7 @@
     <% } %>
   </header>
 
+  <!-- 필터 및 검색 폼 -->
   <section class="filter-form">
     <form method="GET" action="/notes">
       <label>카테고리:
@@ -62,11 +65,14 @@
     
       <button type="submit">검색</button>
     </form>
+
+    <!-- 노트 추가 -->
     <% if (user) { %>
       <a href="/notes/new">노트 추가</a>
     <% } %>
   </section>
 
+  <!-- 노트 목록 -->
   <section class="notes">
     <% if (notes.length === 0) { %>
       <p>표시할 노트가 없습니다.</p>

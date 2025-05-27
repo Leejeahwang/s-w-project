@@ -11,25 +11,29 @@ const commentsRouter = require('./routes/comments');
 
 const app = express();
 
+// 뷰 엔진 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Body parsing & session
 app.use(express.urlencoded({ extended: false }));
-app.use(express.urlencoded({ extended: false }));
-// body._method 또는 query._method 둘 다 확인해서 override
 app.use(methodOverride(req => req.body._method || req.query._method));
 app.use(session({
   secret: 'mySecretKey123',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { maxAge: 3600_000 }
 }));
 
-// 전역 user 객체 설정
+// 정적 파일
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   next();
 });
 
+// 라우팅
 app.use('/', indexRouter);
 app.use('/', authRouter);
 app.use('/notes', notesRouter);
@@ -45,5 +49,3 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`)); 
-
-module.exports = app;

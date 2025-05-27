@@ -1,6 +1,46 @@
 const express = require('express');
+const db = require('../db');  // db 설정
 const router = express.Router();
-const db = require('../db');
+
+// 파일 저장 위치, 이름등 설정
+const multer = require('multer');
+const path = require('path');
+
+// 저장 위치 및 파일명 설정
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '..', 'public', 'files'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+  }
+});
+
+const upload = multer({ storage });
+
+// 1) 목록 + 필터 (GET /notes)
+// router.get('/', async (req, res, next) => {
+//   try {
+//     const { subject = '', professor = '', category = '' } = req.query;
+//     let sql = `
+//       SELECT n.title, n.id, n.subject, n.professor, n.category, n.summary, n.created_at,
+//              n.user_id, u.user_id AS authorName, n.created_at
+//       FROM notes n
+//       JOIN users u ON n.user_id = u.id
+//       WHERE n.subject LIKE ? AND n.professor LIKE ?
+//     `;
+//     const params = [`%${subject}%`, `%${professor}%`];
+//     if (category) {
+//       sql += ' AND n.category = ?';
+//       params.push(category);
+//     }
+//     sql += ' ORDER BY n.created_at DESC';
+//     const [notes] = await db.promise().query(sql, params);
+//     res.render('index', { notes, filters: { subject, professor, category }, user: req.session.user });
+//   } catch (e) { next(e); }
+// });
 
 router.get('/', async (req, res, next) => {
   try {
@@ -74,6 +114,15 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+
+
+
+// 2) 새 노트 작성 폼 및 처리 (로그인 필요)
+// router.get('/new', (req, res) => {
+//   if (!req.session.user) return res.redirect('/login');
+//   res.render('create', { user: req.session.user });
+// });
+
 router.get('/new', async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
   try {
@@ -94,48 +143,42 @@ router.get('/new', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+// 노트 작성 (POST /notes)
+router.post('/', upload.single('file'), async (req, res, next) => {
   if (!req.session.user) return res.redirect('/login');
-  const { title, summary, category, subject, year, semester, professor } = req.body;
+
+  // console.log("original name:", req.file.originalname);
+  // console.log("filename:", req.file.filename);
+  // console.log("size:", req.file.size);
+
+  const { title, summary, category, subject, year, semester, professor, file } = req.body;
+  const uploadedFile = req.file; // multer가 채워줌
+
   try {
     const u = req.session.user;
-    await db.promise().query(
+
+    // notes 테이블에 삽입
+    const [noteResult] = await db.promise().query(
       'INSERT INTO notes (user_id, title, summary, category, subject, year, semester, professor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [u.user_id, title, summary, category, subject, year, semester, professor]
     );
+    const noteId = noteResult.insertId;
+
+    // files 테이블에 삽입
+    if (uploadedFile) {
+      await db.promise().query(
+        `INSERT INTO files (note_id, file_name, file_path, file_size, uploaded_at)
+         VALUES (?, ?, ?, ?, NOW())`,
+        [noteId, uploadedFile.originalname, '/files/' + uploadedFile.filename, uploadedFile.size]
+      );
+    }
+
+    // 리다이렉트
     res.redirect('/notes');
   } catch (err) {
     next(err);
   }
 });
-// 1) 목록 + 필터 (GET /notes)
-// router.get('/', async (req, res, next) => {
-//   try {
-//     const { subject = '', professor = '', category = '' } = req.query;
-//     let sql = `
-//       SELECT n.title, n.id, n.subject, n.professor, n.category, n.summary, n.created_at,
-//              n.user_id, u.user_id AS authorName, n.created_at
-//       FROM notes n
-//       JOIN users u ON n.user_id = u.id
-//       WHERE n.subject LIKE ? AND n.professor LIKE ?
-//     `;
-//     const params = [`%${subject}%`, `%${professor}%`];
-//     if (category) {
-//       sql += ' AND n.category = ?';
-//       params.push(category);
-//     }
-//     sql += ' ORDER BY n.created_at DESC';
-//     const [notes] = await db.promise().query(sql, params);
-//     res.render('index', { notes, filters: { subject, professor, category }, user: req.session.user });
-//   } catch (e) { next(e); }
-// });
-
-
-// 2) 새 노트 작성 폼 및 처리 (로그인 필요)
-// router.get('/new', (req, res) => {
-//   if (!req.session.user) return res.redirect('/login');
-//   res.render('create', { user: req.session.user });
-// });
 
 // 4) 수정 폼 (GET /notes/:id/edit) - 작성자만
 router.get('/:id/edit', async (req, res, next) => {
@@ -192,37 +235,58 @@ router.post('/:id/delete', async (req, res, next) => {
   }
 });
 
-// 노트 상세 + 댓글 렌더링 (inline edit 지원)
+// 3) 상세 조회 (GET /notes/:id)
 router.get('/:id', async (req, res, next) => {
   try {
     const noteId = req.params.id;
     const editCommentId = parseInt(req.query.editCommentId, 10) || null;
-
-    // 노트 조회
     const [[note]] = await db.promise().query(
-      `SELECT
-        n.*,
-        u.user_id AS authorName
-      FROM notes n
-      JOIN users u ON n.user_id = u.user_id
-      WHERE n.id = ?`,
-      [noteId]
+      `SELECT n.id, n.title, n.subject, n.professor, n.category, n.summary, n.like_count, n.download_count,
+              n.user_id, u.user_id AS authorName, n.created_at
+       FROM notes n 
+       JOIN users u 
+       ON n.user_id = u.user_id
+       WHERE n.id = ?`,
+      [req.params.id]
     );
-    if (!note) return res.redirect('/notes');
+    if (!note) return res.status(404).send('노트를 찾을 수 없습니다.');
 
-    // 댓글 조회
+    const [[file]] = await db.promise().query(
+      `SELECT f.file_name, f.file_path, f.file_size
+       FROM files f
+       JOIN notes n
+       ON n.id = f.note_id
+       WHERE n.id = ?`,
+       [req.params.id]
+    )
+
     const [comments] = await db.promise().query(
-      `SELECT c.id, c.content, c.created_at, c.user_id, u.user_id AS authorName
-       FROM comments c JOIN users u ON c.user_id = u.user_id
-       WHERE c.note_id = ?
-       ORDER BY c.created_at`,
-      [noteId]
+      `SELECT c.id, c.content, c.created_at, c.user_id, u.user_id AS author
+       FROM comments c 
+       JOIN users u 
+       ON c.user_id = u.user_id
+       WHERE c.note_id = ? 
+       ORDER BY c.created_at ASC`,
+      [req.params.id]
     );
 
-    res.render('detail', { note, comments, editCommentId });
-  } catch (e) {
-    next(e);
-  }
+    // 파일 사이즈 포맷팅 함수
+    const formatBytes = size => {
+      if (size < 1024) return `${size} B`;
+      if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+      return `${(size / 1024 / 1024).toFixed(1)} MB`;
+    };
+
+    res.render('detail', { note, 
+                           comments,
+                           editCommentId,
+                           file: {
+                              file_name: file.file_name,
+                              file_path: file.file_path,
+                              file_size: formatBytes(file.file_size)
+                          },
+                            user: req.session.user });
+  } catch (e) { next(e); }
 });
 
 // 댓글 작성 (POST /notes/:id/comments) - 로그인 필요
@@ -238,6 +302,93 @@ router.post('/:id/comments', async (req, res, next) => {
     );
     res.redirect('/notes/' + noteId);
   } catch (e) { next(e); }
+});
+
+// 좋아요 (POST /notes/:id/like) - 로그인 필요
+router.post('/:id/like', async (req, res, next) => {
+  // 1. 로그인 여부 확인
+  // 2. note_likes 테이블에 기록 있는지 확인
+  // 3. 없으면 INSERT + UPDATE
+  if (!req.session.user) {
+    res.status(401).json({ message: '로그인이 필요합니다.' });
+    return res.redirect('/login');
+  }
+  const noteId = req.params.id;
+  const userId = req.session.user.user_id;
+  try {
+    const [rows] = await db.promise().query( // 이미 좋아요 했는지 확인
+      'SELECT * FROM note_likes WHERE note_id = ? AND user_id = ?',
+      [noteId, userId]
+    );
+    if (rows.length > 0) { // 이미 좋아요를 했다면
+      return res.status(400).json({ message: '이미 좋아요를 눌렀습니다.' });
+    }
+    await db.promise().query( // 좋아요 기록 추가
+      'INSERT INTO note_likes (note_id, user_id) VALUES (?, ?)',
+      [noteId, userId]
+    );
+    await db.promise().query( // 좋아요 수 증가
+      'UPDATE notes SET like_count = like_count + 1 WHERE id = ?',
+      [noteId]
+    );
+    res.json({ message: '좋아요 완료' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류' });
+  }
+});
+
+// 다운로드 라우터 (GET /files:/filename)
+router.get('/files/:filename', async (req, res, next) => {
+  // 로그인 여부 확인
+  if(!req.session.user) {
+    return res.send(`
+      <script>
+        alert("다운로드는 로그인 시 가능합니다.);
+        window.location.href = "/login";
+      </script>
+      `);
+  }
+
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '..', 'public', 'files', filename);
+  try{
+    res.download(filePath, filename, async err => {
+      // 에러 처리
+      if(err) {
+        console.error("파일 다운로드 오류: ", err);
+        return res.status(404).send("파일을 찾을 수 없습니다");
+      }
+
+      // 1. notes 테이블에서 note_id 조회
+      const [rows] = await db.promise().query(
+        `SELECT note_id FROM files WHERE file_name = ?`, [filename]
+      );
+
+      if(rows.length === 0) {
+        console.warn("해당 파일에 연결된 노트를 찾을 수 없습니다");
+        return;
+      }
+
+      const noteId = rows[0].note_id;
+      const userId = req.session.user.user_id;
+
+      // 2. notes 테이블의 다운로드 수 +1
+      await db.promise().query(
+          'UPDATE notes SET download_count = download_count + 1 WHERE id = ?',
+          [noteId]
+        );
+
+      // 3. note_downloads 테이블에 기록 추가
+      await db.promise().query(
+        'INSERT INTO note_downloads (note_id, user_id, downloaded_at) VALUES (?, ?, NOW())',
+        [noteId, userId]
+      );
+    });
+  } catch(err) {
+    console.error("다운로드 처리 중 오류: ". err);
+    res.status(500).send("서버 오류");
+  }
 });
 
 module.exports = router;

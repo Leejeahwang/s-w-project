@@ -25,7 +25,7 @@ exports.createComment = (req, res) => {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
   const noteId = req.params.noteId;
-  const userId = req.session.user.userId;
+  const userId = req.session.user.user_id;
   const { content } = req.body;
   if (!content || !content.trim()) {
     return res.status(400).json({ message: '댓글 내용을 입력해주세요.' });

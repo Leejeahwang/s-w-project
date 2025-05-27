@@ -3,30 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/detail_style.css">
   <title>노트 상세</title>
 </head>
 <body>
-  <article>
-    <h2><%= note.subject %></h2>
-    <p>교수: <%= note.professor %></p>
-    <p>카테고리: <%= note.category %></p>
-    <div><%= note.summary %></div>
-    <small>
-      작성자: <%= note.authorName %> /
-      작성시간: <%= note.created_at.getFullYear() %>/<%= (note.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= note.created_at.getDate().toString().padStart(2,'0') %> <%= note.created_at.toLocaleTimeString('ko-KR') %>
-    </small>
-  </article>
+  <div class="container">
+    <div class="left-panel">
+      <article>
+        <h2><%= note.title %></h2>
+        <p>과목명: <%= note.subject %></p>
+        <p>교수명: <%= note.professor %></p>
+        <p>카테고리: <%= note.category %></p>
+        <canvas id="pdf-canvas" width="400"></canvas>
+        <div><%= note.summary %></div>
+        <small>
+          작성자: <%= note.authorName %> /
+          작성시간: <%= note.created_at.getFullYear() %>/<%= (note.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= note.created_at.getDate().toString().padStart(2,'0') %> <%= note.created_at.toLocaleTimeString('ko-KR') %>
+        </small>
+      </article>
 
-  <% if (user && note.user_id === user.user_id) { %>
-    <div>
-      <a href="/notes/<%= note.id %>/edit">수정</a>
-      <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
-        <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-      </form>
-    </div>
-  <% } %>
+      <% if (user && note.user_id === user.user_id) { %>
+        <div>
+          <a href="/notes/<%= note.id %>/edit">수정</a>
+          <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+            <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+          </form>
+        </div>
+      <% } %>
   
-
   <section class="comments">
       <h3>댓글 (<%= comments ? comments.length : 0 %>)</h3>
 
@@ -92,7 +96,73 @@
       <% } %>
     </section>
 
+      <a href="/notes">목록으로 돌아가기</a>
+    </div>
 
-  <a href="/notes">목록으로 돌아가기</a>
+    <div class="right-panel">
+      <!-- 다운로드 박스 -->
+      <div class="download-box">
+        <h3>다운로드</h3>
+        <a id="downloadLink" href="<%= file.file_path %>" download class="download-btn">
+          PDF 다운로드
+        </a>
+        <div id="fileInfo" class="file-info">
+          파일명: <%= file.file_name %> <br>
+          용량: <%= file.file_size %></span> <br>
+          업로드: 
+          <%= note.created_at.getFullYear() %>/
+          <%= (note.created_at.getMonth() + 1).toString().padStart(2, '0') %>/
+          <%= note.created_at.getDate().toString().padStart(2, '0') %>
+        </div>
+      </div>
+
+      <!-- 좋아요 & 다운로드 수 -->
+      <div class="like-download-stats">
+      <!-- <% console.log(note); %> -->
+        <button id="likeBtn" data-note-id="<%= note.id %>" style="margin-bottom: 10px;">
+          👍 좋아요 (<span id="likeCount" style="color: aliceblue;"><%= note.like_count %></span>)
+        </button>
+        <p>📥 다운로드 수: <span id="downloadCount"><%= note.download_count || 0 %></span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF 사진 로드 관련 -->
+  <script>
+    window.pdfUrl = "<%= file.file_path %>";
+  </script>
+  <script type = "module" src ="/js/pdf_viewer.js"></script>
+
+  <script>
+    // PDF 다운로드 버튼
+
+    // 좋아요 수 관련
+    document.getElementById("likeBtn").addEventListener("click", async function () {
+      const noteId = this.dataset.noteId;
+      try {
+        const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
+        if (res.status === 401) {
+          alert("로그인이 필요합니다.");
+        }
+        if(res.status === 400) {
+          alert("이미 좋아요를 눌렀습니다");
+        }
+        if (res.ok) {
+          const countSpan = document.getElementById("likeCount");
+          const currentCount = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = currentCount + 1;
+        } else {
+          const err = await res.json();
+          alert(err.message || "좋아요 처리 실패");
+        }
+      } catch (e) {
+        console.error("좋아요 에러:", e);
+      }
+    });
+
+    // PDF 다운로드 관련 (해야함)
+    // 다운로드 수 수정
+    document.getElementById("downloadLink");
+  </script>
 </body>
 </html>
