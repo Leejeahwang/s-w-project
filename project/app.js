@@ -13,11 +13,17 @@ const app = express();
 
 // 뷰 엔진 설정
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride(function (req) {
+  if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+    const method = req.body._method;
+    delete req.body._method;
+    return method;
+  }
+  if (req.query && req.query._method) return req.query._method;
+}));
 
 // Body parsing & session
-app.use(express.urlencoded({ extended: false }));
-app.use(methodOverride(req => req.body._method || req.query._method));
 app.use(session({
   secret: 'mySecretKey123',
   resave: false,
@@ -38,7 +44,6 @@ app.use('/', indexRouter);
 app.use('/', authRouter);
 app.use('/notes', notesRouter);
 app.use('/notes/:noteId/comments', commentsRouter);
-
 // 404 핸들러
 app.use((req, res) => res.status(404).send('페이지를 찾을 수 없습니다.'));
 // 에러 핸들러

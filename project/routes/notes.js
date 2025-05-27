@@ -41,6 +41,19 @@ const upload = multer({ storage });
 //     res.render('index', { notes, filters: { subject, professor, category }, user: req.session.user });
 //   } catch (e) { next(e); }
 // });
+router.post('/:id/like', async (req, res, next) => {
+  if (!req.session.user) return res.status(401).json({ message: '로그인이 필요합니다.' });
+  const noteId = req.params.id, userId = req.session.user.user_id;
+  try {
+    const [exist] = await db.promise().query(
+      'SELECT 1 FROM note_likes WHERE note_id=? AND user_id=?', [noteId, userId]
+    );
+    if (exist.length) return res.status(400).json({ message: '이미 눌렀습니다.' });
+    await db.promise().query('INSERT INTO note_likes (note_id,user_id) VALUES(?,?)', [noteId, userId]);
+    await db.promise().query('UPDATE notes SET like_count=like_count+1 WHERE id=?', [noteId]);
+    res.json({ message: '좋아요 완료' });
+  } catch (e) { next(e); }
+});
 
 router.get('/', async (req, res, next) => {
   try {
@@ -234,7 +247,39 @@ router.post('/:id/delete', async (req, res, next) => {
     next(err);
   }
 });
-
+// 좋아요 (POST /notes/:id/like) - 로그인 필요
+router.post('/:id/like', async (req, res, next) => {
+  // 1. 로그인 여부 확인
+  // 2. note_likes 테이블에 기록 있는지 확인
+  // 3. 없으면 INSERT + UPDATE
+  if (!req.session.user) {
+    res.status(401).json({ message: '로그인이 필요합니다.' });
+    return res.redirect('/login');
+  }
+  const noteId = req.params.id;
+  const userId = req.session.user.user_id;
+  try {
+    const [rows] = await db.promise().query( // 이미 좋아요 했는지 확인
+      'SELECT * FROM note_likes WHERE note_id = ? AND user_id = ?',
+      [noteId, userId]
+    );
+    if (rows.length > 0) { // 이미 좋아요를 했다면
+      return res.status(400).json({ message: '이미 좋아요를 눌렀습니다.' });
+    }
+    await db.promise().query( // 좋아요 기록 추가
+      'INSERT INTO note_likes (note_id, user_id) VALUES (?, ?)',
+      [noteId, userId]
+    );
+    await db.promise().query( // 좋아요 수 증가
+      'UPDATE notes SET like_count = like_count + 1 WHERE id = ?',
+      [noteId]
+    );
+    res.json({ message: '좋아요 완료' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류' });
+  }
+});
 // 3) 상세 조회 (GET /notes/:id)
 router.get('/:id', async (req, res, next) => {
   try {
@@ -304,47 +349,13 @@ router.post('/:id/comments', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-// 좋아요 (POST /notes/:id/like) - 로그인 필요
-router.post('/:id/like', async (req, res, next) => {
-  // 1. 로그인 여부 확인
-  // 2. note_likes 테이블에 기록 있는지 확인
-  // 3. 없으면 INSERT + UPDATE
-  if (!req.session.user) {
-    res.status(401).json({ message: '로그인이 필요합니다.' });
-    return res.redirect('/login');
-  }
-  const noteId = req.params.id;
-  const userId = req.session.user.user_id;
-  try {
-    const [rows] = await db.promise().query( // 이미 좋아요 했는지 확인
-      'SELECT * FROM note_likes WHERE note_id = ? AND user_id = ?',
-      [noteId, userId]
-    );
-    if (rows.length > 0) { // 이미 좋아요를 했다면
-      return res.status(400).json({ message: '이미 좋아요를 눌렀습니다.' });
-    }
-    await db.promise().query( // 좋아요 기록 추가
-      'INSERT INTO note_likes (note_id, user_id) VALUES (?, ?)',
-      [noteId, userId]
-    );
-    await db.promise().query( // 좋아요 수 증가
-      'UPDATE notes SET like_count = like_count + 1 WHERE id = ?',
-      [noteId]
-    );
-    res.json({ message: '좋아요 완료' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: '서버 오류' });
-  }
-});
-
 // 다운로드 라우터 (GET /files:/filename)
 router.get('/files/:filename', async (req, res, next) => {
   // 로그인 여부 확인
   if(!req.session.user) {
     return res.send(`
       <script>
-        alert("다운로드는 로그인 시 가능합니다.);
+        alert("다운로드는 로그인 시 가능합니다.");
         window.location.href = "/login";
       </script>
       `);
@@ -388,6 +399,29 @@ router.get('/files/:filename', async (req, res, next) => {
   } catch(err) {
     console.error("다운로드 처리 중 오류: ". err);
     res.status(500).send("서버 오류");
+  }
+});
+router.get('/:id/download', async (req, res, next) => {
+  try {
+    const noteId = req.params.id;
+    // 1) 파일 경로 조회
+    const [[file]] = await db.promise().query(
+      'SELECT file_path, file_name FROM files WHERE note_id = ?',
+      [noteId]
+    );
+    if (!file) return res.status(404).send('파일이 없습니다.');
+
+    // 2) 다운로드 수 증가
+    await db.promise().query(
+      'UPDATE notes SET download_count = download_count + 1 WHERE id = ?',
+      [noteId]
+    );
+
+    // 3) 파일 전송
+    const fullPath = path.join(__dirname, '..', 'public', file.file_path);
+    res.download(fullPath, file.file_name);
+  } catch (err) {
+    next(err);
   }
 });
 
