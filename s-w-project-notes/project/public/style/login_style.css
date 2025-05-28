@@ -1,0 +1,98 @@
+/* 폰트 정의 */
+@font-face {
+    font-family: 'GmarketSansMedium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: bold;
+}
+
+/* 전체 기본 설정 */
+body {
+  font-family: 'GmarketSansMedium', sans-serif;
+  background-color: #f4f6f9;
+  margin: 0;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #333;
+}
+
+/* 제목 */
+h2 {
+  margin-bottom: 30px;
+  font-size: 1.8em;
+  color: #1976d2;
+}
+
+/* 폼 컨테이너 */
+form {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 라벨 */
+label {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* 입력 필드 */
+input[type="text"],
+input[type="password"] {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95em;
+}
+
+/* 버튼 */
+button[type="submit"] {
+  padding: 10px;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #1259a1;
+}
+
+/* 에러 메시지 */
+p[style*="color:red"] {
+  margin-top: -20px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* 하단 회원가입 링크 */
+p:last-of-type {
+  margin-top: 20px;
+  font-size: 0.9em;
+}
+
+p a {
+  color: #1976d2;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+p a:hover {
+  text-decoration: underline;
+}

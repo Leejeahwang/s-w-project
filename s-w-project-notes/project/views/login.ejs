@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/login_style.css">
+  <title>로그인</title>
+</head>
+<body>
+  <h2>로그인</h2>
+  <% if (error) { %>
+    <p style="color:red;"><%= error %></p>
+  <% } %>
+  <form method="POST" action="/login">
+    <label for="loginId">아이디</label>
+    <input id="loginId" name="id" required />
+    <label for="loginPw">비밀번호</label>
+    <input id="loginPw" type="password" name="pw" required />
+    <button type="submit">로그인</button>
+  </form>
+  <p>계정이 없으신가요? <a href="/signup">회원가입</a></p>
+</body>
+</html>
