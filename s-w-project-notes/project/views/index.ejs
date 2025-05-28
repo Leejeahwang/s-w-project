@@ -9,6 +9,7 @@
 <body>
   <!-- 상단 헤더 -->
   <header>
+
     <% if (user) { %>
       <span>안녕하세요, <%= user.user_id %>님</span>
       <a href="/logout">로그아웃</a>
@@ -28,6 +29,15 @@
 
   <!-- 전체 콘텐츠 포함: container -->
   <div class="container">
+
+    <div class="top-wrapper">
+      <!-- noteHub 로고 -->
+      <div class="logo">
+        <a href="/">
+          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+        </a>
+      </div>
+    </div>
 
     <!-- 검색창, filter-form 외부에 위치-->
     <div class="search-area">
