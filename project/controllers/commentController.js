@@ -4,7 +4,7 @@ const db = require('../db');
 exports.getComments = (req, res) => {
   const noteId = req.params.noteId;
   const query = `
-    SELECT c.id, c.content, c.created_at, u.username AS author
+    SELECT c.id, c.content, c.created_at, u.user_id AS author
     FROM comments c
     JOIN users u ON c.user_id = u.id
     WHERE c.note_id = ?
@@ -25,7 +25,7 @@ exports.createComment = (req, res) => {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
   const noteId = req.params.noteId;
-  const userId = req.session.user.userId;
+  const userId = req.session.user.user_id;
   const { content } = req.body;
   if (!content || !content.trim()) {
     return res.status(400).json({ message: '댓글 내용을 입력해주세요.' });
@@ -37,16 +37,51 @@ exports.createComment = (req, res) => {
       return res.status(500).json({ message: '댓글 작성 중 오류가 발생했습니다.' });
     }
     const fetch = `
-      SELECT c.id, c.content, c.created_at, u.username AS author
+      SELECT c.id, c.content, c.created_at, u.user_id AS author
       FROM comments c
       JOIN users u ON c.user_id = u.id
       WHERE c.id = ?
     `;
     db.query(fetch, [result.insertId], (e, rows) => {
       if (e || rows.length === 0) {
-        return res.status(201).json({ id: result.insertId, content: content.trim(), author: req.session.user.username });
+        return res.status(201).json({ id: result.insertId, content: content.trim(), author: req.session.user.user_id });
       }
       res.status(201).json(rows[0]);
     });
   });
+};
+
+// 댓글 수정
+exports.updateComment = async (req, res, next) => {
+  try {
+    const noteId = req.params.noteId;
+    const commentId = req.params.commentId;
+    const { content } = req.body;
+    const userId = req.session.user.user_id;
+
+    await db.promise().query(
+      'UPDATE comments SET content = ? WHERE id = ? AND user_id = ?',
+      [content, commentId, userId]
+    );
+    res.redirect(`/notes/${noteId}`);
+  } catch (e) {
+    next(e);
+  }
+};
+
+// 댓글 삭제
+exports.deleteComment = async (req, res, next) => {
+  try {
+    const noteId = req.params.noteId;
+    const commentId = req.params.commentId;
+    const userId = req.session.user.user_id;
+
+    await db.promise().query(
+      'DELETE FROM comments WHERE id = ? AND user_id = ?',
+      [commentId, userId]
+    );
+    res.redirect(`/notes/${noteId}`);
+  } catch (e) {
+    next(e);
+  }
 };
