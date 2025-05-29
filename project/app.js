@@ -8,6 +8,7 @@ const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const notesRouter = require('./routes/notes');
 const commentsRouter = require('./routes/comments');
+const filesRouter = require('./routes/files');
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/', indexRouter);
 app.use('/', authRouter);
 app.use('/notes', notesRouter);
 app.use('/notes/:noteId/comments', commentsRouter);
+app.use('/files', filesRouter);
 // 404 핸들러
 app.use((req, res) => res.status(404).send('페이지를 찾을 수 없습니다.'));
 // 에러 핸들러
