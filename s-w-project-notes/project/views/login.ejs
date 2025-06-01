@@ -7,7 +7,17 @@
   <title>로그인</title>
 </head>
 <body>
-  <form method="POST" action="/login">
+  <div class="top-wrapper">
+      <!-- noteHub 로고 -->
+      <div class="logo">
+        <a href="/">
+          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+        </a>
+      </div>
+    </div>
+    
+  <form method="POST" action="/auth/login">
+
     <label for="loginId">아이디</label>
     <input id="loginId" type="text" name="id" required />
     <label for="loginPw">비밀번호</label>
@@ -22,7 +32,7 @@
   <p class="link-row">
     <a href="">비밀번호 찾기</a>
     <span class="divider">|</span>
-    <a href="/signup">회원가입</a>
+    <a href="/auth/signup">회원가입</a>
   </p>
 </body>
 </html>
