@@ -185,9 +185,8 @@
 
           alert(updateDownload_log_result.message);
 
-          // downloadController => /files/download/:stored_name으로 GET 요청
           const link = document.createElement('a');
-          link.href = `/files/download/${stored_name}`;
+          link.href = `/files/download/${stored_name}`; // downloadController => /files/download/:stored_name으로 GET 요청
           link.download = '';
           document.body.appendChild(link);
           link.click();
