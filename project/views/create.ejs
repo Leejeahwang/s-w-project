@@ -52,4 +52,11 @@
   
   <a href="/">목록으로 돌아가기</a>
 </body>
+
+<% if (typeof alertMessage !== 'undefined') { %>
+  <script>
+    alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
+  </script>
+<% } %>
+
 </html>

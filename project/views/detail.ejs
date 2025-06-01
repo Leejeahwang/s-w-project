@@ -205,4 +205,11 @@
     });
   </script>
 </body>
+
+<% if(typeof(alertMessage) != 'undefined') { %>
+  <script>
+    alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
+  </script>
+<% } %>
+
 </html>

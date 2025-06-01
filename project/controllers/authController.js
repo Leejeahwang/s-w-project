@@ -13,11 +13,18 @@ exports.login = async (req, res) => {
     const [rows] = await db.promise().query('SELECT * FROM users WHERE user_id=?', [id]);
 
     if (rows.length && rows[0].password === pw) {
-      req.session.user = { userId: rows[0].id, user_id: rows[0].user_id };
+      req.session.user = { 
+        userId: rows[0].id,
+        user_id: rows[0].user_id
+      };
       return res.redirect('/');
     }
 
-    return res.render('login', { user: null, error: '아이디 또는 비밀번호가 일치하지 않습니다.' });
+    return res.render('login', { 
+      user: null, 
+      error: '아이디 또는 비밀번호가 일치하지 않습니다.' 
+    });
+
   } catch (e) {
     console.error('Login error:', e);
     res.render('login', { user: null, error: '로그인 중 오류가 발생했습니다.' });
@@ -34,8 +41,8 @@ exports.signup = async (req, res) => {
   const { id, pw, name, studentId, grade } = req.body;
   try {
     await db.promise().query(
-      'INSERT INTO users (user_id,password,name,studentId,grade) VALUES (?,?,?,?,?)',
-      [id, pw, name, studentId, grade]
+      'INSERT INTO users (user_id, password, name, studentId, grade, point) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, pw, name, studentId, grade, 100]
     );
     res.redirect('/auth/login');
   } catch (e) {

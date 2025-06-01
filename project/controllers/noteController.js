@@ -17,11 +17,13 @@ exports.getAllNotes = (req, res) => {
   });
 };
 
-// 3) 노트 상세 조회 (GET /notes/:id)
+// 3) 노트 상세 페이지 렌더링 (GET /notes/:id)
 exports.getNoteById = async (req, res, next) => {
   try {
     const noteId = req.params.id;
     const editCommentId = parseInt(req.query.editCommentId, 10) || null;
+    const alertMessage = req.session.alertMessage;
+    delete req.session.alertMessage;
 
     const [[note]] = await db.promise().query(
       `SELECT n.id, n.title, n.subject, n.professor, n.category, n.summary, n.like_count, n.download_count,
@@ -68,7 +70,8 @@ exports.getNoteById = async (req, res, next) => {
                               stored_name: file.stored_name,
                               file_path: file.file_path,
                               file_size: formatBytes(file.file_size)},
-                            user: req.session.user });
+                            user: req.session.user,
+                            alertMessage });
   } catch (e) { next(e); }
 }
 

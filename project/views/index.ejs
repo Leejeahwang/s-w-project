@@ -11,7 +11,7 @@
   <header>
 
     <% if (user) { %>
-      <span>안녕하세요, <%= user.user_id %>님</span>
+      <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
       <a href="/auth/logout">로그아웃</a>
       <a href="">자료 등록</a>
       <a href="">장바구니</a>

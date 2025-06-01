@@ -17,12 +17,12 @@ exports.edit_redering = async (req, res) => {
         if (!note || note.user_id !== req.session.user.user_id) return res.redirect('/notes/' + req.params.id);
     
         res.render('edit', { 
-            note, 
-        categories,
-        subjects,
-        years,
-        semesters,
-        user: req.session.user 
+            note,
+            categories,
+            subjects,
+            years,
+            semesters,
+            user: req.session.user 
         });
 
     } catch (e) { 
@@ -34,6 +34,9 @@ exports.edit_redering = async (req, res) => {
 // 노트 수정 처리 (PUT /notes/:id/edit)
 exports.editNote = async (req, res, next) => {
     const noteId = req.params.id;
+    const uploadedFile = req.file;
+
+    console.log(uploadedFile);
 
     if (!req.session.user) return res.redirect('/login');
 
@@ -47,6 +50,16 @@ exports.editNote = async (req, res, next) => {
         await db.promise().query(
             'UPDATE notes SET title=?, summary=?, category=?, subject=?, year=?, semester=?, professor=?, created_at=NOW() WHERE id=?',
             [title, summary, category, subject, year, semester, professor, noteId]);
+
+        // 수정할 파일이 있으면
+        if (uploadedFile) {
+            await db.promise().query(
+                `UPDATE files 
+                SET file_name=?, stored_name=?, file_path=?, file_size=?, uploaded_at=NOW() 
+                WHERE note_id=?`,
+                [uploadedFile.originalname, uploadedFile.filename, '/files/' + uploadedFile.filename, uploadedFile.size, noteId]
+            );
+        }
 
         return res.redirect('/notes/' + noteId);
     } 

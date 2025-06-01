@@ -10,7 +10,7 @@ exports.createNote = async (req, res, next) => {
         const [subjects] = await db.promise().query('SELECT * FROM subjects');
         const [years] = await db.promise().query('SELECT * FROM years');
         const [semesters] = await db.promise().query('SELECT * FROM semesters');
-
+        
         res.render('create', {
             categories,
             subjects,
@@ -49,6 +49,12 @@ exports.uploadNote = async (req, res) => {
                 [noteId, uploadedFile.originalname, uploadedFile.filename, '/files/' + uploadedFile.filename, uploadedFile.size]
             );
         }
+
+        // 노트 업로드시 100P 적립
+        await db.promise().query(
+            `UPDATE users SET point = point + 100 WHERE user_id = ?`, [u.user_id]
+        );
+        req.session.alertMessage = `100P가 적립되었습니다!`;
         
         res.redirect('/');
     } catch {

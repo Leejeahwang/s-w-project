@@ -1,6 +1,6 @@
 const db = require('../db');
 
-// 댓글 목록 조회 (GET )
+// 댓글 목록 조회 (GET ) -> 안씀
 exports.getComments = (req, res) => {
   const noteId = req.params.noteId;
   const query = `
@@ -39,11 +39,24 @@ exports.createComment = async (req, res) => {
       [noteId, userId, content.trim()]
     );
 
-    const [rows] = await db.promise().query(`
-      SELECT c.id, c.content, c.created_at, u.user_id AS author
-      FROM comments c
-      JOIN users u ON c.user_id = u.id
-      WHERE c.id = ?`, [insertResult.insertId]);
+    // 오늘 댓글 쓴 횟수 조회
+    const [rows] = await db.promise().query(
+      `SELECT COUNT(*) AS cnt FROM comments
+      WHERE user_id = ? AND DATE(created_at) = CURDATE()`, [userId]);
+    const todayCount = rows[0].cnt;
+    
+    // 만약 10개 미만이면 -> 5P 적립
+    if(todayCount < 10) {
+      await db.promise().query(
+        `UPDATE users SET point = point + 5 WHERE user_id = ?`, [userId]);
+        req.session.alertMessage = `5P가 적립되었습니다!\n오늘 쓴 댓글 수: ${todayCount}`;
+    }
+
+    // const [rows] = await db.promise().query(`
+    //   SELECT c.id, c.content, c.created_at, u.user_id AS author
+    //   FROM comments c
+    //   JOIN users u ON c.user_id = u.id
+    //   WHERE c.id = ?`, [insertResult.insertId]);
 
     return res.redirect(`/notes/${noteId}`);
 
