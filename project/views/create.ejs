@@ -8,7 +8,7 @@
 </head>
 <body>
   <h2>새 노트 작성</h2>
-  <form method="POST" action="/notes" enctype="multipart/form-data">
+  <form method="POST" action="/notes/upload" enctype="multipart/form-data">
     <p>제목: <input type="text" name="title" required /></p>
     <p>내용: <textarea name="summary" placeholder="요약" required></textarea></p>
     <p>이수 구분:
@@ -50,6 +50,6 @@
     <button type="submit">작성 완료</button>
   </form>
   
-  <a href="/notes">목록으로 돌아가기</a>
+  <a href="/">목록으로 돌아가기</a>
 </body>
 </html>

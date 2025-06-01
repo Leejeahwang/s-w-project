@@ -26,6 +26,7 @@
         <div>
           <a href="/notes/<%= note.id %>/edit">수정</a>
           <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+            <input type="hidden" name="_method" value="DELETE">
             <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
           </form>
         </div>
@@ -91,22 +92,21 @@
       <% } else { %>
         <p>
           댓글을 작성하려면
-          <a href="/login">로그인</a>이 필요합니다.
+          <a href="/auth/login">로그인</a>이 필요합니다.
         </p>
       <% } %>
     </section>
 
-      <a href="/notes">목록으로 돌아가기</a>
+      <a href="/">목록으로 돌아가기</a>
     </div>
-
 
     <div class="right-panel">
       <!-- 다운로드 박스 -->
       <div class="download-box">
         <h3>다운로드</h3>
-        <a id="downloadLink" href="/notes/<%= note.id %>/download" class="download-btn">
-          PDF 다운로드
-        </a>
+          <a id="downloadLink" href="#" class="download-btn" data-note-id="<%= note.id %>" data-filename = "<%= file.stored_name %>">
+            PDF 다운로드
+          </a>
         <div id="fileInfo" class="file-info">
           파일명: <%= file.file_name %> <br>
           용량: <%= file.file_size %></span> <br>
@@ -135,67 +135,74 @@
   <script type = "module" src ="/js/pdf_viewer.js"></script>
 
   <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const likeBtn = document.getElementById("likeBtn");
-  if (!likeBtn) return;
-
-  likeBtn.replaceWith(likeBtn.cloneNode(true));
-  const newBtn = document.getElementById("likeBtn");
-
-  newBtn.addEventListener("click", async function (e) {
-    e.preventDefault();
-    const noteId = this.dataset.noteId;
-
-    try {
-      const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
-
-      if (res.status === 401) {
-        return alert("로그인이 필요합니다.");
-      }
-
-      if (res.status === 400) {
-        const result = await res.json();
-        return alert(result.message || "이미 좋아요를 눌렀습니다.");
-      }
-
-      if (!res.ok) {
-        return alert("좋아요 처리 중 오류 발생");
-      }
-
-      // ✅ 정상 처리된 경우
-      const countSpan = document.getElementById("likeCount");
-      countSpan.textContent = parseInt(countSpan.textContent) + 1;
-
-    } catch (err) {
-      console.error("좋아요 에러:", err);
-      alert("좋아요 처리 중 오류 발생");
-    }
-  });
-});
-
-    // PDF 다운로드 관련 (해야함)
-    // 다운로드 수 수정
-    document.getElementById("downloadLink");
-  </script>
-  <script>
+    // 좋아요 카운팅
     document.getElementById("likeBtn").addEventListener("click", async function () {
       const noteId = this.dataset.noteId;
+
       try {
         const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
         const result = await res.json();
 
-        if (!res.ok) {
-          // 401, 400, 그 외 모두 한 곳에서 처리
-          return alert(result.message);
+        if(res.status === 401) {
+          alert(result.message);
+          return;
         }
 
-        // 성공했을 때
-        const countSpan = document.getElementById("likeCount");
-        countSpan.textContent = parseInt(countSpan.textContent) + 1;
+        if (res.status === 200) { // 좋아요 처리 완료
+          const countSpan = document.getElementById("likeCount");
+          countSpan.textContent = parseInt(countSpan.textContent) + 1;
+          alert(result.message);
+        }
+
+        else {
+          alert(result.message);
+        }
+
       } catch (e) {
         console.error("좋아요 에러:", e);
         alert("좋아요 처리 중 오류가 발생했습니다.");
       }
+    });
+  </script>
+
+  <script>
+    // 다운로드 카운팅 & 파일 다운로드
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("downloadLink").addEventListener("click", async function(e) {
+        e.preventDefault();
+
+        const noteId = this.dataset.noteId;
+        const stored_name = this.dataset.filename;
+
+        try {
+          const updateDownload_log_res = await fetch(`/files/download-log/${noteId}`, { method: 'POST' });
+          const updateDownload_log_result = await updateDownload_log_res.json();
+
+          if(updateDownload_log_res.status === 401 || updateDownload_log_res.status === 404 || !updateDownload_log_res.ok) {
+            alert(updateDownload_log_result.message);
+            return;
+          }
+
+          alert(updateDownload_log_result.message);
+
+          // downloadController => /files/download/:stored_name으로 GET 요청
+          const link = document.createElement('a');
+          link.href = `/files/download/${stored_name}`;
+          link.download = '';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        
+          // 다운로드 카운팅 +1 올리기
+          const countSpan = document.getElementById("downloadCount");
+          const currentCount = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = currentCount + 1;
+        
+        } catch(e) {
+          console.log(e);
+          alert("다운로드 처리 중 오류");
+        }
+      });
     });
   </script>
 </body>

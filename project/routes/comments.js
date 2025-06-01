@@ -1,20 +1,16 @@
 const express = require('express');
 const commentController = require('../controllers/commentController');
-const {
-  getComments,
-  createComment
-} = require('../controllers/commentController');
 const router = express.Router({ mergeParams: true });
 
-router.get('/', getComments);
+// comments.js => /notes/:id/comments
 
-// 댓글 생성
+// 1. 댓글 작성 (POST /notes/:id/comments)
 router.post('/', commentController.createComment);
 
-// 댓글 수정 처리
+// 2. 댓글 수정 처리 (PUT /notes/:id/comments/:commentId)
 router.put('/:commentId', commentController.updateComment);
 
-// 댓글 삭제 처리
+// 3. 댓글 삭제 처리 (DELETE /notes/:id/comments/:commentId)
 router.delete('/:commentId', commentController.deleteComment);
 
 module.exports = router;
