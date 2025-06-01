@@ -104,7 +104,7 @@
       <!-- 다운로드 박스 -->
       <div class="download-box">
         <h3>다운로드</h3>
-        <a id="downloadLink" href=# class="download-btn" data-note-id="<%= note.id %>" data-stored-name="<%= file.stored_name %>">
+        <a id="downloadLink" href="/notes/<%= note.id %>/download" class="download-btn">
           PDF 다운로드
         </a>
         <div id="fileInfo" class="file-info">
@@ -128,82 +128,75 @@
     </div>
   </div>
 
-   <script>
-    // PDF 다운로드 버튼
+  <!-- PDF 사진 로드 관련 -->
+  <script>
+    window.pdfUrl = "<%= file.file_path %>";
+  </script>
+  <script type = "module" src ="/js/pdf_viewer.js"></script>
 
-    // 좋아요 수 관련
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const likeBtn = document.getElementById("likeBtn");
+  if (!likeBtn) return;
+
+  likeBtn.replaceWith(likeBtn.cloneNode(true));
+  const newBtn = document.getElementById("likeBtn");
+
+  newBtn.addEventListener("click", async function (e) {
+    e.preventDefault();
+    const noteId = this.dataset.noteId;
+
+    try {
+      const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
+
+      if (res.status === 401) {
+        return alert("로그인이 필요합니다.");
+      }
+
+      if (res.status === 400) {
+        const result = await res.json();
+        return alert(result.message || "이미 좋아요를 눌렀습니다.");
+      }
+
+      if (!res.ok) {
+        return alert("좋아요 처리 중 오류 발생");
+      }
+
+      // ✅ 정상 처리된 경우
+      const countSpan = document.getElementById("likeCount");
+      countSpan.textContent = parseInt(countSpan.textContent) + 1;
+
+    } catch (err) {
+      console.error("좋아요 에러:", err);
+      alert("좋아요 처리 중 오류 발생");
+    }
+  });
+});
+
+    // PDF 다운로드 관련 (해야함)
+    // 다운로드 수 수정
+    document.getElementById("downloadLink");
+  </script>
+  <script>
     document.getElementById("likeBtn").addEventListener("click", async function () {
       const noteId = this.dataset.noteId;
       try {
         const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
-        if (res.status === 401) {
-          alert("로그인이 필요합니다.");
+        const result = await res.json();
+
+        if (!res.ok) {
+          // 401, 400, 그 외 모두 한 곳에서 처리
+          return alert(result.message);
         }
-        if(res.status === 400) {
-          alert("이미 좋아요를 눌렀습니다");
-        }
-        if (res.ok) {
-          const countSpan = document.getElementById("likeCount");
-          const currentCount = parseInt(countSpan.textContent) || 0;
-          countSpan.textContent = currentCount + 1;
-        } else {
-          const err = await res.json();
-          alert(err.message || "좋아요 처리 실패");
-        }
+
+        // 성공했을 때
+        const countSpan = document.getElementById("likeCount");
+        countSpan.textContent = parseInt(countSpan.textContent) + 1;
       } catch (e) {
         console.error("좋아요 에러:", e);
-      }
-    });
-
-    // 파일 다운로드 관련
-    document.getElementById("downloadLink").addEventListener("click", async function (e) {
-      e.preventDefault();
-
-      const noteId = this.dataset.noteId;
-      const stored_name = "<%= file.stored_name %>";
-
-      try {
-        // 다운로드 기록 + 카운트 증가 처리용 POST 요청 (POST /files/download-log/:noteId)
-        const res = await fetch(`/files/download-log/${noteId}`, { method: 'POST' });
-
-        if(res.status === 401) {
-          alert("로그인이 필요합니다. (detail.ejs 1)");
-          return;
-        }
-
-        if(res.status === 404) {
-          alert("파일이 존재하지 않습니다 (detail.ejs 2)");
-          return;
-        }
-
-        if(res.ok) {
-          const countSpan = document.getElementById("downloadCount");
-          const currentCount = parseInt(countSpan.textContent) || 0;
-          countSpan.textContent = currentCount + 1;
-          
-          // 실제 파일 다운로드 (GET /files/:stored_name)
-          // window.location.href = `/files/${stored_name}`;
-          const a = document.createElement('a');
-          a.href = `/files/${stored_name}`;
-          a.download = '';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }
-
-        else {
-          alert("다운로드 처리 실패 (detail.ejs 3)");
-        }
-      }
-      catch(err) {
-        console.error("다운로드 에러:", err);
+        alert("좋아요 처리 중 오류가 발생했습니다.");
       }
     });
   </script>
-
-  <!-- PDF viewer는 그대로 유지 -->
-  <script type="module" src="/js/pdf_viewer.js"></script>
-
-
 </body>
 </html>

@@ -20,6 +20,27 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// 1) 목록 + 필터 (GET /notes)
+// router.get('/', async (req, res, next) => {
+//   try {
+//     const { subject = '', professor = '', category = '' } = req.query;
+//     let sql = `
+//       SELECT n.title, n.id, n.subject, n.professor, n.category, n.summary, n.created_at,
+//              n.user_id, u.user_id AS authorName, n.created_at
+//       FROM notes n
+//       JOIN users u ON n.user_id = u.id
+//       WHERE n.subject LIKE ? AND n.professor LIKE ?
+//     `;
+//     const params = [`%${subject}%`, `%${professor}%`];
+//     if (category) {
+//       sql += ' AND n.category = ?';
+//       params.push(category);
+//     }
+//     sql += ' ORDER BY n.created_at DESC';
+//     const [notes] = await db.promise().query(sql, params);
+//     res.render('index', { notes, filters: { subject, professor, category }, user: req.session.user });
+//   } catch (e) { next(e); }
+// });
 router.post('/:id/like', async (req, res, next) => {
   if (!req.session.user) return res.status(401).json({ message: '로그인이 필요합니다.' });
   const noteId = req.params.id, userId = req.session.user.user_id;
@@ -306,7 +327,6 @@ router.get('/:id', async (req, res, next) => {
                            editCommentId,
                            file: {
                               file_name: file.file_name,
-                              stored_name: file.stored_name,
                               file_path: file.file_path,
                               file_size: formatBytes(file.file_size)
                           },
@@ -327,6 +347,82 @@ router.post('/:id/comments', async (req, res, next) => {
     );
     res.redirect('/notes/' + noteId);
   } catch (e) { next(e); }
+});
+
+// 다운로드 라우터 (GET /files:/filename)
+router.get('/files/:filename', async (req, res, next) => {
+  // 로그인 여부 확인
+  if(!req.session.user) {
+    return res.send(`
+      <script>
+        alert("다운로드는 로그인 시 가능합니다.");
+        window.location.href = "/login";
+      </script>
+      `);
+  }
+
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '..', 'public', 'files', filename);
+  try{
+    res.download(filePath, filename, async err => {
+      // 에러 처리
+      if(err) {
+        console.error("파일 다운로드 오류: ", err);
+        return res.status(404).send("파일을 찾을 수 없습니다");
+      }
+
+      // 1. notes 테이블에서 note_id 조회
+      const [rows] = await db.promise().query(
+        `SELECT note_id FROM files WHERE file_name = ?`, [filename]
+      );
+
+      if(rows.length === 0) {
+        console.warn("해당 파일에 연결된 노트를 찾을 수 없습니다");
+        return;
+      }
+
+      const noteId = rows[0].note_id;
+      const userId = req.session.user.user_id;
+
+      // 2. notes 테이블의 다운로드 수 +1
+      await db.promise().query(
+          'UPDATE notes SET download_count = download_count + 1 WHERE id = ?',
+          [noteId]
+        );
+
+      // 3. note_downloads 테이블에 기록 추가
+      await db.promise().query(
+        'INSERT INTO note_downloads (note_id, user_id, downloaded_at) VALUES (?, ?, NOW())',
+        [noteId, userId]
+      );
+    });
+  } catch(err) {
+    console.error("다운로드 처리 중 오류: ". err);
+    res.status(500).send("서버 오류");
+  }
+});
+router.get('/:id/download', async (req, res, next) => {
+  try {
+    const noteId = req.params.id;
+    // 1) 파일 경로 조회
+    const [[file]] = await db.promise().query(
+      'SELECT file_path, file_name FROM files WHERE note_id = ?',
+      [noteId]
+    );
+    if (!file) return res.status(404).send('파일이 없습니다.');
+
+    // 2) 다운로드 수 증가
+    await db.promise().query(
+      'UPDATE notes SET download_count = download_count + 1 WHERE id = ?',
+      [noteId]
+    );
+
+    // 3) 파일 전송
+    const fullPath = path.join(__dirname, '..', 'public', file.file_path);
+    res.download(fullPath, file.file_name);
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

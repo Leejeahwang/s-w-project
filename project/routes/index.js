@@ -6,4 +6,9 @@ router.get('/', (req, res) => {
   res.redirect('/notes');
 });
 
+// /chat 페이지 렌더링
+router.get('/chat', (req, res) => {
+  res.render('chat', { user: req.session.user });
+});
+
 module.exports = router;

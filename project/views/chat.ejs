@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>실시간 채팅</title>
+  <style>
+    /* 간단한 스타일: 비활성화 상태를 살짝 회색 톤으로 표시 */
+    #chatForm {
+      margin-top: 1rem;
+    }
+    #msgInput:disabled {
+      background-color: #f0f0f0;
+      cursor: not-allowed;
+    }
+    #sendBtn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>채팅</h1>
+
+  <!-- 1) 메시지 리스트 (항상 보임) -->
+  <ul id="messages"></ul>
+
+  <!-- 2) 입력 폼은 “항상” 렌더링하되, 로그인 여부(user)에 따라 disabled 처리 -->
+  <div id="chatForm">
+    <input
+      id="msgInput"
+      autocomplete="off"
+      placeholder="<%= user ? '메시지를 입력하세요' : '로그인 후 채팅 가능합니다' %>"
+      <%= user ? '' : 'disabled' %>
+    />
+    <button id="sendBtn" <%= user ? '' : 'disabled' %>>
+      전송
+    </button>
+    <!-- 로그인 안 된 상태라면 눌러도 알림 띄움 -->
+    <% if (!user) { %>
+      <small style="color: #a00;">
+        (채팅을 보내려면 <a href="/login">로그인</a>해야 합니다)
+      </small>
+    <% } %>
+  </div>
+
+  <!-- 3) Socket.IO 및 스크립트 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // 메시지를 보내는 함수
+    function sendMessage() {
+      const input = document.getElementById('msgInput');
+      const text = input.value.trim();
+      if (!text) return;
+      socket.emit('chat message', text);
+      input.value = '';
+    }
+
+    // 3-1) 로그인된 사용자라면, 클릭 시 sendMessage() 호출
+    <% if (user) { %>
+      document.getElementById('sendBtn').addEventListener('click', sendMessage);
+      // 엔터(key = 13)로도 전송할 수 있게
+      document.getElementById('msgInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+    <% } else { %>
+      // 3-2) 비로그인 상태라면, 클릭 시 경고창 표시
+      document.getElementById('sendBtn').addEventListener('click', e => {
+        e.preventDefault();
+        alert('채팅을 보내려면 로그인해야 합니다.');
+      });
+      document.getElementById('msgInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          alert('채팅을 보내려면 로그인해야 합니다.');
+        }
+      });
+    <% } %>
+
+    // 4) 서버에서 'chat message' 이벤트 받으면 화면에 추가
+    socket.on('chat message', msg => {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      document.getElementById('messages').appendChild(li);
+    });
+
+    // (선택) 비로그인 상태에서 개발자 도구 콘솔로 io() 연결 시도 시 경고 처리
+    socket.on('connect_error', err => {
+      if (!<%= user ? 'true' : 'false' %>) {
+        console.warn('채팅 연결이 거부되었습니다:', err.message);
+      }
+    });
+  </script>
+</body>
+</html>
