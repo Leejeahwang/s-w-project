@@ -1,6 +1,6 @@
 const db = require('../db');
 
-// 전체 노트 목록 조회
+// 전체 노트 목록 조회 -> 안쓰는듯?
 exports.getAllNotes = (req, res) => {
   const query = `
     SELECT n.id, n.subject, n.professor, n.category, n.summary, n.created_at, u.username AS authorName
@@ -72,7 +72,7 @@ exports.getNoteById = async (req, res, next) => {
   } catch (e) { next(e); }
 }
 
-// 새 노트 생성
+// 새 노트 생성 -> 안쓰는듯?
 exports.createNote = (req, res) => {
   if (!req.session.user || !req.session.user.userId) {
     return res.status(401).json({ message: '로그인이 필요합니다.' });

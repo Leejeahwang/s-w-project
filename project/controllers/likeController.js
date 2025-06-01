@@ -1,6 +1,6 @@
 const db = require('../db');
 
-// 좋아요 버튼: POST /notes/:id/like
+// 좋아요 버튼 (POST /notes/:id/like)
 exports.updateLike_log = async (req, res) => {
     // 로그인 여부 확인
     if(!req.session.user) return res.status(401).json({ message: "로그인이 필요합니다." });

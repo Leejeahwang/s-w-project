@@ -1,6 +1,6 @@
 const db = require('../db');
 
-// 메인페이지 (GET /)
+// 메인 페이지 렌더링 처리 (GET /)
 exports.getIndex = async (req, res, next) => {
     try {
         const { category, subject, professor, year, semester, keyword } = req.query;

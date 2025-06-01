@@ -21,7 +21,6 @@ const upload = multer({ storage });
 
 
 // notes.js => /notes
-// 여기서부터 보면 됩니다.
 const noteController = require('../controllers/noteController');
 const noteCreateController = require('../controllers/noteCreateController');
 const noteEditController = require('../controllers/noteEditController');

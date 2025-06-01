@@ -22,25 +22,6 @@ exports.login = async (req, res) => {
     console.error('Login error:', e);
     res.render('login', { user: null, error: '로그인 중 오류가 발생했습니다.' });
   }
-  // const { id, pw } = req.body;
-  // if (!id || !pw) {
-  //   return res.status(400).send('아이디와 비밀번호를 모두 입력해주세요.');
-  // }
-  // db.query('SELECT * FROM users WHERE username = ?', [id], (err, results) => {
-  //   if (err) {
-  //     console.error('로그인 DB 조회 오류:', err);
-  //     return res.status(500).send('로그인 처리 중 오류가 발생했습니다.');
-  //   }
-  //   if (results.length === 0 || pw !== results[0].password) {
-  //     return res.status(401).send('<script>alert("아이디 또는 비밀번호가 일치하지 않습니다."); window.location="/login.html";</script>');
-  //   }
-  //   const user = results[0];
-  //   req.session.user = {
-  //     userId: user.id,
-  //     username: user.username
-  //   };
-  //   res.redirect('/');
-  // });
 };
 
 // 회원가입 화면 렌더링 (GET /auth/singup)
