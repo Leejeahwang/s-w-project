@@ -129,7 +129,19 @@ select * from files;
 select * from note_downloads;
 select * from comments;
 
-delete from notes where id = 24;
+delete from comments;
+
+SELECT id, title, like_count
+FROM notes
+ORDER BY like_count DESC
+LIMIT 5;
+
+SELECT COUNT(*) FROM comments WHERE user_id='admin' AND DATE(created_at) = CURDATE();
+
+ALTER TABLE users
+  ADD COLUMN point INT;
+
+delete from notes where id = 32;
 
 SELECT note_id FROM files WHERE note_id = 23;
 INSERT INTO note_downloads (note_id, user_id, downloaded_at) VALUES (?, ?, NOW());
@@ -162,10 +174,7 @@ CREATE TABLE note_downloads (
   id INT AUTO_INCREMENT PRIMARY KEY,
   note_id INT NOT NULL,
   user_id VARCHAR(50) NOT NULL,
-  downloaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY unique_downlode (note_id, user_id),
-  FOREIGN KEY (note_id) REFERENCES notes(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+  downloaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 ALTER TABLE files
@@ -173,4 +182,4 @@ ALTER TABLE files
   
 delete from notes where id = 22;
 
-ALTER TABLE note_downloads DROP INDEX unique_downlode;
+DROP TABLE IF EXISTS note_downloads;
