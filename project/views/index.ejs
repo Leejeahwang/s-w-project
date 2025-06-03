@@ -11,15 +11,15 @@
   <header>
 
     <% if (user) { %>
-      <span>안녕하세요, <%= user.user_id %>님</span>
-      <a href="/logout">로그아웃</a>
+      <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
+      <a href="/auth/logout">로그아웃</a>
       <a href="">자료 등록</a>
       <a href="">장바구니</a>
       <a href="">마이페이지</a>
       <a href="">고객센터</a>
     <% } else { %>
-      <a href="/login">로그인</a>
-      <a href="/signup">회원가입</a>
+      <a href="/auth/login">로그인</a>
+      <a href="/auth/signup">회원가입</a>
       <a href="">자료 등록</a>
       <a href="">장바구니</a>
       <a href="">마이페이지</a>
@@ -41,7 +41,7 @@
 
     <!-- 검색창, filter-form 외부에 위치-->
     <div class="search-area">
-      <form method="GET" action="/notes">
+      <form method="GET" action="/">
         <!-- 검색 영역 -->
         <div class="search-wrapper">
           <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
@@ -56,7 +56,7 @@
 
     <!-- 필터 폼 부분 -->
     <section class="filter-form">
-      <form method="GET" action="/notes">
+      <form method="GET" action="/">
 
         <!-- 필터 영역-->
         <div class="filter-section">
@@ -100,7 +100,7 @@
         </div>
       </form>
 
-      <!-- 노트 추가 -->
+      <!-- 노트 추가 noteRouer /notes/new -->
       <% if (user) { %>
         <a href="/notes/new">자료 등록</a>
       <% } %>
