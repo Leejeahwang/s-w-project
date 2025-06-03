@@ -11,18 +11,38 @@
   <header>
 
     <% if (user) { %>
-      <span>안녕하세요, <%= user.user_id %>님</span>
-      <a href="/logout">로그아웃</a>
-      <a href="">자료 등록</a>
+      <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
+      <a href="/auth/logout">로그아웃</a>
+      <a href="/notes/new">자료 등록</a>
+      <span class="divider">|</span>
+
       <a href="">장바구니</a>
+      <span class="divider">|</span>
+
+      <a href="/point">포인트 샵</a>
+      <span class="divider">|</span>
+
       <a href="">마이페이지</a>
+      <span class="divider">|</span>
+
       <a href="">고객센터</a>
     <% } else { %>
-      <a href="/login">로그인</a>
-      <a href="/signup">회원가입</a>
+      <a href="/auth/login">로그인</a>
+      <a href="/auth/signup">회원가입</a>
+      <span class="divider">|</span>
+
       <a href="">자료 등록</a>
+      <span class="divider">|</span>
+
       <a href="">장바구니</a>
+      <span class="divider">|</span>
+
+      <a href="/point">포인트샵</a>
+      <span class="divider">|</span>
+
       <a href="">마이페이지</a>
+      <span class="divider">|</span>
+      
       <a href="">고객센터</a>
     <% } %>
   </header>
@@ -34,14 +54,14 @@
       <!-- noteHub 로고 -->
       <div class="logo">
         <a href="/">
-          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고">
         </a>
       </div>
     </div>
 
     <!-- 검색창, filter-form 외부에 위치-->
     <div class="search-area">
-      <form method="GET" action="/notes">
+      <form method="GET" action="/">
         <!-- 검색 영역 -->
         <div class="search-wrapper">
           <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
@@ -54,56 +74,81 @@
       </form>
     </div>
 
+    <!-- 좋아요 랭킹 -->
+    <aside class="like-ranking" style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+      <h4>🔥 좋아요 랭킹</h4>
+      <% if (likeRanking.length === 0) { %>
+        <p>데이터 없음</p>
+      <% } else { %>
+        <ol>
+          <% likeRanking.forEach(item => { %>
+            <li>
+              <a href="/notes/<%= item.id %>"><%= item.title %></a>
+              (<%= item.like_count %>개)
+            </li>
+          <% }) %>
+        </ol>
+      <% } %>
+    </aside>
+
     <!-- 필터 폼 부분 -->
     <section class="filter-form">
-      <form method="GET" action="/notes">
-
-        <!-- 필터 영역-->
+      <form method="GET" action="/">
         <div class="filter-section">
-          <label>이수구분
-            <select name="category">
-              <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
-              <% categories.forEach(c => { %>
-                <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
-              <% }) %>
-            </select>
-          </label>
-        
-          <label>과목
-            <select name="subject">
-              <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
-              <% subjects.forEach(s => { %>
-                <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
-              <% }) %>
-            </select>
-          </label>
-        
-          <label>학년
-            <select name="year">
-              <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
-              <% years.forEach(y => { %>
-                <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
-              <% }) %>
-            </select>
-          </label>
-        
-          <label>학기
-            <select name="semester">
-              <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
-              <% semesters.forEach(sm => { %>
-                <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
-              <% }) %>
-            </select>
-          </label>
-        
-          <button type="submit">필터 적용</button>
+          
+          <!-- 드롭다운 필터 -->
+          <div class="filter-left">
+              <label>이수구분
+              <select name="category">
+                <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
+                <% categories.forEach(c => { %>
+                  <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+                <% }) %>
+              </select>
+            </label>
+          
+            <label>과목
+              <select name="subject">
+                <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
+                <% subjects.forEach(s => { %>
+                  <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+                <% }) %>
+              </select>
+            </label>
+          
+            <label>학년
+              <select name="year">
+                <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
+                <% years.forEach(y => { %>
+                  <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+                <% }) %>
+              </select>
+            </label>
+          
+            <label>학기
+              <select name="semester">
+                <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
+                <% semesters.forEach(sm => { %>
+                  <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+                <% }) %>
+              </select>
+            </label>
+          </div>
+
+          <!-- 버튼 그룹 -->
+          <div class="button-group">
+            <button type="submit">필터 적용</button>
+
+            <!-- 노트 추가 noteRouer /notes/new -->
+            <% if (user) { %>
+              <a href="/notes/new">자료 등록</a>
+            <% } %>
+          </div>
+          
         </div>
       </form>
 
-      <!-- 노트 추가 -->
-      <% if (user) { %>
-        <a href="/notes/new">자료 등록</a>
-      <% } %>
+      
     </section>
 
     <!-- 노트 목록 -->

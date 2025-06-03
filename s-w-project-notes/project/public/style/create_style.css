@@ -21,19 +21,12 @@ body {
   color: #333;
 }
 
-/* 제목 */
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
 /* 폼 전체 영역 */
 form {
   max-width: 600px;
   margin: 0 auto;
   background-color: #ffffff;
   padding: 30px;
-  border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -41,23 +34,69 @@ form {
 form p {
   margin-bottom: 20px;
   font-weight: 500;
+  font-family: inherit;
 }
 
 /* 입력 박스, 셀렉트 공통 스타일 */
-input[type="text"], textarea, select, input[name="professor"] {
+input[type="text"], select, input[name="professor"] {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #ccc;
-  border-radius: 8px;
   box-sizing: border-box;
-  font-size: 0.95em;
+  font-size: 0.85em;
   margin-top: 6px;
+  font-family: inherit;
 }
 
-/* 텍스트박스 사이즈 조정 */
-textarea {
-  resize: vertical;
-  min-height: 100px;
+/* 텍스트 작성 도구 */
+.editor-toolbar {
+  border: 1px solid #ccc;
+  border-bottom: none;
+  background-color: #f5f5f5;
+  padding: 8px;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.editor-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  border: 2px;
+}
+
+.editor-btn:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
+}
+
+.editor-btn.activer {
+  background-color: #d0d0d0;
+  background-color: #999;
+}
+
+.editor-separator {
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 5px;
+}
+
+.editor-content {
+  border: 1px solid #ccc;
+  min-height: 200px;
+  padding: 10px;
+  background-color: white;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+}
+
+.editor-content:focus {
+  border-color: #1976d2;
 }
 
 /* 버튼 */
@@ -69,17 +108,18 @@ button[type="submit"] {
   padding: 12px;
   font-size: 1em;
   font-weight: bold;
-  border-radius: 8px;
+  font-family: inherit;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 20px;
 }
 
 .pdf-bar {
-  color: #666;
+  color: #969696;
 }
 
 button[type="submit"]:hover {
-  background-color: #135ba1;
+  background-color: #6fb7f2;
 }
 
 /* 목록 돌아가기 링크 */
@@ -88,7 +128,6 @@ a {
   text-align: center;
   margin-top: 25px;
   color: #1976d2;
-  font-weight: bold;
   text-decoration: none;
 }
 

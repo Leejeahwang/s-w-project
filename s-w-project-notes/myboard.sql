@@ -184,5 +184,13 @@ delete from notes where id = 22;
 
 DROP TABLE IF EXISTS note_downloads;
 
-ALTER TABLE users ADD point INT DEFAULT 0;
+ALTER TABLE users ADD point INT DEFAULT 0; -- user 가입 시 point 부여
 
+insert into semesters (name) values("2022년-계절학기(하계)"); -- 22 계절(하계)
+insert into semesters (name) values("2022년-계절학기(동계)"); -- 22 계절(동계)
+insert into semesters (name) values("2023년-계절학기(하계)"); -- 23 계절(하계)
+insert into semesters (name) values("2023년-계절학기(동계)"); -- 23 계절(동계)
+insert into semesters (name) values("2024년-계절학기(하계)"); -- 24 계절(하계)
+insert into semesters (name) values("2024년-계절학기(동계)"); -- 24 계절(동계)
+insert into semesters (name) values("2025년-계절학기(하계)"); -- 25 계절(하계)
+insert into semesters (name) values("2025년-계절학기(동계)"); -- 25 계절(동계)
