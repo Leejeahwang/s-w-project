@@ -17,6 +17,6 @@ const sever = http.createServer((req, res) => {
     }
 });
 
-sever.listen(3000, () => {
+sever.listen(3001, () => {
     console.log('http://localhost:3000 에서 서버 실행 중');
 });
