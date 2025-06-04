@@ -50,18 +50,28 @@
     <% if (parents.length > 0) { %>
       <ul class="comments-list">
         <% parents.forEach(parent => { %>
-          <li class="comment-item" style="margin-bottom: 1.5rem;">
+          <li id="comment-<%= parent.id %>" class="comment-item" style="margin-bottom: 1.5rem;">
 
             <!-- 1) 부모 댓글 수정 분기 -->
             <% if (editCommentId === parent.id) { %>
               <!-- 수정 폼 (인라인으로 텍스트박스 보임) -->
-              <form action="/notes/<%= note.id %>/comments/<%= parent.id %>" method="POST">
+              <form
+                id="edit-parent-form-<%= parent.id %>"
+                action="/notes/<%= note.id %>/comments/<%= parent.id %>"
+                method="POST"
+              >
                 <input type="hidden" name="_method" value="PUT">
-                <textarea name="content" rows="3" required><%= parent.content %></textarea>
+                <!-- 수정용 textarea에도 js-enter-submit 클래스와 data-form-id 지정 -->
+                <textarea
+                  name="content"
+                  rows="3"
+                  required
+                  class="js-enter-submit"
+                  data-form-id="edit-parent-form-<%= parent.id %>"
+                ><%= parent.content %></textarea>
                 <button type="submit">저장</button>
                 <a href="/notes/<%= note.id %>">취소</a>
               </form>
-
             <% } else { %>
               <!-- 수정 폼이 아닐 때(일반 댓글 표시) -->
               <div class="comment-main">
@@ -70,7 +80,7 @@
                 <% if (user && user.user_id === parent.user_id) { %>
                   <span class="comment-actions">
                     <!-- 수정 버튼: 클릭 시 페이지가 ?editCommentId=<id>로 리로드됨 -->
-                    <a href="/notes/<%= note.id %>?editCommentId=<%= parent.id %>">수정</a>
+                    <a href="/notes/<%= note.id %>?editCommentId=<%= parent.id %>#comment-<%= parent.id %>">수정</a>
                     <form action="/notes/<%= note.id %>/comments/<%= parent.id %>" method="POST" style="display:inline;">
                       <input type="hidden" name="_method" value="DELETE">
                       <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
@@ -87,23 +97,33 @@
             <% if (childrenByParent[parent.id]) { %>
               <ul class="nested-comments-list" style="margin-left: 2rem; margin-top: 1rem;">
                 <% childrenByParent[parent.id].forEach(child => { %>
-                  <li class="comment-item child-comment" style="margin-bottom: 1rem;">
+                  <li id="comment-<%= child.id %>" class="comment-item child-comment" style="margin-bottom: 1rem;">
 
                     <!-- 대댓글 수정 분기 -->
                     <% if (editCommentId === child.id) { %>
-                      <form action="/notes/<%= note.id %>/comments/<%= child.id %>" method="POST">
+                      <form
+                        id="edit-child-form-<%= child.id %>"
+                        action="/notes/<%= note.id %>/comments/<%= child.id %>"
+                        method="POST"
+                      >
                         <input type="hidden" name="_method" value="PUT">
-                        <textarea name="content" rows="2" required><%= child.content %></textarea>
+                        <!-- 수정용 textarea에도 동일하게 처리 -->
+                        <textarea
+                          name="content"
+                          rows="2"
+                          required
+                          class="js-enter-submit"
+                          data-form-id="edit-child-form-<%= child.id %>"
+                        ><%= child.content %></textarea>
                         <button type="submit">저장</button>
                         <a href="/notes/<%= note.id %>">취소</a>
                       </form>
-
                     <% } else { %>
                       <p><strong><%= child.author %>:</strong> <%= child.content %></p>
                       <small><em><%= new Date(child.created_at).toLocaleString('ko-KR') %></em></small>
                       <% if (user && user.user_id === child.user_id) { %>
                         <span class="comment-actions">
-                          <a href="/notes/<%= note.id %>?editCommentId=<%= child.id %>">수정</a>
+                          <a href="/notes/<%= note.id %>?editCommentId=<%= child.id %>#comment-<%= child.id %>">수정</a>
                           <form action="/notes/<%= note.id %>/comments/<%= child.id %>" method="POST" style="display:inline;">
                             <input type="hidden" name="_method" value="DELETE">
                             <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
@@ -118,12 +138,28 @@
             <% } %>
 
             <!-- 3) 대댓글 작성 폼(숨김) -->
-            <form action="/notes/<%= note.id %>/comments" method="POST" class="new-reply-form" id="reply-form-<%= parent.id %>" style="display:none; margin-left: 2rem; margin-top: 0.5rem;">
-              <input type="hidden" name="parentId" value="<%= parent.id %>">
-              <textarea name="content" rows="2" placeholder="답글을 입력하세요" required></textarea>
-              <button type="submit">등록</button>
-              <button type="button" class="cancel-reply-btn" data-parent-id="<%= parent.id %>">취소</button>
-            </form>
+            <% if (user) { %>
+              <form
+                id="reply-form-<%= parent.id %>"
+                action="/notes/<%= note.id %>/comments"
+                method="POST"
+                class="new-reply-form"
+                style="display: none; margin-left: 2rem; margin-top: 0.5rem;"
+              >
+                <input type="hidden" name="parentId" value="<%= parent.id %>">
+                <!-- textarea에 동일한 클래스와 data-form-id를 설정 -->
+                <textarea
+                  name="content"
+                  rows="2"
+                  placeholder="답글을 입력하세요"
+                  required
+                  class="js-enter-submit"
+                  data-form-id="reply-form-<%= parent.id %>"
+                ></textarea>
+                <button type="submit">등록</button>
+                <button type="button" class="cancel-reply-btn" data-parent-id="<%= parent.id %>">취소</button>
+              </form>
+            <% } %>
 
           </li>
         <% }) %>
@@ -134,9 +170,17 @@
 
     <!-- 최상위 댓글 작성 폼은 그대로 두면 됩니다 -->
     <% if (user) { %>
-      <form action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form" style="margin-top:2rem;">
+      <form id="new-comment-form" action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form" style="margin-top: 2rem;">
         <h4>새 댓글 작성</h4>
-        <textarea name="content" rows="3" placeholder="댓글을 입력하세요" required></textarea>
+        <!-- textarea에 클래스 및 data-form-id 지정 -->
+        <textarea
+          name="content"
+          rows="3"
+          placeholder="댓글을 입력하세요"
+          required
+          class="js-enter-submit"
+          data-form-id="new-comment-form"
+        ></textarea>
         <button type="submit">등록</button>
       </form>
     <% } else { %>
@@ -273,6 +317,27 @@
     });
   </script>
 </body>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // .js-enter-submit 클래스를 가진 모든 textarea에 keydown 이벤트를 달아줍니다.
+      document.querySelectorAll('.js-enter-submit').forEach(textarea => {
+        textarea.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            // Ctrl+Enter는 줄바꿈(기본 동작) 그대로
+            if (e.ctrlKey) {
+              return;
+            }
+            // Enter 단독: 기본 줄바꿈 방지 후 해당 폼 제출
+            e.preventDefault();
+            const formId = textarea.dataset.formId;
+            const form = document.getElementById(formId);
+            if (form) form.submit();
+          }
+        });
+      });
+    });
+  </script>
 
 <% if(typeof(alertMessage) != 'undefined') { %>
   <script>

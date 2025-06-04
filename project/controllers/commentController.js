@@ -21,7 +21,7 @@ exports.getComments = (req, res) => {
 
 // 댓글 작성 (POST /notes/:id/comments)
 exports.createComment = async (req, res) => {
-  if (!req.session.user || !req.session.user.userId) {
+  if (!req.session.user || !req.session.user.user_id) {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
 
@@ -40,7 +40,7 @@ exports.createComment = async (req, res) => {
       'INSERT INTO comments (note_id, user_id, content, parent_id) VALUES (?, ?, ?, ?)',
       [noteId, userId, content.trim(), parent]
     );
-
+    const newCommentId = insertResult.insertId;
     // 오늘 댓글 쓴 횟수 조회
     const [rows] = await db.promise().query(
       `SELECT COUNT(*) AS cnt FROM comments
@@ -59,9 +59,7 @@ exports.createComment = async (req, res) => {
     //   FROM comments c
     //   JOIN users u ON c.user_id = u.id
     //   WHERE c.id = ?`, [insertResult.insertId]);
-
-    return res.redirect(`/notes/${noteId}`);
-
+    return res.redirect(`/notes/${noteId}#comment-${newCommentId}`);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "댓글 작성 중 오류가 발생했습니다" });
@@ -73,18 +71,23 @@ exports.updateComment = async (req, res, next) => {
   const noteId = req.params.id;
   const commentId = req.params.commentId;
   const { content } = req.body;
+
+  if (!req.session.user || !req.session.user.user_id) {
+    return res.status(401).json({ message: '로그인이 필요합니다.' });
+  }
   const userId = req.session.user.user_id;
 
-  if(!content || !content.trim()) return res.status(400).json({ message: '수정할 내용을 입력해주세요.' });
+  if (!content || !content.trim()) {
+    return res.status(400).json({ message: '수정할 내용을 입력해주세요.' });
+  }
   
   try {
-    await db.promise().query(
+    const [result] = await db.promise().query(
       'UPDATE comments SET content = ? WHERE id = ? AND user_id = ?',
-      [content, commentId, userId]
+      [content.trim(), commentId, userId]
     );
 
-    return res.redirect(`/notes/${noteId}`);
-
+     return res.redirect(`/notes/${noteId}#comment-${commentId}`);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "댓글 수정 중 오류가 발생했습니다" });
