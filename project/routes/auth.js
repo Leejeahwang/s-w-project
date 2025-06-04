@@ -20,6 +20,7 @@ router.post('/signup', authController.signup);
 // 로그아웃 (GET /auth/logout)
 router.get('/logout', authController.logout);
 
+// 따로 빼는것도 나쁘지 않을듯 ? ? ?
 // 카카오톡 토큰 얻기 (GET /auth/kakao/token)
 router.get('/kakao/token', authController.getKakaoToken);
 
