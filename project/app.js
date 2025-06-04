@@ -2,12 +2,15 @@ const express = require('express');
 const session = require('express-session');
 const path = require('path');
 const methodOverride = require('method-override');
+require('dotenv').config()
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const notesRouter = require('./routes/notes');
 const downloadRouter = require('./routes/downloads');
 const commentRouter = require('./routes/comments');
+const todoRouter = require('./routes/todos');
+const pointshopRouter = require('./routes/pointshop');
 
 const app = express();
 
@@ -41,6 +44,8 @@ app.use('/auth', authRouter);
 app.use('/notes', notesRouter);
 app.use('/files', downloadRouter);
 app.use('/notes/:id/comments', commentRouter);
+app.use('/todo', todoRouter);
+app.use('/pointshop', pointshopRouter);
 
 // 404 핸들러
 app.use((req, res) => res.status(404).send('페이지를 찾을 수 없습니다.'));

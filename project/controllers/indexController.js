@@ -51,6 +51,7 @@ exports.getIndex = async (req, res, next) => {
         const [years] = await db.promise().query('SELECT name FROM years');
         const [semesters] = await db.promise().query('SELECT name FROM semesters');
         const [professors] = await db.promise().query('SELECT DISTINCT professor AS name FROM notes');
+        const [likeRanking] = await db.promise().query('SELECT id, title, like_count FROM notes ORDER BY like_count DESC LIMIT 5');
 
         let userInfo = null;
         if(req.session.user) {
@@ -71,7 +72,8 @@ exports.getIndex = async (req, res, next) => {
             semesters,
             filters : { category, subject, professor, year, semester },
             keyword: keyword || '',
-            user: userInfo
+            user: userInfo,
+            likeRanking
         });
     } catch (err) { next(err); }
 }

@@ -50,9 +50,67 @@ header a {
   line-height: 1;          /* 또는 1.2, 전체 통일 */
 }
 
-header a:hover {
+header a:hover,
+#toggle:hover {
   text-decoration: underline;
+  color: #0d8ddb;
 }
+
+/* 사이드바 토글 */
+header div#toggle {
+  position: fixed;
+  top: 15px;
+  left: 20px;
+  text-decoration: none;
+  margin-right: auto;
+  font-size: 14px;
+  color: #2196f3;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* 사이드바 */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px; /* 숨겨진 상태 */
+  width: 300px;
+  height: 100%;
+  background-color: #fefefe;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+  z-index: 1000;
+  transition: left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+#sidebar.active {
+  left: 0; /* 슬라이드 인 */
+}
+
+#sidebar.active ~ #toggle {
+  left: 320px; /* sidebar 너비 + 여유 */
+}
+
+#sidebar .read-only,
+#sidebar .write-only {
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+#sidebar .write-only {
+  flex: 1;
+}
+
+#markdown-input {
+  width: 290px;
+  height: 100px;
+  resize: vertical;
+}
+
+
+
 
 /* 사이트 로고 */
 .top-wrapper {
@@ -338,4 +396,18 @@ header a:hover {
     padding: 10px 15px;
     font-size: 13px;
   }
+}
+
+/* ToDO 리스트 */
+#todo-toggle {
+  position: fixed;
+  left: 20px;
+  top: 20px;
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 13px;
+  z-index: 1000;
 }

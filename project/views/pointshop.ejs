@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>포인트 샵</title>
+  <link rel="stylesheet" href="/style/pointshop_style.css">
+</head>
+<body>
+  <div class="shop-container">
+    <h2 class="shop-title">🎁 포인트 샵</h2>
+
+    <div class="point-info">
+      안녕하세요, <strong><%= user.user_id %></strong>님 <br>
+      현재 보유 포인트: <strong><%= user.point %>P</strong>
+    </div>
+
+    <div class="item-list">
+      <div class="item">
+        <h4>☕ 학교 카페 쿠폰</h4>
+        <p>아메리카노 1잔 / 300P</p>
+        <form action="/pointshop/buy" method="POST">
+          <input type="hidden" name="item" value="cafe_coupon">
+          <button type="submit">구매하기</button>
+        </form>
+      </div>
+
+      <div class="item">
+        <h4>🍚 학식 쿠폰</h4>
+        <p>1회 이용권 / 400P</p>
+        <form action="/pointshop/buy" method="POST">
+          <input type="hidden" name="item" value="meal_coupon">
+          <button type="submit">구매하기</button>
+        </form>
+      </div>
+
+      <div class="item">
+        <h4>🎉 기프티콘</h4>
+        <p>기프티콘 / 500P</p>
+        <form action="/pointshop/buy" method="POST">
+          <input type="hidden" name="item" value="gifticon">
+          <button type="submit">구매하기</button>
+        </form>
+      </div>
+    </div>
+    <a href="/">다시 돌아가기</a>
+  </div>
+</body>
+</html>
