@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/index_style.css">
+  <title>노트 목록</title>
+</head>
+<body>
+  <!-- 상단 헤더 -->
+  <header>
+
+    <% if (user) { %>
+      <span>안녕하세요, <%= user.user_id %>님</span>
+      <a href="/logout">로그아웃</a>
+      <a href="">자료 등록</a>
+      <a href="/chat">채팅</a>
+      <a href="">장바구니</a>
+      <a href="">마이페이지</a>
+      <a href="">고객센터</a>
+    <% } else { %>
+      <a href="/login">로그인</a>
+      <a href="/signup">회원가입</a>
+      <a href="">자료 등록</a>
+      <a href="">장바구니</a>
+      <a href="">마이페이지</a>
+      <a href="">고객센터</a>
+    <% } %>
+  </header>
+
+  <!-- 전체 콘텐츠 포함: container -->
+  <div class="container">
+
+    <div class="top-wrapper">
+      <!-- noteHub 로고 -->
+      <div class="logo">
+        <a href="/">
+          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+        </a>
+      </div>
+    </div>
+
+    <!-- 검색창, filter-form 외부에 위치-->
+    <div class="search-area">
+      <form method="GET" action="/notes">
+        <!-- 검색 영역 -->
+        <div class="search-wrapper">
+          <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
+          <button type="submit" aria-label="검색">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#007bff">
+              <path d="M10 2a8 8 0 105.29 14.29l4.7 4.7a1 1 0 001.42-1.42l-4.7-4.7A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- 필터 폼 부분 -->
+    <section class="filter-form">
+      <form method="GET" action="/notes">
+
+        <!-- 필터 영역-->
+        <div class="filter-section">
+          <label>이수구분
+            <select name="category">
+              <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
+              <% categories.forEach(c => { %>
+                <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+              <% }) %>
+            </select>
+          </label>
+        
+          <label>과목
+            <select name="subject">
+              <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
+              <% subjects.forEach(s => { %>
+                <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+              <% }) %>
+            </select>
+          </label>
+        
+          <label>학년
+            <select name="year">
+              <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
+              <% years.forEach(y => { %>
+                <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+              <% }) %>
+            </select>
+          </label>
+        
+          <label>학기
+            <select name="semester">
+              <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
+              <% semesters.forEach(sm => { %>
+                <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+              <% }) %>
+            </select>
+          </label>
+        
+          <button type="submit">필터 적용</button>
+        </div>
+      </form>
+
+      <!-- 노트 추가 -->
+      <% if (user) { %>
+        <a href="/notes/new">자료 등록</a>
+      <% } %>
+    </section>
+
+    <!-- 노트 목록 -->
+    <section class="notes">
+      <% if (notes.length === 0) { %>
+        <p>표시할 노트가 없습니다.</p>
+      <% } else { %>
+        <% notes.forEach(n => { %>
+          <article class="note-card">
+            <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
+            <p>과목: <%= n.subject %></p>
+            <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
+            <small>
+              작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
+            </small>
+          </article>
+        <% }) %>
+      <% } %>
+    </section>
+  </div>
+  
+</body>
+</html>

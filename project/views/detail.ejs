@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/detail_style.css">
+  <title>노트 상세</title>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <article>
+        <h2><%= note.title %></h2>
+        <p>과목명: <%= note.subject %></p>
+        <p>교수명: <%= note.professor %></p>
+        <p>카테고리: <%= note.category %></p>
+        <canvas id="pdf-canvas" width="400"></canvas>
+        <div><%= note.summary %></div>
+        <small>
+          작성자: <%= note.authorName %> /
+          작성시간: <%= note.created_at.getFullYear() %>/<%= (note.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= note.created_at.getDate().toString().padStart(2,'0') %> <%= note.created_at.toLocaleTimeString('ko-KR') %>
+        </small>
+      </article>
+
+      <% if (user && note.user_id === user.user_id) { %>
+        <div>
+          <a href="/notes/<%= note.id %>/edit">수정</a>
+          <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+            <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+          </form>
+        </div>
+      <% } %>
+  
+  <section class="comments">
+      <h3>댓글 (<%= comments ? comments.length : 0 %>)</h3>
+
+      <% if (comments && comments.length > 0) { %>
+        <ul class="comments-list">
+          <% comments.forEach(c => { %>
+            <li class="comment-item">
+              <% if (editCommentId === c.id) { %>
+                <!-- 인라인 댓글 수정 폼 -->
+                 <!-- ★ EDITED at 2025-05-23 -->
+                  <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST">
+                    <!-- method-override를 body에서 읽도록 hidden 필드 추가 -->
+                    <input type="hidden" name="_method" value="PUT">
+                    <textarea name="content" rows="3" required><%= c.content %></textarea>
+                    <button type="submit">저장</button>
+                    <a href="/notes/<%= note.id %>">취소</a>
+                  </form>
+              <% } else { %>
+                <!-- 일반 댓글 표시 -->
+                <p><strong><%= c.author %>:</strong> <%= c.content %></p>
+                <small>
+                  <em><%= new Date(c.created_at).toLocaleString('ko-KR') %></em>
+                </small>
+
+                <% /* 수정/삭제 버튼: 로그인 & 작성자 본인만 */ %>
+                <% if (user && user.user_id === c.user_id) { %>
+                  <span class="comment-actions">
+                    <a
+                      href="/notes/<%= note.id %>?editCommentId=<%= c.id %>"
+                    >수정</a>
+                     <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST" style="display:inline">
+                        <!-- 여기에도 hidden 필드로 DELETE 지정 -->
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
+                     </form>
+                  </span>
+                <% } %>
+              <% } %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>아직 댓글이 없습니다.</p>
+      <% } %>
+
+      <% /* 새 댓글 작성 폼 */ %>
+      <% if (user) { %>
+        <form action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form">
+          <h4>새 댓글 작성</h4>
+          <textarea
+            name="content"
+            rows="3"
+            placeholder="댓글을 입력하세요"
+            required
+          ></textarea>
+          <button type="submit">등록</button>
+        </form>
+      <% } else { %>
+        <p>
+          댓글을 작성하려면
+          <a href="/login">로그인</a>이 필요합니다.
+        </p>
+      <% } %>
+    </section>
+
+      <a href="/notes">목록으로 돌아가기</a>
+    </div>
+
+
+    <div class="right-panel">
+      <!-- 다운로드 박스 -->
+      <div class="download-box">
+        <h3>다운로드</h3>
+        <a id="downloadLink" href="/notes/<%= note.id %>/download" class="download-btn">
+          PDF 다운로드
+        </a>
+        <div id="fileInfo" class="file-info">
+          파일명: <%= file.file_name %> <br>
+          용량: <%= file.file_size %></span> <br>
+          업로드: 
+          <%= note.created_at.getFullYear() %>/
+          <%= (note.created_at.getMonth() + 1).toString().padStart(2, '0') %>/
+          <%= note.created_at.getDate().toString().padStart(2, '0') %>
+        </div>
+      </div>
+
+      <!-- 좋아요 & 다운로드 수 -->
+      <div class="like-download-stats">
+      <!-- <% console.log(note); %> -->
+        <button id="likeBtn" data-note-id="<%= note.id %>" style="margin-bottom: 10px;">
+          👍 좋아요 (<span id="likeCount" style="color: aliceblue;"><%= note.like_count %></span>)
+        </button>
+        <p>📥 다운로드 수: <span id="downloadCount"><%= note.download_count || 0 %></span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF 사진 로드 관련 -->
+  <script>
+    window.pdfUrl = "<%= file.file_path %>";
+  </script>
+  <script type = "module" src ="/js/pdf_viewer.js"></script>
+
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const likeBtn = document.getElementById("likeBtn");
+  if (!likeBtn) return;
+
+  likeBtn.replaceWith(likeBtn.cloneNode(true));
+  const newBtn = document.getElementById("likeBtn");
+
+  newBtn.addEventListener("click", async function (e) {
+    e.preventDefault();
+    const noteId = this.dataset.noteId;
+
+    try {
+      const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
+
+      if (res.status === 401) {
+        return alert("로그인이 필요합니다.");
+      }
+
+      if (res.status === 400) {
+        const result = await res.json();
+        return alert(result.message || "이미 좋아요를 눌렀습니다.");
+      }
+
+      if (!res.ok) {
+        return alert("좋아요 처리 중 오류 발생");
+      }
+
+      // ✅ 정상 처리된 경우
+      const countSpan = document.getElementById("likeCount");
+      countSpan.textContent = parseInt(countSpan.textContent) + 1;
+
+    } catch (err) {
+      console.error("좋아요 에러:", err);
+      alert("좋아요 처리 중 오류 발생");
+    }
+  });
+});
+
+    // PDF 다운로드 관련 (해야함)
+    // 다운로드 수 수정
+    document.getElementById("downloadLink");
+  </script>
+  <script>
+    document.getElementById("likeBtn").addEventListener("click", async function () {
+      const noteId = this.dataset.noteId;
+      try {
+        const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
+        const result = await res.json();
+
+        if (!res.ok) {
+          // 401, 400, 그 외 모두 한 곳에서 처리
+          return alert(result.message);
+        }
+
+        // 성공했을 때
+        const countSpan = document.getElementById("likeCount");
+        countSpan.textContent = parseInt(countSpan.textContent) + 1;
+      } catch (e) {
+        console.error("좋아요 에러:", e);
+        alert("좋아요 처리 중 오류가 발생했습니다.");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>그림판 + 텍스트 + 채팅 통합</title>
+  <link rel="stylesheet" href="/style/canvas_style.css" />
+</head>
+<body>
+  <!-- 그림판 영역 -->
+  <div id="drawingSection">
+    <div id="controls">
+      색상: <input type="color" id="colorPicker" value="#000000" />
+      선굵기: <input type="range" id="lineWidth" min="1" max="20" value="2" />
+      <button onclick="setMode('draw')">그리기</button>
+      <button onclick="setMode('text')">텍스트</button>
+      <button onclick="saveTextToCanvas()">텍스트 고정</button>
+      <button onclick="clearCanvas()">초기화</button>
+    </div>
+    <div id="canvasWrapper">
+      <canvas id="canvas" width="800" height="500"></canvas>
+    </div>
+  </div>
+
+  <!-- 채팅 영역 -->
+  <div id="chatSection">
+    <h1>채팅</h1>
+    <ul id="messages"></ul>
+    <input id="msgInput" autocomplete="off" placeholder="메시지 입력" />
+    <button id="sendBtn">전송</button>
+  </div>
+
+  <!-- 스크립트 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // --- 그림판 JS ---
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const wrapper = document.getElementById("canvasWrapper");
+    let drawing = false;
+    let mode = "draw";
+
+    ctx.lineCap = "round";
+
+    canvas.addEventListener("mousedown", (e) => {
+      if (mode === "draw") {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+      } else if (mode === "text") {
+        createTextBox(e.offsetX, e.offsetY);
+      }
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (drawing && mode === "draw") {
+        ctx.strokeStyle = document.getElementById("colorPicker").value;
+        ctx.lineWidth = document.getElementById("lineWidth").value;
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      }
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      if (mode === "draw") drawing = false;
+    });
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.querySelectorAll(".text-box").forEach((box) => box.remove());
+    }
+
+    function setMode(newMode) {
+      mode = newMode;
+    }
+
+    function createTextBox(x, y) {
+      const box = document.createElement("div");
+      box.className = "text-box";
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+      box.style.width = "150px";
+      box.style.height = "50px";
+
+      const textarea = document.createElement("textarea");
+      box.appendChild(textarea);
+      wrapper.appendChild(box);
+      makeDraggable(box);
+      textarea.focus();
+    }
+
+    function makeDraggable(el) {
+      let isDragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      el.addEventListener("mousedown", (e) => {
+        if (e.target.tagName.toLowerCase() === "textarea") return;
+        isDragging = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+        el.style.zIndex = 1000;
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+          el.style.left = `${e.pageX - wrapper.offsetLeft - offsetX}px`;
+          el.style.top = `${e.pageY - wrapper.offsetTop - offsetY}px`;
+        }
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+    }
+
+    function saveTextToCanvas() {
+      const boxes = document.querySelectorAll(".text-box");
+      boxes.forEach((box) => {
+        const textarea = box.querySelector("textarea");
+        const text = textarea.value;
+        const x = parseInt(box.style.left, 10);
+        const y = parseInt(box.style.top, 10) + 16;
+
+        ctx.font = "16px sans-serif";
+        ctx.fillStyle = document.getElementById("colorPicker").value;
+        text.split("\n").forEach((line, i) => {
+          ctx.fillText(line, x, y + i * 20);
+        });
+
+        box.remove();
+      });
+    }
+
+    // --- 채팅 JS ---
+    const socket = io();
+
+    const input = document.getElementById("msgInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    sendBtn.onclick = () => {
+      if (input.value.trim() === "") return;
+      socket.emit("chat message", input.value);
+      input.value = "";
+    };
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        if (input.value.trim() === "") return;
+        socket.emit("chat message", input.value);
+        input.value = "";
+      }
+    });
+
+    socket.on("chat message", (msg) => {
+      const li = document.createElement("li");
+      li.textContent = `${msg.user} : ${msg.message}`;
+      document.getElementById("messages").appendChild(li);
+      // 메시지 자동 스크롤
+      const messages = document.getElementById("messages");
+      messages.scrollTop = messages.scrollHeight;
+    });
+    
+
+  </script>
+</body>
+</html>

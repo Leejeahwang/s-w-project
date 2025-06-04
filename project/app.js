@@ -1,22 +1,57 @@
-const fs = require('fs');
-const http = require('http');
+const express = require('express');
+const session = require('express-session');
+const path = require('path');
+const http = require('http'); // ★ 추가
+const { Server } = require('socket.io'); // ★ 추가
 
-const sever = http.createServer((req, res) => {
-    if(req.url === '/' && req.method === 'GET') {
-        fs.readFile('./index.html', (err, data) => {
-            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(err ? '페이지 로드 오류' : data);
-        });
-    }
 
-    else if(req.url === '/note_detail' && req.method === 'GET') {
-        fs.readFile('./note_detail.html', (err, data) => {
-            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-            res.end(err ? '페이지 로드 오류' : data);
-        });
-    }
+const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
+const notesRouter = require('./routes/notes');
+const filesRouter = require('./routes/files');
+const chatRouter = require('./routes/chat');
+
+const app = express();
+const server = http.createServer(app); // ★ Express 앱을 기반으로 HTTP 서버 생성
+const io = new Server(server); // ★ socket.io 서버 생성
+
+// 뷰 엔진 설정
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Body parsing & session
+app.use(express.urlencoded({ extended: true }));
+const sessionMiddleware = session({ // ⭐ 변수로 분리
+  secret: 'mySecretKey123',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 3600_000 }
 });
 
-sever.listen(3001, () => {
-    console.log('http://localhost:3000 에서 서버 실행 중');
+app.use(sessionMiddleware); 
+
+// 정적 파일
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 라우팅
+app.use('/', indexRouter);
+app.use('/', authRouter);
+app.use('/notes', notesRouter);
+app.use('/files', filesRouter);
+app.use('/chat', chatRouter);
+
+// 404 핸들러
+app.use((req, res) => res.status(404).send('페이지를 찾을 수 없습니다.'));
+// 에러 핸들러
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('서버 내부 오류');
 });
+
+// ★ Socket.IO 핸들링 로직 분리해서 불러오기
+const socketHandler = require('./socket'); 
+socketHandler(io, sessionMiddleware); // io 인스턴스를 넘겨줌
+
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`)); 
