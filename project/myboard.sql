@@ -174,3 +174,23 @@ ALTER TABLE files
 delete from notes where id = 22;
 
 ALTER TABLE note_downloads DROP INDEX unique_downlode;
+
+## 채팅방
+CREATE TABLE chat_rooms (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  created_by varchar(50) DEFAULT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES users(user_id)
+);
+
+## 채팅 메세
+CREATE TABLE chat_messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  room_id INT NOT NULL,
+  user_id INT NOT NULL,
+  message TEXT NOT NULL,
+  sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (room_id) REFERENCES chat_rooms(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
