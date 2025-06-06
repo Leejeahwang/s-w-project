@@ -53,7 +53,10 @@ ADMIN_KAKAO_ACCESS_TOKEN=3GJfpfLVVj0vJE3QExZHmnNIO_xrd-8LAAAAAQoNIdkAAAGXOt-7Koh
 KAKAO_CLIENT_ID=b79c5221c044c8b43f979e12f48efb3c
 이런식으로 만들어놔야해요
 
-access token은 서버를 꺼도 약 2시간동안 유효해요
+access token은 서버를 꺼도 약 6시간동안 유효해요
 access token이 만료되면 다시 41번라인으로 돌아가서 직접 수정해야합니다
 그러니까 다시 access token 받는거임
+
+그리고 .env에서 access token 다시 설정해주고 서버 껐다가 실행해야 합니다
+아니면 만료된 토큰값이라고 떠요
 */

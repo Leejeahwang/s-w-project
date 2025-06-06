@@ -90,7 +90,7 @@ exports.getKakaoToken = async (req, res) => {
       qs.stringify({
         grant_type: 'authorization_code',
         client_id: process.env.KAKAO_CLIENT_ID, // 내 REST API 값
-        redirect_uri: 'http://localhost:3000/auth/kakao/token',  // 현재 이 라우트로 redirect
+        redirect_uri: 'http://localhost:3000/auth/kakao/token',  // Redirect URI
         code: code
       }),
       {

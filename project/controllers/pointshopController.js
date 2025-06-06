@@ -5,13 +5,18 @@ const axios = require('axios');
 // 포인트샵 페이지 렌더링 (GET /pointshop)
 exports.getPointshop = async (req, res) => {
     const sessionUser = req.session.user;
+    const alertMessage = req.session.alertMessage;
+    delete req.session.alertMessage;
+
     if(!sessionUser) return res.redirect('/auth/login');
 
     const [[user]] = await db.promise().query(
         'SELECT id, user_id, point FROM users WHERE user_id = ?', [sessionUser.user_id]
     );
 
-    res.render('pointshop', { user });
+    // console.log(alertMessage);
+
+    res.render('pointshop', { user, alertMessage });
 }
 
 // 학식 쿠폰 (POST /pointshop/buy/1)
@@ -27,46 +32,50 @@ exports.getCoupon_1 = async (req, res) => {
 
         const user_id = rows[0].user_id;
         let point = rows[0].point;
+        let link;
 
-        if(kind === 'cafe_coupon') {    // 학교 카페 쿠폰
+        if(kind === 'caffee') {    // 컴포즈 아이스 아메리카노 1잔 / 300P
             if(point < 300) {
                 return res.send(`<script>alert('포인트가 부족합니다.'); window.history.back();</script>`);
             }
             point -= 300;
+            link = 'https://i.imgur.com/8qb8Aza.jpeg';
 
             await db.promise().query(
                 'UPDATE users SET point = point - 300 WHERE user_id=?', [user_id]
             );
             
-            kind_value = '학교 카페 쿠폰';
+            kind_value = '아이스 아메리카노';
         }
-        else if(kind === 'meal_coupon') {   // 학식 쿠폰
-            if(point < 400) {
+        else if(kind === 'icecream') {   // 베스킨라빈스 파인트 아이스크림 / 1000P
+            if(point < 1000) {
                 return res.send(`<script>alert('포인트가 부족합니다.'); window.history.back();</script>`);
             }
-            point -= 400;
-
+            point -= 1000;
+            link = 'https://i.imgur.com/IgmOsAm.jpeg';
+            
             await db.promise().query(
-                'UPDATE users SET point = point - 400 WHERE user_id=?', [user_id]
+                'UPDATE users SET point = point - 1000 WHERE user_id=?', [user_id]
             );
 
-            kind_value = '학식 쿠폰';
+            kind_value = '아이스크림';
         }
-        else {  // 기프티콘 쿠폰
-            if(point < 500) {
+        else {  // BBQ 황올반 + 양념반 + 콜라 1.25L 기프티콘 / 2500P
+            if(point < 2500) {
                 return res.send(`<script>alert('포인트가 부족합니다.'); window.history.back();</script>`);
             }
-            point -= 500;
+            point -= 2500;
+            link = 'https://i.imgur.com/qwykoL8.jpeg';
 
             await db.promise().query(
-                'UPDATE users SET point = point - 500 WHERE user_id=?', [user_id]
+                'UPDATE users SET point = point - 2500 WHERE user_id=?', [user_id]
             );
 
             kind_value = '기프티콘 쿠폰';
         }
 
         const accessToken = process.env.ADMIN_KAKAO_ACCESS_TOKEN;
-        const message = `${req.session.user.user_id}님이 상품을 구매했습니다.\n구매 상품: ${kind_value}\n포인트 잔액: ${point}P`;
+        const message = `[포인트샵 구매 알림]\n구매자: ${req.session.user.user_id}님\n구매 상품: ${kind_value}\n포인트 잔액: ${point}P`;
 
         await axios.post('https://kapi.kakao.com/v2/api/talk/memo/default/send', {
             template_object: JSON.stringify({
@@ -76,7 +85,7 @@ exports.getCoupon_1 = async (req, res) => {
                     web_url: 'http://localhost:3000/pointshop',
                     mobile_web_url: 'http://localhost:3000/pointshop'
                 },
-                button_title: '상점 보기'
+                buttons_title: '상점 바로가기'
             })
         }, {
             headers: {
@@ -85,7 +94,9 @@ exports.getCoupon_1 = async (req, res) => {
             }
         });
 
-        res.send(`<script>alert('관리자에게 ${kind_value} 요청 완료!'); location.href='/pointshop';</script>`)
+        req.session.alertMessage = `관리자에게 ${kind_value} 요청 완료!\n관리자가 확인후 기프티콘 보내드릴게요!\n조금만 기다려주세요!`;
+        res.redirect('/pointshop');
+        
     } catch(e) {
         console.log(e);
         return;

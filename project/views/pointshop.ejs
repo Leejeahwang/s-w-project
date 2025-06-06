@@ -16,33 +16,45 @@
 
     <div class="item-list">
       <div class="item">
-        <h4>☕ 학교 카페 쿠폰</h4>
-        <p>아메리카노 1잔 / 300P</p>
+        <h4>☕ 컴포즈 기프티콘</h4>
+        <p>아이스 아메리카노 1잔 / 300P</p>
         <form action="/pointshop/buy" method="POST">
-          <input type="hidden" name="item" value="cafe_coupon">
+          <input type="hidden" name="item" value="caffee">
           <button type="submit">구매하기</button>
         </form>
       </div>
 
       <div class="item">
-        <h4>🍚 학식 쿠폰</h4>
-        <p>1회 이용권 / 400P</p>
+        <h4>🍦 베스킨라빈스 기프티콘</h4>
+        <p>파인트 아이스크림 / 1000P</p>
         <form action="/pointshop/buy" method="POST">
-          <input type="hidden" name="item" value="meal_coupon">
+          <input type="hidden" name="item" value="icecream">
           <button type="submit">구매하기</button>
         </form>
       </div>
 
       <div class="item">
-        <h4>🎉 기프티콘</h4>
-        <p>기프티콘 / 500P</p>
+        <h4>🐔 BBQ 기프트킨</h4>
+        <p>황올반 + 양념반 + 콜라 1.25L 기프티콘 / 2500P</p>
         <form action="/pointshop/buy" method="POST">
-          <input type="hidden" name="item" value="gifticon">
+          <input type="hidden" name="item" value="chicken">
           <button type="submit">구매하기</button>
         </form>
       </div>
+
     </div>
     <a href="/">다시 돌아가기</a>
   </div>
+
+  <!-- 빨간줄이 떠도 정상 작동하는듯합니다 -->
+  <!-- 거슬리는 분들은 아래 링크 참고 -->
+  <!-- https://4sii.tistory.com/301 -->
+  <% if (alertMessage) { %>
+    <script>
+      window.onload = function () {
+        alert(<%- JSON.stringify(alertMessage) %>);
+      }
+    </script>
+  <% } %>
 </body>
 </html>
