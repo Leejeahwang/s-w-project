@@ -101,6 +101,7 @@ header div#toggle {
 
 #sidebar .write-only {
   flex: 1;
+  bottom: 100px;
 }
 
 #markdown-input {
@@ -109,7 +110,28 @@ header div#toggle {
   resize: vertical;
 }
 
+#sidebar h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
 
+#sidebar .read_only {
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+#sidebar .write_only textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  margin-bottom: 15px;
+}
 
 
 /* 사이트 로고 */

@@ -22,9 +22,6 @@
         <h4>ToDo List 작성</h4>
         <textarea id="markdown-input" placeholder="Markdown 형식으로 작성"></textarea>
       </div>
-      <form action="/todo/confirm" method="post">
-        <button type="submit">저장</button>
-      </form>
     </div>
   </div>
 
@@ -165,17 +162,33 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
+    const LOCAL_STORAGE_KEY = 'todo-content';
     // 사이드 바 관련
     document.getElementById('toggle').addEventListener('click', (e) => {
       
       const sidebar = document.getElementById('sidebar');
       const toggle = document.getElementById('toggle');
+      
+      const content = document.getElementById('markdown-input').value;
+      localStorage.setItem(LOCAL_STORAGE_KEY, content);
+
+      const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY) || '';
+      document.getElementById('markdown-input').value = savedContent;
+      document.getElementById('rendered-content').innerHTML = marked.parse(savedContent);
+
       sidebar.classList.toggle('active');
 
       if (sidebar.classList.contains('active')) toggle.style.left = '320px';
       else toggle.style.left = '20px';
     });
 
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedContent) {
+        document.getElementById('markdown-input').value = savedContent;
+        document.getElementById('rendered-content').innerHTML = marked.parse(savedContent);
+      }
+    });
 
     // 키보드 입력시 마크다운 파싱 관련
     document.getElementById('markdown-input').addEventListener('input', () => {
