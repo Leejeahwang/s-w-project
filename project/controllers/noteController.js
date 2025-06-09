@@ -1,23 +1,6 @@
 const db = require('../db');
 
-// 전체 노트 목록 조회 -> 안쓰는듯?
-exports.getAllNotes = (req, res) => {
-  const query = `
-    SELECT n.id, n.subject, n.professor, n.category, n.summary, n.created_at, u.username AS authorName
-    FROM notes n
-    JOIN users u ON n.user_id = u.id
-    ORDER BY n.created_at DESC
-  `;
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error('노트 목록 조회 오류:', err);
-      return res.status(500).json({ message: '노트 목록 조회 중 오류가 발생했습니다.' });
-    }
-    res.json(results);
-  });
-};
-
-// 3) 노트 상세 페이지 렌더링 (GET /notes/:id)
+// 노트 상세 페이지 렌더링 (GET /notes/:id)
 exports.getNoteById = async (req, res, next) => {
   try {
     const noteId = req.params.id;
@@ -46,12 +29,12 @@ exports.getNoteById = async (req, res, next) => {
     )
 
     const [comments] = await db.promise().query(
-     `SELECT c.id, c.content, c.created_at, c.user_id, c.parent_id, u.user_id AS author
-      FROM comments c 
-      JOIN users u 
-      ON c.user_id = u.user_id
-      WHERE c.note_id = ?
-      ORDER BY c.created_at ASC`,
+      `SELECT c.id, c.content, c.created_at, c.user_id, c.parent_id, u.user_id AS author
+       FROM comments c 
+       JOIN users u 
+       ON c.user_id = u.user_id
+       WHERE c.note_id = ? 
+       ORDER BY c.created_at ASC`,
       [req.params.id]
     );
 
@@ -74,23 +57,3 @@ exports.getNoteById = async (req, res, next) => {
                             alertMessage });
   } catch (e) { next(e); }
 }
-
-// 새 노트 생성 -> 안쓰는듯?
-exports.createNote = (req, res) => {
-  if (!req.session.user || !req.session.user.userId) {
-    return res.status(401).json({ message: '로그인이 필요합니다.' });
-  }
-  const { subject, professor, category, summary } = req.body;
-  const userId = req.session.user.userId;
-  if (!subject || !summary) {
-    return res.status(400).json({ message: '교과명과 요약은 필수입니다.' });
-  }
-  const query = 'INSERT INTO notes (user_id, subject, professor, category, summary) VALUES (?, ?, ?, ?, ?)';
-  db.query(query, [userId, subject, professor, category, summary], (err, result) => {
-    if (err) {
-      console.error('노트 생성 오류:', err);
-      return res.status(500).json({ message: '노트 생성 중 오류가 발생했습니다.' });
-    }
-    res.status(201).json({ id: result.insertId, userId, subject, professor, category, summary });
-  });
-};

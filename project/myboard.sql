@@ -191,3 +191,21 @@ ADD CONSTRAINT fk_comments_parent
     FOREIGN KEY (parent_id)
     REFERENCES comments(id)
     ON DELETE CASCADE;
+
+## 채팅 메세지
+CREATE TABLE chat_messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  room_id INT NOT NULL,
+  user_id INT NOT NULL,
+  message TEXT NOT NULL,
+  sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (room_id) REFERENCES chat_rooms(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE canvas_history (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  room_id INT NOT NULL,
+  event_data JSON NOT NULL,      -- 한 획(draw/stroke/text/clear 등)에 대한 정보
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);    

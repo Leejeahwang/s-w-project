@@ -9,19 +9,38 @@
 <body>
   <!-- 상단 헤더 -->
   <header>
+    <!-- 사이드 바 토글 버튼 -->
+    <div id="toggle">☰ ToDo 리스트</div>
+    
+    <!-- 사이드바 본체 -->
+    <div id="sidebar">
+      <div class="read_only" contenteditable="false">
+        <h4>ToDo List</h4>
+        <div id="rendered-content"></div>
+      </div>
+      <div class="write_only">
+        <h4>ToDo List 작성</h4>
+        <textarea id="markdown-input" placeholder="Markdown 형식으로 작성"></textarea>
+      </div>
+    </div>
+  </div>
 
     <% if (user) { %>
       <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
       <a href="/auth/logout">로그아웃</a>
       <a href="">자료 등록</a>
+      <a href="/chat">채팅</a>
       <a href="">장바구니</a>
+      <a href="/pointshop">포인트 샵</a>
       <a href="">마이페이지</a>
       <a href="">고객센터</a>
     <% } else { %>
       <a href="/auth/login">로그인</a>
       <a href="/auth/signup">회원가입</a>
       <a href="">자료 등록</a>
+      <a href="/chat">채팅</a>
       <a href="">장바구니</a>
+      <a href="/pointshop">포인트 샵</a>
       <a href="">마이페이지</a>
       <a href="">고객센터</a>
     <% } %>
@@ -34,7 +53,7 @@
       <!-- noteHub 로고 -->
       <div class="logo">
         <a href="/">
-          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고">
         </a>
       </div>
     </div>
@@ -53,6 +72,23 @@
         </div>
       </form>
     </div>
+
+    <!-- 좋아요 랭킹 -->
+    <aside class="like-ranking" style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+      <h4>🔥 좋아요 랭킹</h4>
+      <% if (likeRanking.length === 0) { %>
+        <p>데이터 없음</p>
+      <% } else { %>
+        <ol>
+          <% likeRanking.forEach(item => { %>
+            <li>
+              <a href="/notes/<%= item.id %>"><%= item.title %></a>
+              (<%= item.like_count %>개)
+            </li>
+          <% }) %>
+        </ol>
+      <% } %>
+    </aside>
 
     <!-- 필터 폼 부분 -->
     <section class="filter-form">
@@ -125,5 +161,43 @@
     </section>
   </div>
   
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    const LOCAL_STORAGE_KEY = 'todo-content';
+    // 사이드 바 관련
+    document.getElementById('toggle').addEventListener('click', (e) => {
+      
+      const sidebar = document.getElementById('sidebar');
+      const toggle = document.getElementById('toggle');
+      
+      const content = document.getElementById('markdown-input').value;
+      localStorage.setItem(LOCAL_STORAGE_KEY, content);
+
+      const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY) || '';
+      document.getElementById('markdown-input').value = savedContent;
+      document.getElementById('rendered-content').innerHTML = marked.parse(savedContent);
+
+      sidebar.classList.toggle('active');
+
+      if (sidebar.classList.contains('active')) toggle.style.left = '320px';
+      else toggle.style.left = '20px';
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedContent) {
+        document.getElementById('markdown-input').value = savedContent;
+        document.getElementById('rendered-content').innerHTML = marked.parse(savedContent);
+      }
+    });
+
+    // 키보드 입력시 마크다운 파싱 관련
+    document.getElementById('markdown-input').addEventListener('input', () => {
+      const input = document.getElementById('markdown-input').value;
+      document.getElementById('rendered-content').innerHTML = marked.parse(input);
+    });
+  </script>
+
 </body>
 </html>

@@ -31,9 +31,8 @@
           </form>
         </div>
       <% } %>
-
+  <!--comments 배열을 parent_id 기준으로 분리 -->
   <% 
-  // comments 배열을 parent_id 기준으로 분리
     const parents = comments.filter(c => c.parent_id === null);
     const childrenByParent = {}; 
     comments.forEach(c => {
@@ -43,7 +42,7 @@
       }
     });
   %>
-
+    
   <section class="comments">
     <h3>댓글 (<%= parents.length %>)</h3>
 
@@ -188,7 +187,8 @@
     <% } %>
 
   </section>
- 
+
+
       <a href="/">목록으로 돌아가기</a>
     </div>
 
@@ -256,7 +256,7 @@
       }
     });
   </script>
-
+  
   <script>
     // 답글 쓰기 버튼 클릭 시 대응하는 hidden form을 보이도록/숨기도록
     document.querySelectorAll('.reply-toggle-btn').forEach(btn => {
