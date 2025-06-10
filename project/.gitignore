@@ -13,3 +13,6 @@ yarn-error.log*
 # Editor
 .idea/
 .vscode/
+
+# eicar.pdf
+eicar.pdf

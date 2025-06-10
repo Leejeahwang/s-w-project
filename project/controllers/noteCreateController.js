@@ -1,5 +1,8 @@
 // create.ejs
 const db = require('../db');
+const path = require('path');
+const { exec } = require('child_process');
+const { rejects } = require('assert');
 
 // 새 노트 작성 페이지 랜더링 처리 (GET /notes/new)
 exports.createNote = async (req, res, next) => {
@@ -33,7 +36,29 @@ exports.uploadNote = async (req, res) => {
 
     try {
         const u = req.session.user;
-        
+
+        // 바이러스 검사 (clamscan.exe 사용)
+        const windowPath = uploadedFile.path;
+        const wslPath = '/mnt/' + windowPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, drive) => drive.toLowerCase());
+
+        await new Promise((resolve, rejects) => {
+            exec(`wsl clamscan "${wslPath}"`, (error, stdout, stderr) => {
+                if(error) {
+                    console.error("ClamAV 검사 오류: ", stderr || stdout);
+                    return rejects(new Error("ClamAV 검사 중 오류 발생 또는 감염 파일입니다."));
+                }
+
+                if(stdout.includes('Infected files: 0')) {
+                    console.log("안전한 파일입니다.");
+                    resolve();
+                }
+                else {
+                    console.warn('악성 파일이 탐지되었습니다:', stdout);
+                    return reject(new Error('악성 코드가 포함된 파일입니다.'));
+                }
+            });
+        });
+
         // notes 테이블에 INSERT
         const [noteResult] = await db.promise().query(
             'INSERT INTO notes (user_id, title, summary, category, subject, year, semester, professor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',

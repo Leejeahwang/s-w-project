@@ -100,12 +100,13 @@ header div#toggle {
 }
 
 #sidebar .write-only {
+  position: absolute;
   flex: 1;
   bottom: 100px;
 }
 
 #markdown-input {
-  width: 290px;
+  width: 100px;
   height: 100px;
   resize: vertical;
 }
