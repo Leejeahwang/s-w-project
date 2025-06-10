@@ -7,132 +7,169 @@
   <title>노트 목록</title>
 </head>
 <body>
-  <!-- 상단 헤더 -->
-  <header>
+  <!-- 상단 컨테이너 부분 -->
+  <div class="up-container">
+    <header>
+      <!-- 사이드바 오버레이 -->
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <% if (user) { %>
-      <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
-      <a href="/auth/logout">로그아웃</a>
-      <a href="/notes/new">자료 등록</a>
-      <span class="divider">|</span>
+      <!-- 사이드 바 토글 버튼 -->
+      <div id="toggle">☰ ToDo 리스트
+    
+        <!-- 사이드바 본체 -->
+        <div id="sidebar">
 
-      <a href="">장바구니</a>
-      <span class="divider">|</span>
+          <!-- 사이드바 헤더 -->
+          <div class="sidebar-header">
+            <h4>ToDo List</h4>
+            <button class="close-btn" id="close-sidebar"></button>
+          </div>
 
-      <a href="/point">포인트 샵</a>
-      <span class="divider">|</span>
+          <!-- 사이드바 내용 -->
+          <div class="sidebar-content">
+            <!-- 읽기 전용 영역 -->
+            <div class="read-only" contenteditable="false">
+              <div id="rendered-content"></div>
+            </div>
 
-      <a href="">마이페이지</a>
-      <span class="divider">|</span>
-
-      <a href="">고객센터</a>
-    <% } else { %>
-      <a href="/auth/login">로그인</a>
-      <a href="/auth/signup">회원가입</a>
-      <span class="divider">|</span>
-
-      <a href="">자료 등록</a>
-      <span class="divider">|</span>
-
-      <a href="">장바구니</a>
-      <span class="divider">|</span>
-
-      <a href="/point">포인트샵</a>
-      <span class="divider">|</span>
-
-      <a href="">마이페이지</a>
-      <span class="divider">|</span>
-      
-      <a href="">고객센터</a>
-    <% } %>
-  </header>
-
-  <!-- 전체 콘텐츠 포함: container -->
-  <div class="container">
-
-    <div class="top-wrapper">
-      <!-- noteHub 로고 -->
-      <div class="logo">
-        <a href="/">
-          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고">
-        </a>
-      </div>
-    </div>
-
-    <!-- 검색창, filter-form 외부에 위치-->
-    <div class="search-area">
-      <form method="GET" action="/">
-        <!-- 검색 영역 -->
-        <div class="search-wrapper">
-          <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
-          <button type="submit" aria-label="검색">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#007bff">
-              <path d="M10 2a8 8 0 105.29 14.29l4.7 4.7a1 1 0 001.42-1.42l-4.7-4.7A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
-            </svg>
-          </button>
+            <!-- 작성 영역 -->
+            <div class="write_only">
+              <h4>ToDo List 작성</h4>
+              <textarea id="markdown-input" placeholder="Markdown 형식으로 작성하세요...&#10;&#10;예시:&#10;- [ ] 할 일 1&#10;- [x] 완료된 일&#10;- [ ] 할 일 2"></textarea>
+            </div>
+          </div>
+          
         </div>
-      </form>
-    </div>
+      
+      </div>
 
-    <!-- 좋아요 랭킹 -->
-    <aside class="like-ranking" style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
-      <h4>🔥 좋아요 랭킹</h4>
-      <% if (likeRanking.length === 0) { %>
-        <p>데이터 없음</p>
+      <% if (user) { %>
+        <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
+        <a href="/auth/logout">로그아웃</a>
+        <span class="divider">|</span>
+
+        <a href="/notes/new">자료 등록</a>
+        <span class="divider">|</span>
+
+        <a href="/point">포인트 샵</a>
+        <span class="divider">|</span>
+
+        <a href="">고객센터</a>
+
       <% } else { %>
-        <ol>
-          <% likeRanking.forEach(item => { %>
-            <li>
-              <a href="/notes/<%= item.id %>"><%= item.title %></a>
-              (<%= item.like_count %>개)
-            </li>
-          <% }) %>
-        </ol>
-      <% } %>
-    </aside>
+        <a href="/auth/login">로그인</a>
+        <a href="/auth/signup">회원가입</a>
+        <span class="divider">|</span>
 
-    <!-- 필터 폼 부분 -->
-    <section class="filter-form">
-      <form method="GET" action="/">
-        <div class="filter-section">
-          
-          <!-- 드롭다운 필터 -->
-          <div class="filter-left">
+        <a href="">자료 등록</a>
+        <span class="divider">|</span>
+
+        <a href="/point">포인트샵</a>
+        <span class="divider">|</span>
+        
+        <a href="">고객센터</a>
+      <% } %>
+    </header>
+
+  </div>
+
+  <!-- 왼쪽 컨테이너 부분 -->
+  <div class="left-container">
+  </div>
+
+  <!-- 오른쪽 컨테이너 부분 -->
+  <div class="right-container">
+  </div>
+
+
+  <!-- 중앙 구역 -->
+  <div class="center-container">
+    <!-- 전체 콘텐츠 포함: container -->
+    <div class="container">
+
+      <div class="top-wrapper">
+        <!-- noteHub 로고 -->
+        <div class="logo">
+            <a href="/">
+              <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고">
+            </a>
+        </div>
+      </div>
+
+      <!-- 검색창, filter-form 외부에 위치-->
+      <div class="search-area">
+        <form method="GET" action="/">
+          <!-- 검색 영역 -->
+          <div class="search-wrapper">
+              <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
+              <button type="submit" aria-label="검색">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#007bff">
+                  <path d="M10 2a8 8 0 105.29 14.29l4.7 4.7a1 1 0 001.42-1.42l-4.7-4.7A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+                </svg>
+              </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 좋아요 랭킹 -->
+      <aside class="like-ranking" style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+        <h4>🔥 좋아요 랭킹</h4>
+        <% if (likeRanking.length === 0) { %>
+          <p>데이터 없음</p>
+        <% } else { %>
+          <ol>
+            <% likeRanking.forEach(item => { %>
+              <li>
+                <a href="/notes/<%= item.id %>"><%= item.title %></a>
+                (<%= item.like_count %>개)
+              </li>
+            <% }) %>
+          </ol>
+        <% } %>
+      </aside>
+
+      <!-- 필터 폼 부분 -->
+      <section class="filter-form">
+        <form method="GET" action="/">
+          <div class="filter-section">
+            <!-- 드롭다운 필터 -->
+            <div class="filter-left">
               <label>이수구분
-              <select name="category">
-                <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
-                <% categories.forEach(c => { %>
-                  <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
-                <% }) %>
-              </select>
-            </label>
-          
-            <label>과목
-              <select name="subject">
-                <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
-                <% subjects.forEach(s => { %>
-                  <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
-                <% }) %>
-              </select>
-            </label>
-          
-            <label>학년
-              <select name="year">
-                <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
-                <% years.forEach(y => { %>
-                  <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
-                <% }) %>
-              </select>
-            </label>
-          
-            <label>학기
-              <select name="semester">
-                <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
-                <% semesters.forEach(sm => { %>
-                  <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
-                <% }) %>
-              </select>
-            </label>
+                <select name="category">
+                  <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
+                  <% categories.forEach(c => { %>
+                    <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  
+              <label>과목
+                <select name="subject">
+                  <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
+                  <% subjects.forEach(s => { %>
+                    <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  
+              <label>학년
+                <select name="year">
+                  <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
+                  <% years.forEach(y => { %>
+                    <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  
+              <label>학기
+                <select name="semester">
+                  <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
+                  <% semesters.forEach(sm => { %>
+                    <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+            </div>
           </div>
 
           <!-- 버튼 그룹 -->
@@ -144,31 +181,124 @@
               <a href="/notes/new">자료 등록</a>
             <% } %>
           </div>
-          
-        </div>
-      </form>
+        </form>
+      </section>
 
-      
-    </section>
+      <!-- 노트 목록 -->
+      <section class="notes">
+        <% if (notes.length === 0) { %>
+          <p>표시할 노트가 없습니다.</p>
+        <% } else { %>
+          <% notes.forEach(n => { %>
+            <article class="note-card">
+              <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
+              <p>과목: <%= n.subject %></p>
+              <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
+              <small>
+                작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
+              </small>
+            </article>
+            <% }) %>
+        <% } %>
+      </section>
+    </div>
 
-    <!-- 노트 목록 -->
-    <section class="notes">
-      <% if (notes.length === 0) { %>
-        <p>표시할 노트가 없습니다.</p>
-      <% } else { %>
-        <% notes.forEach(n => { %>
-          <article class="note-card">
-            <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
-            <p>과목: <%= n.subject %></p>
-            <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
-            <small>
-              작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
-            </small>
-          </article>
-        <% }) %>
-      <% } %>
-    </section>
   </div>
-  
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    const LOCAL_STORAGE_KEY = 'todo-content';
+
+      //dom 요소
+      const toggle = document.getElementById('toggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const closeBtn = document.getElementById('close-sidebar');
+      const markdownInput = document.getElementById('markdown-input');
+      const renderedContent = document.getElementById('rendered-content');
+
+      //사이드 바 열기
+      function openSidebar() {
+        sidebar.classList.add('active');
+        overlay.classList.add('active');
+        toggle.style.left = '370px';
+
+        //내용 저장장
+        const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY) || '';
+        markdownInput.value = savedContent;
+        renderedContent.innerHTML = marked.parse(savedContent);
+      }
+
+      //사이드 바 닫기
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('acitve');
+        toggle.style.left = '20px';
+
+        const content = markdownInput.value;
+        localStorage.setItem(LOCAL_STORAGE_KEY, content);
+      }
+
+      // 이벤트 리스너너
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (sidebar.classList.contains('active')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+
+      // X 버튼 클릭!
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeSidebar();
+      });
+
+      // 오버레이 클릭
+      overlay.addEventListener('click', closeSidebar);
+
+      // 사이드바 내부 클릭, 이벤트 전파 방지하기
+      sidebar.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // ESC 키로 슬라이드 닫기
+      document.addEventListener('keydown', (e) => {
+        if(e.key == 'Escape' && sidebar.classList.contains('active')) {
+          closeSidebar();
+        }
+      });
+
+      // 마크다운 실시간 파싱 및 자동 저장
+      markdonwInput.addEventListener('input', () => {
+        const input = markdownInput.value;
+        renderedContent.innerHTML = marked.parse(input);
+
+        // 자동 저장
+        clearTimeout(window.autosaveTimeout);
+        window.autosaveTimeout = setTimeout(() => {
+          localStorage.setItem(LOCAL_STORAGE_KEY, input);
+        }, 500);
+      });    
+
+      // // 페이지 로드 시 저장된 내용 불러오기
+      // window.addEventListener('DOMContentLoaded', () => {
+      //   const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY);
+      //   if (savedContent) {
+      //     markdownInput.value = savedContent;
+      //     renderedContent.innerHTML = marked.parse(savedContent);
+      //   }
+      // });
+
+      // // 페이지 떠날 때 저장
+      // window.addEventListener('beforeunload', () => {
+      //   const content = markdownInput.value;
+      //   localStorage.setItem(LOCAL_STORAGE_KEY, content);
+      // });
+
+  </script>
+
 </body>
 </html>
