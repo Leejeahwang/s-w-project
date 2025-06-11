@@ -38,6 +38,8 @@ exports.uploadNote = async (req, res) => {
         const u = req.session.user;
 
         // 바이러스 검사 (clamscan.exe 사용)
+        // WSL 활용
+        // X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H* (EICAR 문자열)
         const windowPath = uploadedFile.path;
         const wslPath = '/mnt/' + windowPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, drive) => drive.toLowerCase());
 
