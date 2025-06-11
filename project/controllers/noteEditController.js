@@ -1,4 +1,7 @@
 const db = require('../db');
+const path = require('path');
+const { exec } = require('child_process');
+const { rejects } = require('assert');
 
 // 노트 수정 페이지 랜더링 처리 (GET /notes/:id/edit)
 exports.edit_redering = async (req, res) => {
@@ -53,6 +56,28 @@ exports.editNote = async (req, res, next) => {
 
         // 수정할 파일이 있으면
         if (uploadedFile) {
+            // 파일검사
+            const windowPath = uploadedFile.path;
+            const wslPath = '/mnt/' + windowPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, drive) => drive.toLowerCase());
+
+            await new Promise((resolve, rejects) => {
+                exec(`wsl clamscan "${wslPath}"`, (error, stdout, stderr) => {
+                    if(error) {
+                        console.error("ClamAV 검사 오류: ", stderr || stdout);
+                        return rejects(new Error("ClamAV 검사 중 오류 발생 또는 감염 파일입니다."));
+                    }
+
+                    if(stdout.includes('Infected files: 0')) {
+                        console.log("안전한 파일입니다.");
+                        resolve();
+                    }
+                    else {
+                        console.warn('악성 파일이 탐지되었습니다:', stdout);
+                        return reject(new Error('악성 코드가 포함된 파일입니다.'));
+                    }
+                });
+            });
+
             await db.promise().query(
                 `UPDATE files 
                 SET file_name=?, stored_name=?, file_path=?, file_size=?, uploaded_at=NOW() 

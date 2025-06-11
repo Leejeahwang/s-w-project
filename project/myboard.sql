@@ -192,7 +192,7 @@ ADD CONSTRAINT fk_comments_parent
     REFERENCES comments(id)
     ON DELETE CASCADE;
 
-## 채팅 메세지
+## 채팅 메세지 -- 이 두가지만 추가가
 CREATE TABLE chat_messages (
   id INT AUTO_INCREMENT PRIMARY KEY,
   room_id INT NOT NULL,

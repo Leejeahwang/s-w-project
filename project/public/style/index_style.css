@@ -14,7 +14,8 @@
 
 /* 색상코드
 background: #f4f6f9
-maincolor: #2196f3 */
+maincolor: #2196f3
+buttonhover color: #6fb7f2*/
 
 /* 기본 설정 */
 body {
@@ -42,7 +43,7 @@ header span {
 }
 
 header a {
-  margin-left: 10px;
+  margin: 0 7px 0 0;
   color: #2196f3;
   text-decoration: none;
   font-size: 14px;
@@ -50,89 +51,250 @@ header a {
   line-height: 1;          /* 또는 1.2, 전체 통일 */
 }
 
-header a:hover,
-#toggle:hover {
+header a:hover {
   text-decoration: underline;
-  color: #0d8ddb;
 }
 
-/* 사이드바 토글 */
-header div#toggle {
+/* 사이드바 토글 버튼튼 */
+#toggle {
   position: fixed;
   top: 15px;
   left: 20px;
-  text-decoration: none;
-  margin-right: auto;
+  background-color: #2196f3;
+  color: white;
+  padding: 10px 15px;
   font-size: 14px;
-  color: #2196f3;
   cursor: pointer;
-  transition: color 0.2s ease;
+  z-index: 1001;
+  transition: left 0.3s ease;
+}
+
+/* 사이드바가 열렸을 때 버튼 위치 조정 */
+#sidebar.active ~ #toggle {
+  left: 420px;
+}
+
+#toggle:hover {
+  text-decoration: underline;
+}
+
+/* 사이드바 오버레이 (근데 지금 작동 안 함) */
+.sider-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* 사이드바 */
 #sidebar {
   position: fixed;
   top: 0;
-  left: -300px; /* 숨겨진 상태 */
-  width: 300px;
+  left: -450px; /* 숨겨진 상태 */
+  width: 400px; /* 이 사이즈가 제일 적당한 듯 (나머지는 튀어나옴) */ 
   height: 100%;
-  background-color: #fefefe;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+  background-color: #fff;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
   z-index: 1000;
   transition: left 0.3s ease;
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
 }
 
 #sidebar.active {
   left: 0; /* 슬라이드 인 */
 }
 
-#sidebar.active ~ #toggle {
-  left: 320px; /* sidebar 너비 + 여유 */
+/* 사이드바 헤더 */
+.sider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6;
+  background-color: #2196f3;
+  color: white;
 }
 
-#sidebar .read-only,
-#sidebar .write-only {
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
+.sider-header h4 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:before {
+  content: 'x';
+}
+
+.close-btn:hover {
+  background-color: rgba(255,255,255,0.2);
+}
+
+/* 사이드바 콘텐츠 */
+.sidebar-content {
+  padding: 15px 20px;
+}
+
+.todo-input-section h4 {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.todo-input {
+  width: 90%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  font-size: 14px;
+  margin-bottom: 20px;
+  font-family: inherit;
+}
+
+.todo-input:focus {
+  outline: none;
+  border-color: #2196f3;
+}
+
+/* 통계 */
+.todo-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.todo-stats span {
+  color: #666;
+}
+
+/* 할 일 목록 */
+.todo-list {
+  max-height: 400px;
   overflow-y: auto;
 }
 
-#sidebar .write-only {
-  flex: 1;
-  bottom: 100px;
+.empty-state {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-#markdown-input {
-  width: 290px;
-  height: 100px;
-  resize: vertical;
-}
-
-#sidebar h4 {
-  margin-top: 0;
-  margin-bottom: 10px;
-}
-
-#sidebar .read_only {
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  padding: 10px;
+.todo-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
   background-color: #fff;
-  border-radius: 5px;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
 }
 
-#sidebar .write_only textarea {
+.todo-item:hover {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.todo-item.completed {
+  opacity: 0.7;
+  background-color: #f8f9fa;
+  }
+
+.todo-item.removing {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+
+.todo-checkbox {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.todo-text {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 14px;
+  padding: 5px;
+  border-radius: 3px;
+  font-family: inherit;
+}
+
+.todo-text:focus {
+  outline: none;
+  background-color: #f8f9fa;
+}
+
+.todo-text.completed {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.todo-delete {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  font-family: inherit;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.todo-delete:hover {
+  background-color: #c82333;
+}
+
+.clear-completed {
   width: 100%;
-  height: 150px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
   padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  resize: vertical;
-  margin-bottom: 15px;
+  cursor: pointer;
+  margin-top: 15px;
 }
 
+.clear-completed:hover {
+  background-color: #5a6268;
+}
+
+/* */
+
+/* 상단 헤더 분류선 */
+header .divider {
+  margin: 0 7px 0 0;
+  color: #bbb;
+  font-weight: normal;
+  font-size: 0.95em;
+}
 
 /* 사이트 로고 */
 .top-wrapper {
@@ -241,12 +403,25 @@ header div#toggle {
 
 .filter-section {
   display: flex;
-  gap: 24px;
+  gap: 20px 32px;
   align-items: flex-end;
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 30px;
   font-size: 14px;
+}
+
+.filter-left {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .filter-section label {
@@ -286,31 +461,36 @@ header div#toggle {
 .filter-form button {
   padding: 8px 16px;
   font-size: 14px;
-  font-weight: bold;
+  height: 36px;
   background-color: #2196f3;
   color: white;
   border: none;
   cursor: pointer;
-  height: 36px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .filter-form button:hover {
-  background-color: #2196f3;
+  background-color: #6fb7f2;
 }
 
 /* 노트 추가 링크 */
 .filter-form a {
-  display: inline-block;
-  color: white;
-  background-color: #4caf50;
   padding: 8px 16px;
-  border-radius: 4px;
-  text-decoration: none;
   font-size: 14px;
   height: 36px;
+  background-color: #3ec642;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   box-sizing: border-box;
-  line-height: 20px;
-  margin-left: auto;
   transition: background-color 0.3s ease;
 }
 
@@ -387,37 +567,6 @@ header div#toggle {
   margin-top: 15px;
   font-size: 12px;
   color: #999;
-}
-
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .filter-form {
-    padding: 20px 15px;
-  }
-  
-  .filter-form form {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .filter-form label {
-    margin-bottom: 10px;
-  }
-  
-  .filter-form a {
-    margin-left: 0;
-    margin-top: 10px;
-    text-align: center;
-  }
-  
-  .main-content {
-    padding: 20px 15px;
-  }
-  
-  header {
-    padding: 10px 15px;
-    font-size: 13px;
-  }
 }
 
 /* ToDO 리스트 */
