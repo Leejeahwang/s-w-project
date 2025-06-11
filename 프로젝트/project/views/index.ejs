@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/index_style.css">
+  <title>노트 목록</title>
+</head>
+<body>
+  <!-- 상단 컨테이너 부분 -->
+  <div class="up-container">
+    <header>
+
+      <!-- 사이드바 오버레이 -->
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+      <!-- 사이드 바 토글 버튼 -->
+      <div id="toggle">☰ ToDo 리스트
+    
+        <!-- 사이드바 본체 -->
+        <div id="sidebar">
+
+          <!-- 사이드바 헤더 -->
+          <div class="sidebar-header">
+            <h4>ToDo List</h4>
+            <button class="close-btn" id="close-sidebar"></button>
+          </div>
+
+          <!-- 사이드바 내용 -->
+          <div class="sidebar-content">
+            <div class="todo-input-section">
+              <h4>새 할 일 추가</h4>
+              <input type="text" id="todo-input" class="todo-input" placeholder="할 일을 입력하고 Enter를 누르세요!">
+            </div>
+
+            <!-- todo 통계 -->
+            <div class="todo-stats">
+              <span id="total-count">전체: 0개</span>
+              <span id="completed-count">완료: 0개</span>
+              <span id="remaining-count">남은 일: 0개</span>
+            </div>
+
+            <!-- todo 목록 -->
+            <div class="todo-list" id="todo-list">
+              <div class="empty-state" id="empty-state">
+                아직 할 일이 없습니다. <br>
+                위에서 할 일을 추가해보세요!
+              </div>
+            </div>
+
+            <!-- 완료된 항목 일괄 삭제 -->
+            <button class="clear-completed" id="clear-completed" style="display:none;">완료된 항목 일괄 삭제제</button>
+          </div>
+          
+        </div>
+      
+      </div>
+
+      <% if (user) { %>
+        <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
+        <a href="/auth/logout">로그아웃</a>
+        <span class="divider">|</span>
+
+        <a href="/notes/new">자료 등록</a>
+        <span class="divider">|</span>
+        <a href="/chat">채팅</a>
+        <a href="/pointshop">포인트 샵</a>
+        <span class="divider">|</span>
+
+        <a href="">고객센터</a>
+
+      <% } else { %>
+        <a href="/auth/login">로그인</a>
+        <a href="/auth/signup">회원가입</a>
+        <span class="divider">|</span>
+        
+        <a href="/pointshop">포인트샵</a>
+        <span class="divider">|</span>
+        
+        <a href="">고객센터</a>
+      <% } %>
+    </header>
+
+  </div>
+
+  <!-- 왼쪽 컨테이너 부분 -->
+  <div class="left-container">
+  </div>
+
+  <!-- 오른쪽 컨테이너 부분 -->
+  <div class="right-container">
+  </div>
+
+
+  <!-- 중앙 구역 -->
+  <div class="center-container">
+    <!-- 전체 콘텐츠 포함: container -->
+    <div class="container">
+
+      <div class="top-wrapper">
+        <!-- noteHub 로고 -->
+        <div class="logo">
+            <a href="/">
+              <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고">
+            </a>
+        </div>
+      </div>
+
+      <!-- 검색창, filter-form 외부에 위치-->
+      <div class="search-area">
+        <form method="GET" action="/">
+          <!-- 검색 영역 -->
+          <div class="search-wrapper">
+              <input type="text" name="keyword" value="<%= keyword %>" placeholder="제목 검색">
+              <button type="submit" aria-label="검색">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#007bff">
+                  <path d="M10 2a8 8 0 105.29 14.29l4.7 4.7a1 1 0 001.42-1.42l-4.7-4.7A8 8 0 0010 2zm0 2a6 6 0 110 12A6 6 0 0110 4z"/>
+                </svg>
+              </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 좋아요 랭킹 -->
+      <aside class="like-ranking" style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+        <h4> 🔥 좋아요 랭킹</h4>
+        <% if (likeRanking.length === 0) { %>
+          <p>데이터 없음</p>
+        <% } else { %>
+          <ol>
+            <% likeRanking.forEach(item => { %>
+              <li>
+                <a href="/notes/<%= item.id %>"><%= item.title %></a>
+                (<%= item.like_count %>개)
+              </li>
+            <% }) %>
+          </ol>
+        <% } %>
+      </aside>
+
+      <!-- 필터 폼 부분 -->
+      <section class="filter-form">
+        <form method="GET" action="/">
+          <div class="filter-section">
+            <!-- 드롭다운 필터 -->
+            <div class="filter-left">
+              <label>이수구분
+                <select name="category">
+                  <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
+                  <% categories.forEach(c => { %>
+                    <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  
+              <label>과목
+                <select name="subject">
+                  <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
+                  <% subjects.forEach(s => { %>
+                    <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  
+              <label>학년
+                <select name="year">
+                  <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
+                  <% years.forEach(y => { %>
+                    <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+                  
+              <label>학기
+                <select name="semester">
+                  <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
+                  <% semesters.forEach(sm => { %>
+                    <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+                  <% }) %>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- 버튼 그룹 -->
+          <div class="button-group">
+            <button type="submit">필터 적용</button>
+
+            <!-- 노트 추가 noteRouer /notes/new -->
+            <% if (user) { %>
+              <a href="/notes/new">자료 등록</a>
+            <% } %>
+          </div>
+        </form>
+      </section>
+
+      <!-- 노트 목록 -->
+      <section class="notes">
+        <% if (notes.length === 0) { %>
+          <p>표시할 노트가 없습니다.</p>
+        <% } else { %>
+          <% notes.forEach(n => { %>
+            <article class="note-card">
+              <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
+              <p>과목: <%= n.subject %></p>
+              <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
+              <small>
+                작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
+              </small>
+            </article>
+            <% }) %>
+        <% } %>
+      </section>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    //dom 요소
+    const toggle = document.getElementById('toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const closeBtn = document.getElementById('close-sidebar');
+
+    const todoInput = document.getElementById('todo-input');
+    const todoList = document.getElementById('todo-list');
+    const emptyState = document.getElementById('empty-state');
+    const clearCompleted = document.getElementById('clear-completed');
+
+    const totalCount = document.getElementById('total-count');
+    const completedCount = document.getElementById('completed-count');
+    const remainingCount = document.getElementById('remaining-count');
+
+    // Todo 데이터
+    let todos = [];
+    let nextId = 1;
+
+    // 로컬 스토리지에서 데이터 불러오기
+    function loadTodos() {
+      const savedTodos = localStorage.getItem('todos');
+      if (savedTodos) {
+        todos = JSON.parse(savedTodos);
+        nextId = Math.max(...todos.map(t => t.id), 0) + 1;
+      }
+    }
+
+    // 로컬 스토리지에 데이터 저장
+    function saveTodos() {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }+
+
+    // 통계 업데이트
+    function updateStats() {
+      const total = todos.length;
+      const completed = todos.filter(todo => todo.completed).length;
+      const remaining = total - completed;
+
+      totalCount.textContent = `전체: ${total}개`;
+      completedCount.textContent = `완료: ${completed}개`;
+      remainingCount.textContent = `남은 일: ${remaining}개`;
+
+      // 완료된 항목이 있으면 일괄 삭제 버튼 표시
+      clearCompleted.style.display = completed > 0 ? 'block' : 'none';
+    }
+
+    // Todo 항목 생성
+    function createTodoElement(todo) {
+      const todoItem = document.createElement('div');
+      todoItem.className = 'todo-item';
+      todoItem.setAttribute('data-id', todo.id);
+      if (todo.completed) {
+        todoItem.classList.add('completed');
+      }
+
+      todoItem.innerHTML = `
+        <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}>
+        <input type="text" class="todo-text ${todo.completed ? 'completed' : ''}" value="${todo.text}">
+        <button class="todo-delete">삭제</button>
+      `;
+
+      // 체크박스 이벤트
+      const checkbox = todoItem.querySelector('.todo-checkbox');
+      checkbox.addEventListener('change', () => {
+        toggleTodo(todo.id);
+      });
+
+      // 텍스트 수정 이벤트
+      const textInput = todoItem.querySelector('.todo-text');
+      textInput.addEventListener('blur', () => {
+        updateTodoText(todo.id, textInput.value);
+      });
+
+      textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          textInput.blur();
+        }
+      });
+
+      // 삭제 버튼 이벤트
+      const deleteBtn = todoItem.querySelector('.todo-delete');
+      deleteBtn.addEventListener('click', () => {
+        deleteTodo(todo.id);
+      });
+
+      return todoItem;
+    }
+
+    // ToDo 목록 렌더링
+    function renderTodos() {
+      todoList.innerHTML = '';
+
+      if (todos.length === 0) {
+        todoList.appendChild(emptyState);
+      } else {
+        todos.forEach(todo => {
+          todoList.appendChild(createTodoElement(todo));
+        });
+      }
+
+      updateStats();
+    }
+
+    // 새 ToDo 추가
+    function addTodo(text) {
+      if (!text.trim()) return;
+
+      const newTodo = {
+        id: nextId++,
+        text: text.trim(),
+        completed: false,
+        createdAt: new Date()
+      };
+
+      todos.unshift(newTodo); // 맨 앞에 추가
+      saveTodos();
+      renderTodos();
+      todoInput.value = '';
+    }
+
+    // ToDo 완료 상태 토글
+    function toggleTodo(id) {
+      const todo = todos.find(t => t.id === id);
+      if (todo) {
+        todo.completed = !todo.completed;
+        saveTodos();
+        renderTodos();
+      }
+    }
+
+    // ToDo 텍스트 수정
+    function updateTodoText(id, newText) {
+      if (!newText.trim()) return;
+            
+      const todo = todos.find(t => t.id === id);
+      if (todo) {
+        todo.text = newText.trim();
+        saveTodos();
+      }
+    }
+
+    // ToDo 삭제
+    function deleteTodo(id) {
+      const element = document.querySelector(`[data-id="${id}"]`);
+      element.classList.add('removing');
+            
+      setTimeout(() => {
+        todos = todos.filter(t => t.id !== id);
+        saveTodos();
+        renderTodos();
+      }, 300);
+    }
+
+    // 완료된 항목 모두 삭제
+    function clearCompletedTodos() {
+      if (confirm('완료된 항목을 모두 삭제하시겠습니까?')) {
+        todos = todos.filter(t => !t.completed);
+        saveTodos();
+        renderTodos();
+        }
+    }
+
+    //사이드 바 열기
+    function openSidebar() {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+      toggle.style.left = '470px';
+      document.body.style.overflow = 'hidden'; // 스크롤 방지
+    }
+
+    //사이드 바 닫기
+    function closeSidebar() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      toggle.style.left = '20px';
+      document.body.style.overflow = 'auto'; // 스크롤 복원
+    }
+
+    // 이벤트 리스너
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (sidebar.classList.contains('active')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+
+    // X 버튼 클릭!
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      closeSidebar();
+    });
+
+    // 오버레이 클릭
+    overlay.addEventListener('click', closeSidebar);
+
+    // 사이드바 내부 클릭, 이벤트 전파 방지하기
+    sidebar.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // ESC 키로 슬라이드 닫기
+    document.addEventListener('keydown', (e) => {
+      if(e.key == 'Escape' && sidebar.classList.contains('active')) {
+        closeSidebar();
+      }
+    });
+
+
+    // Enter로 새 ToDo 추가
+    todoInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTodo(todoInput.value);
+      }
+    });
+
+    // 완료된 항목 일괄 삭제
+    clearCompleted.addEventListener('click', clearCompletedTodos);
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      loadTodos();
+      renderTodos();
+    });
+
+
+  </script>
+
+</body>
+</html>
