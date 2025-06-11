@@ -47,15 +47,15 @@
     </p>
 
     <p>교수명 <br>
-      <input name="professor" placeholder="교수명"/>
+      <input name="professor" placeholder="교수명을 입력하세요" required/>
     </p>
 
-    <p>파일 업로드 <br>
+    <p>파일 업로드
       <span class="pdf-bar">(pdf)</span> <br>
       <input type="file" id="file" name="file" accept=".pdf" required>
     </p>
 
-    <!-- 본문 작성성 도구 모음 -->
+    <!-- 본문 작성 도구 모음 -->
     <div class="editor-toolbar">
                 
       <div class="editor-separator"></div>
@@ -84,9 +84,12 @@
       <button type="button" class="editor-btn" onclick="formatText('removeFormat')">Clear</button>
     </div>
 
+    <!-- 텍스트 구역 -->
+    <textarea name="summary" id="summaryTextarea" style="display: none;"></textarea>
+
     <!-- 본문 작성 -->
-    <div class="editor-content" contenteditable="true" id="editor">
-      <p>여기에 내용을 입력하세요...</p>
+    <div class="editor-content" contenteditable="true" id="editor" name="summary">
+      <p>내용을 입력하세요...</p>
     </div>
 
     <button type="submit">게시하기</button>
@@ -147,6 +150,11 @@
     document.getElementById('editor').focus();
   }
 
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const editorContent = document.getElementById('editor').innerHTML;
+    document.getElementById('summaryTextarea').value = editorContent;
+  })
+
   // 에디터 초기화
   document.getElementById('editor').addEventListener('click', function() {
     if (this.innerText.trim() === '여기에 내용을 입력하세요...') {
@@ -155,12 +163,18 @@
   });
 
   // 폼 제출 시 에디터 내용 포함
-  document.querySelector('form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const editorContent = document.getElementById('editor').innerHTML;
-    console.log('에디터 내용:', editorContent);
-    alert('작성이 완료되었습니다!');
-  });
+  // document.querySelector('form').addEventListener('submit', function(e) {
+  //   e.preventDefault();
+  //   const editorContent = document.getElementById('editor').innerHTML;
+  //   console.log('에디터 내용:', editorContent);
+  //   alert('작성이 완료되었습니다!');
+  // });
 </script>
+
+<% if (typeof alertMessage !== 'undefined') { %>
+  <script>
+    alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
+  </script>
+<% } %>
 
 </html>

@@ -93,13 +93,14 @@ input[type="text"], select, input[name="professor"] {
   font-size: 14px;
   line-height: 1.5;
   outline: none;
+  color: #999;
 }
 
 .editor-content:focus {
   border-color: #1976d2;
 }
 
-/* 버튼 */
+/* 게시 버튼 */
 button[type="submit"] {
   width: 100%;
   background-color: #1976d2;
@@ -107,19 +108,18 @@ button[type="submit"] {
   border: none;
   padding: 12px;
   font-size: 1em;
-  font-weight: bold;
   font-family: inherit;
   cursor: pointer;
   transition: background-color 0.3s ease;
   margin-top: 20px;
 }
 
-.pdf-bar {
-  color: #969696;
-}
-
 button[type="submit"]:hover {
   background-color: #6fb7f2;
+}
+
+.pdf-bar {
+  color: #969696;
 }
 
 /* 목록 돌아가기 링크 */

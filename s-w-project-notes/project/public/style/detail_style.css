@@ -40,7 +40,6 @@ body {
   min-width: 280px;
   background-color: #ffffff;
   padding: 20px;
-  border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   height: fit-content;
   position: sticky;
@@ -66,16 +65,15 @@ body {
   display: inline-block;
   margin-top: 10px;
   padding: 10px 16px;
-  background-color: #4caf50;
+  background-color: #3ec642;
   color: white;
   text-decoration: none;
-  font-weight: bold;
-  border-radius: 8px;
   transition: background-color 0.3s ease;
+  font-family: inherit;
 }
 
 .download-btn:hover {
-  background-color: #388e3c;
+  background-color: #218838;
 }
 
 .file-info {
@@ -101,10 +99,9 @@ body {
   background-color: #1976d2;
   color: white;
   border: none;
-  border-radius: 8px;
-  font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  font-family: inherit;
 }
 
 #likeBtn:hover {
@@ -112,7 +109,6 @@ body {
 }
 
 #likeCount, #downloadCount {
-  font-weight: bold;
   color: #333;
 }
 
@@ -123,7 +119,6 @@ article {
   padding: 30px;
   margin: 0 auto 30px;
   max-width: 700px;
-  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
@@ -151,7 +146,6 @@ article div {
   padding: 10px;
   background-color: #f1f1f1;
   border-left: 4px solid #2196f3;
-  border-radius: 6px;
 }
 
 article small {
@@ -166,6 +160,7 @@ article + div {
   text-align: right;
   max-width: 700px;
   margin: 0 auto 30px;
+  font-family: inherit;
 }
 
 article + div a,
@@ -174,10 +169,8 @@ article + div button {
   background-color: #1976d2;
   color: white;
   padding: 8px 14px;
-  border-radius: 6px;
   border: none;
   text-decoration: none;
-  font-weight: bold;
   font-size: 0.95em;
   line-height: 1.4;
   cursor: pointer;
@@ -196,7 +189,6 @@ article + div a:hover {
   margin: 0 auto;
   background-color: #ffffff;
   padding: 25px;
-  border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.06);
 }
 
@@ -244,23 +236,22 @@ article + div a:hover {
   padding: 10px;
   font-size: 1em;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  font-family: inherit;
 }
 
 .comments button {
   margin-top: 10px;
   align-self: flex-end;
-  background-color: #4caf50;
+  background-color: #2196f3;
   color: white;
   padding: 10px 16px;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
   cursor: pointer;
+  font-family: inherit;
 }
 
 .comments button:hover {
-  background-color: #388e3c;
+  background-color: #6fb7f2;
 }
 
 /* 로그인 유도 문구 */
@@ -270,15 +261,14 @@ article + div a:hover {
 }
 
 /* 목록 돌아가기 */
-a[href="/notes"] {
+a[href="/"] {
   display: block;
   text-align: center;
-  margin: 40px 0 0;
+  margin-top: 25px;
   color: #1976d2;
   text-decoration: none;
-  font-weight: bold;
 }
 
-a[href="/notes"]:hover {
+a[href="/"]:hover {
   text-decoration: underline;
 }

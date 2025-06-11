@@ -26,43 +26,87 @@
         <div>
           <a href="/notes/<%= note.id %>/edit">수정</a>
           <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+            <input type="hidden" name="_method" value="DELETE">
             <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
           </form>
         </div>
       <% } %>
   
-      <section class="comments">
-        <h3>댓글</h3>
-        <% if (comments.length) { %>
-          <ul>
-            <% comments.forEach(c => { %>
-              <li><strong><%= c.author %>:</strong> <%= c.content %> <em>(<%= c.created_at.toLocaleString() %>)</em></li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <p>댓글이 없습니다.</p>
-        <% } %>
+  <section class="comments">
+      <h3>댓글 (<%= comments ? comments.length : 0 %>)</h3>
 
-        <% if (user) { %>
-          <form method="POST" action="/notes/<%= note.id %>/comments">
-            <textarea name="content" placeholder="댓글 입력" required></textarea>
-            <button type="submit">댓글 작성</button>
-          </form>
-        <% } else { %>
-          <p>댓글을 작성하려면 <a href="/login">로그인</a>이 필요합니다.</p>
-        <% } %>
-      </section>
-      <a href="/notes">목록으로 돌아가기</a>
+      <% if (comments && comments.length > 0) { %>
+        <ul class="comments-list">
+          <% comments.forEach(c => { %>
+            <li class="comment-item">
+              <% if (editCommentId === c.id) { %>
+                <!-- 인라인 댓글 수정 폼 -->
+                 <!-- ★ EDITED at 2025-05-23 -->
+                  <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST">
+                    <!-- method-override를 body에서 읽도록 hidden 필드 추가 -->
+                    <input type="hidden" name="_method" value="PUT">
+                    <textarea name="content" rows="3" required><%= c.content %></textarea>
+                    <button type="submit">저장</button>
+                    <a href="/notes/<%= note.id %>">취소</a>
+                  </form>
+              <% } else { %>
+                <!-- 일반 댓글 표시 -->
+                <p><strong><%= c.author %>:</strong> <%= c.content %></p>
+                <small>
+                  <em><%= new Date(c.created_at).toLocaleString('ko-KR') %></em>
+                </small>
+
+                <% /* 수정/삭제 버튼: 로그인 & 작성자 본인만 */ %>
+                <% if (user && user.user_id === c.user_id) { %>
+                  <span class="comment-actions">
+                    <a
+                      href="/notes/<%= note.id %>?editCommentId=<%= c.id %>"
+                    >수정</a>
+                     <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST" style="display:inline">
+                        <!-- 여기에도 hidden 필드로 DELETE 지정 -->
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
+                     </form>
+                  </span>
+                <% } %>
+              <% } %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>아직 댓글이 없습니다.</p>
+      <% } %>
+
+      <% /* 새 댓글 작성 폼 */ %>
+      <% if (user) { %>
+        <form action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form">
+          <h4>새 댓글 작성</h4>
+          <textarea
+            name="content"
+            rows="3"
+            placeholder="댓글을 입력하세요"
+            required
+          ></textarea>
+          <button type="submit">등록</button>
+        </form>
+      <% } else { %>
+        <p>
+          댓글을 작성하려면
+          <a href="/auth/login">로그인</a>이 필요합니다.
+        </p>
+      <% } %>
+    </section>
+
+      <a href="/">목록으로 돌아가기</a>
     </div>
 
     <div class="right-panel">
       <!-- 다운로드 박스 -->
       <div class="download-box">
         <h3>다운로드</h3>
-        <!-- /files/<%= file.file_name %> -->
-        <a id="downloadLink" href="#" download class="download-btn" data-note-id="<%= note.id %>">
-          PDF 다운로드
-        </a>
+          <a id="downloadLink" href="#" class="download-btn" data-note-id="<%= note.id %>" data-filename = "<%= file.stored_name %>">
+            PDF 다운로드
+          </a>
         <div id="fileInfo" class="file-info">
           파일명: <%= file.file_name %> <br>
           용량: <%= file.file_size %></span> <br>
@@ -91,76 +135,81 @@
   <script type = "module" src ="/js/pdf_viewer.js"></script>
 
   <script>
-    // PDF 다운로드 버튼
-
-    // 좋아요 수 관련
+    // 좋아요 카운팅
     document.getElementById("likeBtn").addEventListener("click", async function () {
       const noteId = this.dataset.noteId;
+
       try {
         const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
-        if (res.status === 401) {
-          alert("로그인이 필요합니다.");
-        }
-        if(res.status === 400) {
-          alert("이미 좋아요를 눌렀습니다");
-        }
-        if (res.ok) {
-          const countSpan = document.getElementById("likeCount");
-          const currentCount = parseInt(countSpan.textContent) || 0;
-          countSpan.textContent = currentCount + 1;
-        } else {
-          const err = await res.json();
-          alert(err.message || "좋아요 처리 실패");
-        }
-      } catch (e) {
-        console.error("좋아요 에러:", e);
-      }
-    });
-
-    // 파일 다운로드 관련
-    document.getElementById("downloadLink").addEventListener("click", async function (e) {
-      e.preventDefault();
-
-      const noteId = this.dataset.noteId;
-      const stored_name = "<%= file.stored_name %>";
-
-      try {
-        // 다운로드 기록 + 카운트 증가 처리용 POST 요청 (POST /files/download-log/:noteId)
-        const res = await fetch(`/files/download-log/${noteId}`, { method: 'POST' });
+        const result = await res.json();
 
         if(res.status === 401) {
-          alert("로그인이 필요합니다. (detail.ejs 1)");
+          alert(result.message);
           return;
         }
 
-        if(res.status === 404) {
-          alert("파일이 존재하지 않습니다 (detail.ejs 2)");
-          return;
-        }
-
-        if(res.ok) {
-          const countSpan = document.getElementById("downloadCount");
-          const currentCount = parseInt(countSpan.textContent) || 0;
-          countSpan.textContent = currentCount + 1;
-          
-          // 실제 파일 다운로드 (GET /files/:stored_name)
-          // window.location.href = `/files/${stored_name}`;
-          const a = document.createElement('a');
-          a.href = `/files/${stored_name}`;
-          a.download = '';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+        if (res.status === 200) { // 좋아요 처리 완료
+          const countSpan = document.getElementById("likeCount");
+          countSpan.textContent = parseInt(countSpan.textContent) + 1;
+          alert(result.message);
         }
 
         else {
-          alert("다운로드 처리 실패 (detail.ejs 3)");
+          alert(result.message);
         }
-      }
-      catch(err) {
-        console.error("다운로드 에러:", err);
+
+      } catch (e) {
+        console.error("좋아요 에러:", e);
+        alert("좋아요 처리 중 오류가 발생했습니다.");
       }
     });
   </script>
+
+  <script>
+    // 다운로드 카운팅 & 파일 다운로드
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("downloadLink").addEventListener("click", async function(e) {
+        e.preventDefault();
+
+        const noteId = this.dataset.noteId;
+        const stored_name = this.dataset.filename;
+
+        try {
+          const updateDownload_log_res = await fetch(`/files/download-log/${noteId}`, { method: 'POST' });
+          const updateDownload_log_result = await updateDownload_log_res.json();
+
+          if(updateDownload_log_res.status === 401 || updateDownload_log_res.status === 404 || !updateDownload_log_res.ok) {
+            alert(updateDownload_log_result.message);
+            return;
+          }
+
+          alert(updateDownload_log_result.message);
+
+          const link = document.createElement('a');
+          link.href = `/files/download/${stored_name}`; // downloadController => /files/download/:stored_name으로 GET 요청
+          link.download = '';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        
+          // 다운로드 카운팅 +1 올리기
+          const countSpan = document.getElementById("downloadCount");
+          const currentCount = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = currentCount + 1;
+        
+        } catch(e) {
+          console.log(e);
+          alert("다운로드 처리 중 오류");
+        }
+      });
+    });
+  </script>
 </body>
+
+<% if(typeof(alertMessage) != 'undefined') { %>
+  <script>
+    alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
+  </script>
+<% } %>
+
 </html>

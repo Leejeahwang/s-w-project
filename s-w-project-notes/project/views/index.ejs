@@ -10,6 +10,7 @@
   <!-- 상단 컨테이너 부분 -->
   <div class="up-container">
     <header>
+
       <!-- 사이드바 오버레이 -->
       <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
@@ -27,16 +28,28 @@
 
           <!-- 사이드바 내용 -->
           <div class="sidebar-content">
-            <!-- 읽기 전용 영역 -->
-            <div class="read-only" contenteditable="false">
-              <div id="rendered-content"></div>
+            <div class="todo-input-section">
+              <h4>새 할 일 추가</h4>
+              <input type="text" id="todo-input" class="todo-input" placeholder="할 일을 입력하고 Enter를 누르세요!">
             </div>
 
-            <!-- 작성 영역 -->
-            <div class="write_only">
-              <h4>ToDo List 작성</h4>
-              <textarea id="markdown-input" placeholder="Markdown 형식으로 작성하세요...&#10;&#10;예시:&#10;- [ ] 할 일 1&#10;- [x] 완료된 일&#10;- [ ] 할 일 2"></textarea>
+            <!-- todo 통계 -->
+            <div class="todo-stats">
+              <span id="total-count">전체: 0개</span>
+              <span id="completed-count">완료: 0개</span>
+              <span id="remaining-count">남은 일: 0개</span>
             </div>
+
+            <!-- todo 목록 -->
+            <div class="todo-list" id="todo-list">
+              <div class="empty-state" id="empty-state">
+                아직 할 일이 없습니다. <br>
+                위에서 할 일을 추가해보세요!
+              </div>
+            </div>
+
+            <!-- 완료된 항목 일괄 삭제 -->
+            <button class="clear-completed" id="clear-completed" style="display:none;">완료된 항목 일괄 삭제제</button>
           </div>
           
         </div>
@@ -51,7 +64,7 @@
         <a href="/notes/new">자료 등록</a>
         <span class="divider">|</span>
 
-        <a href="/point">포인트 샵</a>
+        <a href="/pointshop">포인트 샵</a>
         <span class="divider">|</span>
 
         <a href="">고객센터</a>
@@ -61,10 +74,7 @@
         <a href="/auth/signup">회원가입</a>
         <span class="divider">|</span>
 
-        <a href="">자료 등록</a>
-        <span class="divider">|</span>
-
-        <a href="/point">포인트샵</a>
+        <a href="/pointshop">포인트샵</a>
         <span class="divider">|</span>
         
         <a href="">고객센터</a>
@@ -113,7 +123,7 @@
 
       <!-- 좋아요 랭킹 -->
       <aside class="like-ranking" style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
-        <h4>🔥 좋아요 랭킹</h4>
+        <h4> 🔥 좋아요 랭킹</h4>
         <% if (likeRanking.length === 0) { %>
           <p>데이터 없음</p>
         <% } else { %>
@@ -208,95 +218,235 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
-    const LOCAL_STORAGE_KEY = 'todo-content';
+    //dom 요소
+    const toggle = document.getElementById('toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const closeBtn = document.getElementById('close-sidebar');
 
-      //dom 요소
-      const toggle = document.getElementById('toggle');
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-      const closeBtn = document.getElementById('close-sidebar');
-      const markdownInput = document.getElementById('markdown-input');
-      const renderedContent = document.getElementById('rendered-content');
+    const todoInput = document.getElementById('todo-input');
+    const todoList = document.getElementById('todo-list');
+    const emptyState = document.getElementById('empty-state');
+    const clearCompleted = document.getElementById('clear-completed');
 
-      //사이드 바 열기
-      function openSidebar() {
-        sidebar.classList.add('active');
-        overlay.classList.add('active');
-        toggle.style.left = '370px';
+    const totalCount = document.getElementById('total-count');
+    const completedCount = document.getElementById('completed-count');
+    const remainingCount = document.getElementById('remaining-count');
 
-        //내용 저장장
-        const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY) || '';
-        markdownInput.value = savedContent;
-        renderedContent.innerHTML = marked.parse(savedContent);
+    // Todo 데이터
+    let todos = [];
+    let nextId = 1;
+
+    // 로컬 스토리지에서 데이터 불러오기
+    function loadTodos() {
+      const savedTodos = localStorage.getItem('todos');
+      if (savedTodos) {
+        todos = JSON.parse(savedTodos);
+        nextId = Math.max(...todos.map(t => t.id), 0) + 1;
+      }
+    }
+
+    // 로컬 스토리지에 데이터 저장
+    function saveTodos() {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }+
+
+    // 통계 업데이트
+    function updateStats() {
+      const total = todos.length;
+      const completed = todos.filter(todo => todo.completed).length;
+      const remaining = total - completed;
+
+      totalCount.textContent = `전체: ${total}개`;
+      completedCount.textContent = `완료: ${completed}개`;
+      remainingCount.textContent = `남은 일: ${remaining}개`;
+
+      // 완료된 항목이 있으면 일괄 삭제 버튼 표시
+      clearCompleted.style.display = completed > 0 ? 'block' : 'none';
+    }
+
+    // Todo 항목 생성
+    function createTodoElement(todo) {
+      const todoItem = document.createElement('div');
+      todoItem.className = 'todo-item';
+      todoItem.setAttribute('data-id', todo.id);
+      if (todo.completed) {
+        todoItem.classList.add('completed');
       }
 
-      //사이드 바 닫기
-      function closeSidebar() {
-        sidebar.classList.remove('active');
-        overlay.classList.remove('acitve');
-        toggle.style.left = '20px';
+      todoItem.innerHTML = `
+        <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}>
+        <input type="text" class="todo-text ${todo.completed ? 'completed' : ''}" value="${todo.text}">
+        <button class="todo-delete">삭제</button>
+      `;
 
-        const content = markdownInput.value;
-        localStorage.setItem(LOCAL_STORAGE_KEY, content);
-      }
+      // 체크박스 이벤트
+      const checkbox = todoItem.querySelector('.todo-checkbox');
+      checkbox.addEventListener('change', () => {
+        toggleTodo(todo.id);
+      });
 
-      // 이벤트 리스너너
-      toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (sidebar.classList.contains('active')) {
-          closeSidebar();
-        } else {
-          openSidebar();
+      // 텍스트 수정 이벤트
+      const textInput = todoItem.querySelector('.todo-text');
+      textInput.addEventListener('blur', () => {
+        updateTodoText(todo.id, textInput.value);
+      });
+
+      textInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          textInput.blur();
         }
       });
 
-      // X 버튼 클릭!
-      closeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+      // 삭제 버튼 이벤트
+      const deleteBtn = todoItem.querySelector('.todo-delete');
+      deleteBtn.addEventListener('click', () => {
+        deleteTodo(todo.id);
+      });
+
+      return todoItem;
+    }
+
+    // ToDo 목록 렌더링
+    function renderTodos() {
+      todoList.innerHTML = '';
+
+      if (todos.length === 0) {
+        todoList.appendChild(emptyState);
+      } else {
+        todos.forEach(todo => {
+          todoList.appendChild(createTodoElement(todo));
+        });
+      }
+
+      updateStats();
+    }
+
+    // 새 ToDo 추가
+    function addTodo(text) {
+      if (!text.trim()) return;
+
+      const newTodo = {
+        id: nextId++,
+        text: text.trim(),
+        completed: false,
+        createdAt: new Date()
+      };
+
+      todos.unshift(newTodo); // 맨 앞에 추가
+      saveTodos();
+      renderTodos();
+      todoInput.value = '';
+    }
+
+    // ToDo 완료 상태 토글
+    function toggleTodo(id) {
+      const todo = todos.find(t => t.id === id);
+      if (todo) {
+        todo.completed = !todo.completed;
+        saveTodos();
+        renderTodos();
+      }
+    }
+
+    // ToDo 텍스트 수정
+    function updateTodoText(id, newText) {
+      if (!newText.trim()) return;
+            
+      const todo = todos.find(t => t.id === id);
+      if (todo) {
+        todo.text = newText.trim();
+        saveTodos();
+      }
+    }
+
+    // ToDo 삭제
+    function deleteTodo(id) {
+      const element = document.querySelector(`[data-id="${id}"]`);
+      element.classList.add('removing');
+            
+      setTimeout(() => {
+        todos = todos.filter(t => t.id !== id);
+        saveTodos();
+        renderTodos();
+      }, 300);
+    }
+
+    // 완료된 항목 모두 삭제
+    function clearCompletedTodos() {
+      if (confirm('완료된 항목을 모두 삭제하시겠습니까?')) {
+        todos = todos.filter(t => !t.completed);
+        saveTodos();
+        renderTodos();
+        }
+    }
+
+    //사이드 바 열기
+    function openSidebar() {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+      toggle.style.left = '470px';
+      document.body.style.overflow = 'hidden'; // 스크롤 방지
+    }
+
+    //사이드 바 닫기
+    function closeSidebar() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      toggle.style.left = '20px';
+      document.body.style.overflow = 'auto'; // 스크롤 복원
+    }
+
+    // 이벤트 리스너
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (sidebar.classList.contains('active')) {
         closeSidebar();
-      });
+      } else {
+        openSidebar();
+      }
+    });
 
-      // 오버레이 클릭
-      overlay.addEventListener('click', closeSidebar);
+    // X 버튼 클릭!
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      closeSidebar();
+    });
 
-      // 사이드바 내부 클릭, 이벤트 전파 방지하기
-      sidebar.addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
+    // 오버레이 클릭
+    overlay.addEventListener('click', closeSidebar);
 
-      // ESC 키로 슬라이드 닫기
-      document.addEventListener('keydown', (e) => {
-        if(e.key == 'Escape' && sidebar.classList.contains('active')) {
-          closeSidebar();
-        }
-      });
+    // 사이드바 내부 클릭, 이벤트 전파 방지하기
+    sidebar.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
 
-      // 마크다운 실시간 파싱 및 자동 저장
-      markdonwInput.addEventListener('input', () => {
-        const input = markdownInput.value;
-        renderedContent.innerHTML = marked.parse(input);
+    // ESC 키로 슬라이드 닫기
+    document.addEventListener('keydown', (e) => {
+      if(e.key == 'Escape' && sidebar.classList.contains('active')) {
+        closeSidebar();
+      }
+    });
 
-        // 자동 저장
-        clearTimeout(window.autosaveTimeout);
-        window.autosaveTimeout = setTimeout(() => {
-          localStorage.setItem(LOCAL_STORAGE_KEY, input);
-        }, 500);
-      });    
 
-      // // 페이지 로드 시 저장된 내용 불러오기
-      // window.addEventListener('DOMContentLoaded', () => {
-      //   const savedContent = localStorage.getItem(LOCAL_STORAGE_KEY);
-      //   if (savedContent) {
-      //     markdownInput.value = savedContent;
-      //     renderedContent.innerHTML = marked.parse(savedContent);
-      //   }
-      // });
+    // Enter로 새 ToDo 추가
+    todoInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTodo(todoInput.value);
+      }
+    });
 
-      // // 페이지 떠날 때 저장
-      // window.addEventListener('beforeunload', () => {
-      //   const content = markdownInput.value;
-      //   localStorage.setItem(LOCAL_STORAGE_KEY, content);
-      // });
+    // 완료된 항목 일괄 삭제
+    clearCompleted.addEventListener('click', clearCompletedTodos);
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      loadTodos();
+      renderTodos();
+    });
+
 
   </script>
 
