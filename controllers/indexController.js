@@ -73,7 +73,9 @@ exports.getIndex = async (req, res, next) => {
             filters : { category, subject, professor, year, semester },
             keyword: keyword || '',
             user: userInfo,
-            likeRanking
+            likeRanking,
+            alertMessage: req.session.alertMessage
         });
+        delete req.session.alertMessage;
     } catch (err) { next(err); }
 }

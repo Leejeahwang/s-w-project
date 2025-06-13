@@ -43,11 +43,11 @@ exports.uploadNote = async (req, res) => {
         const windowPath = uploadedFile.path;
         const wslPath = '/mnt/' + windowPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, drive) => drive.toLowerCase());
 
-        await new Promise((resolve, rejects) => {
+        await new Promise((resolve, reject) => {
             exec(`wsl clamscan "${wslPath}"`, (error, stdout, stderr) => {
                 if(error) {
                     console.error("ClamAV 검사 오류: ", stderr || stdout);
-                    return rejects(new Error("ClamAV 검사 중 오류 발생 또는 감염 파일입니다."));
+                    return reject(new Error("ClamAV 검사 중 오류 발생 또는 감염 파일입니다."));
                 }
 
                 if(stdout.includes('Infected files: 0')) {
@@ -81,10 +81,18 @@ exports.uploadNote = async (req, res) => {
         await db.promise().query(
             `UPDATE users SET point = point + 100 WHERE user_id = ?`, [u.user_id]
         );
+
         req.session.alertMessage = `100P가 적립되었습니다!`;
-        
         res.redirect('/');
-    } catch {
-        return res.status(400).json({ message: "파일 업로드중 오류" });
+    } catch (err) {
+        console.log(err);
+        if(err.message === '악성 코드가 포함된 파일입니다.' || err.message === 'ClamAV 검사 중 오류 발생 또는 감염 파일입니다.') {
+            req.session.alertMessage = '업로드하신 파일에 악성 코드가 포함되어 있어 업로드가 차단되었습니다.';
+            return res.redirect('/');
+        }
+        else {
+            req.session.alertMessage = '파일 업로드중'
+            return res.status(400).json({ message: "파일 업로드중 오류" });
+        }
     }
 }
