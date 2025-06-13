@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/signup_style.css">
+  <title>회원가입</title>
+</head>
+<body>
+  <h2>회원가입</h2>
+  <% if (error) { %>
+    <p style="color:red;"><%= error %></p>
+  <% } %>
+  <form method="POST" action="/auth/signup">
+    <label for="signupId">아이디</label>
+    <input id="signupId" name="id" required />
+    <label for="signupPw">비밀번호</label>
+    <input id="signupPw" type="password" name="pw" required />
+    <label for="signupName">이름</label>
+    <input id="signupName" name="name" required />
+    <label for="signupStudentId">학번</label>
+    <input id="signupStudentId" name="studentId" required />
+    <label for="signupGrade">학년</label>
+    <input id="signupGrade" name="grade" required />
+    <button type="submit">회원가입</button>
+  </form>
+  <p>이미 계정이 있으신가요? <a href="/auth/login">로그인</a></p>
+</body>
+</html>

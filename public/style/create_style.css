@@ -1,0 +1,136 @@
+/* 폰트 정의 */
+@font-face {
+    font-family: 'GmarketSansMedium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'GmarketSans';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: bold;
+}
+
+/* 전체 페이지 기본 설정 */
+body {
+  font-family: 'GmarketSansMedium', sans-serif;
+  margin: 0;
+  padding: 40px;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* 폼 전체 영역 */
+form {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  padding: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 폼 안 각 항목 */
+form p {
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-family: inherit;
+}
+
+/* 입력 박스, 셀렉트 공통 스타일 */
+input[type="text"], select, input[name="professor"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 0.85em;
+  margin-top: 6px;
+  font-family: inherit;
+}
+
+/* 텍스트 작성 도구 */
+.editor-toolbar {
+  border: 1px solid #ccc;
+  border-bottom: none;
+  background-color: #f5f5f5;
+  padding: 8px;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.editor-btn {
+  background: none;
+  border: 1px solid transparent;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 12px;
+  border: 2px;
+}
+
+.editor-btn:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
+}
+
+.editor-btn.activer {
+  background-color: #d0d0d0;
+  background-color: #999;
+}
+
+.editor-separator {
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 5px;
+}
+
+.editor-content {
+  border: 1px solid #ccc;
+  min-height: 200px;
+  padding: 10px;
+  background-color: white;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  color: #999;
+}
+
+.editor-content:focus {
+  border-color: #1976d2;
+}
+
+/* 게시 버튼 */
+button[type="submit"] {
+  width: 100%;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 1em;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+button[type="submit"]:hover {
+  background-color: #6fb7f2;
+}
+
+.pdf-bar {
+  color: #969696;
+}
+
+/* 목록 돌아가기 링크 */
+a {
+  display: block;
+  text-align: center;
+  margin-top: 25px;
+  color: #1976d2;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

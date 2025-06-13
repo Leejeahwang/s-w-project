@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= room.name %> 채팅방</title>
+  <link rel="stylesheet" href="/style/canvas_style.css" />
+</head>
+<body>
+  <h2><%= room.name %> 채팅방</h2>
+
+  <!-- 그림판 영역 -->
+  <div id="drawingSection">
+    <div id="controls">
+      색상: <input type="color" id="colorPicker" value="#000000" />
+      선굵기: <input type="range" id="lineWidth" min="1" max="20" value="2" />
+      <button onclick="setMode('draw')">그리기</button>
+      <button onclick="setMode('text')">텍스트</button>
+      <button onclick="saveTextToCanvas()">텍스트 고정</button>
+      <button onclick="clearCanvas()">초기화</button>
+    </div>
+    <div id="canvasWrapper">
+      <canvas id="canvas" width="800" height="500"></canvas>
+    </div>
+  </div>
+
+  <!-- 채팅 영역 -->
+  <div id="chatSection">
+    <h3>채팅</h3>
+    <ul id="messages"></ul>
+    <form id="chat-form">
+      <input id="msgInput" autocomplete="off" placeholder="메시지 입력..." />
+      <button type="submit">전송</button>
+    </form>
+  </div>
+
+  <!-- Socket.IO 및 통합 스크립트 -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const roomId = "<%= room.id %>";
+    const user = "<%= user.user_id %>";  // 세션상의 사용자 ID
+
+    // 1) 방 입장
+    socket.emit('joinRoom', roomId);
+
+    // --- 그림판 JS ---
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const wrapper = document.getElementById("canvasWrapper");
+    let drawing = false;
+    let mode = "draw";
+
+    ctx.lineCap = "round";
+
+    canvas.addEventListener("mousedown", (e) => {
+      if (mode === "draw") {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+
+        socket.emit('drawing', {
+          roomId,
+          type: 'beginPath',
+          x: e.offsetX,
+          y: e.offsetY,
+          color: document.getElementById("colorPicker").value,
+          lineWidth: document.getElementById("lineWidth").value 
+        });       
+      } else if (mode === "text") {
+        createTextBox(e.offsetX, e.offsetY);
+      }
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (drawing && mode === "draw") {
+        const color = document.getElementById("colorPicker").value;
+        const lineWidth = document.getElementById("lineWidth").value;
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;        
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+
+        socket.emit('drawing', {
+          roomId,
+          type: 'stroke',
+          x: e.offsetX,
+          y: e.offsetY,
+          color,
+          lineWidth
+        });        
+      }
+    });
+
+    canvas.addEventListener("mouseup", () => {
+      if (mode === "draw") {
+        drawing = false;
+        socket.emit('drawing', {
+          roomId,
+          type: 'endPath'
+        });
+      }
+    });
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.querySelectorAll(".text-box").forEach((box) => box.remove());
+      socket.emit('drawing', {
+        roomId,
+        type: 'clear'
+      });
+    }
+
+    // 5) “텍스트 모드” 관련 함수 (기존 createTextBox, makeDraggable, saveTextToCanvas)
+    //    텍스트 박스를 고정해서 canvas에 그릴 때에도 서버로 data 전송
+    function saveTextToCanvas() {
+      const boxes = document.querySelectorAll(".text-box");
+      boxes.forEach((box) => {
+        const textarea = box.querySelector("textarea");
+        const text = textarea.value;
+        const x = parseInt(box.style.left, 10);
+        const y = parseInt(box.style.top, 10) + 16;
+        const color = document.getElementById("colorPicker").value;
+
+        ctx.font = "16px sans-serif";
+        ctx.fillStyle = color;
+        text.split("\n").forEach((line, i) => {
+          ctx.fillText(line, x, y + i * 20);
+        });
+
+        // 서버로도 “텍스트 그리기” 이벤트 전송
+        socket.emit('drawing', {
+          roomId,
+          type: 'text',
+          x, y,
+          text,
+          color
+        });
+
+        box.remove();
+      });
+    }
+
+    function setMode(newMode) {
+      mode = newMode;
+    }
+
+    function createTextBox(x, y) {
+      const box = document.createElement("div");
+      box.className = "text-box";
+      box.style.left = `${x}px`;
+      box.style.top = `${y}px`;
+      box.style.width = "150px";
+      box.style.height = "50px";
+
+      const textarea = document.createElement("textarea");
+      box.appendChild(textarea);
+      wrapper.appendChild(box);
+      makeDraggable(box);
+      textarea.focus();
+    }
+
+    function makeDraggable(el) {
+      let isDragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      el.addEventListener("mousedown", (e) => {
+        if (e.target.tagName.toLowerCase() === "textarea") return;
+        isDragging = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+        el.style.zIndex = 1000;
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+          el.style.left = `${e.pageX - wrapper.offsetLeft - offsetX}px`;
+          el.style.top = `${e.pageY - wrapper.offsetTop - offsetY}px`;
+        }
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+    }
+
+    socket.on('drawing', (data) => {
+      switch (data.type) {
+        case 'beginPath':
+          ctx.beginPath();
+          ctx.moveTo(data.x, data.y);
+          break;
+        case 'stroke':
+          ctx.strokeStyle = data.color;
+          ctx.lineWidth = data.lineWidth;
+          ctx.lineTo(data.x, data.y);
+          ctx.stroke();
+          break;
+        case 'endPath':
+          // 아무 동작 필요 없음(또는 ctx.closePath() 호출 가능)
+          ctx.closePath();
+          break;
+        case 'clear':
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          // 모든 text-box 제거
+          document.querySelectorAll(".text-box").forEach(box => box.remove());
+          break;
+        case 'text':
+          // 텍스트 박스 없이 바로 캔버스에 글자 그리기
+          ctx.font = "16px sans-serif";
+          ctx.fillStyle = data.color;
+          data.text.split("\n").forEach((line, i) => {
+            ctx.fillText(line, data.x, data.y + i * 20);
+          });
+          break;
+        default:
+          break;
+      }
+    });
+    
+    socket.on('initDrawing', (history) => {
+      history.forEach(data => {
+        // 위의 switch와 동일하게 처리
+        switch (data.type) {
+          case 'beginPath':
+            ctx.beginPath();
+            ctx.moveTo(data.x, data.y);
+            break;
+          case 'stroke':
+            ctx.strokeStyle = data.color;
+            ctx.lineWidth = data.lineWidth;
+            ctx.lineTo(data.x, data.y);
+            ctx.stroke();
+            break;
+          case 'endPath':
+            ctx.closePath();
+            break;
+          case 'clear':
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.querySelectorAll(".text-box").forEach(box => box.remove());
+            break;
+          case 'text':
+            ctx.font = "16px sans-serif";
+            ctx.fillStyle = data.color;
+            data.text.split("\n").forEach((line, i) => {
+              ctx.fillText(line, data.x, data.y + i * 20);
+            });
+            break;
+          default:
+            break;
+        }
+      });
+    });    
+
+    document.getElementById("chat-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const msgInput = document.getElementById("msgInput");
+      const message = msgInput.value.trim();
+      if (!message) return;
+      socket.emit("chat message", { roomId, msg: message });
+      msgInput.value = "";
+    });
+
+    socket.on("chat message", (data) => {
+      const li = document.createElement("li");
+      li.textContent = `${data.user}: ${data.message.msg}`;
+      document.getElementById("messages").appendChild(li);
+
+      const messages = document.getElementById("messages");
+      messages.scrollTop = messages.scrollHeight;
+    });
+  </script>
+</body>
+</html>

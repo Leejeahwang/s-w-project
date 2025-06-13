@@ -1,0 +1,15 @@
+<h2>채팅방 목록</h2>
+<a href="/chat/create">방 만들기</a>
+<ul>
+  <% rooms.forEach(room => { %>
+    <li>
+      <a href="/chat/<%= room.id %>"><%= room.name %></a>
+      - 만든이: <%= room.creator %>
+      <% if (room.creator === user.user_id) { %>
+        <form action="/chat/<%= room.id %>/delete" method="POST" style="display:inline;">
+          <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+        </form>
+      <% } %>
+    </li>
+  <% }) %>
+</ul>

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/detail_style.css">
+  <title>노트 상세</title>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <article>
+        <h2><%= note.title %></h2>
+        <p>과목명: <%= note.subject %></p>
+        <p>교수명: <%= note.professor %></p>
+        <p>카테고리: <%= note.category %></p>
+        <canvas id="pdf-canvas" width="400"></canvas>
+        <div><%= note.summary %></div>
+        <small>
+          작성자: <%= note.authorName %> /
+          작성시간: <%= note.created_at.getFullYear() %>/<%= (note.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= note.created_at.getDate().toString().padStart(2,'0') %> <%= note.created_at.toLocaleTimeString('ko-KR') %>
+        </small>
+      </article>
+
+      <% if (user && note.user_id === user.user_id) { %>
+        <div>
+          <a href="/notes/<%= note.id %>/edit">수정</a>
+          <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+          </form>
+        </div>
+      <% } %>
+  <!--comments 배열을 parent_id 기준으로 분리 -->
+  <% 
+    const parents = comments.filter(c => c.parent_id === null);
+    const childrenByParent = {}; 
+    comments.forEach(c => {
+      if (c.parent_id) {
+        if (!childrenByParent[c.parent_id]) childrenByParent[c.parent_id] = [];
+        childrenByParent[c.parent_id].push(c);
+      }
+    });
+  %>
+    
+  <section class="comments">
+    <h3>댓글 (<%= parents.length %>)</h3>
+
+    <% if (parents.length > 0) { %>
+      <ul class="comments-list">
+        <% parents.forEach(parent => { %>
+          <li id="comment-<%= parent.id %>" class="comment-item" style="margin-bottom: 1.5rem;">
+
+            <!-- 1) 부모 댓글 수정 분기 -->
+            <% if (editCommentId === parent.id) { %>
+              <!-- 수정 폼 (인라인으로 텍스트박스 보임) -->
+              <form
+                id="edit-parent-form-<%= parent.id %>"
+                action="/notes/<%= note.id %>/comments/<%= parent.id %>"
+                method="POST"
+              >
+                <input type="hidden" name="_method" value="PUT">
+                <!-- 수정용 textarea에도 js-enter-submit 클래스와 data-form-id 지정 -->
+                <textarea
+                  name="content"
+                  rows="3"
+                  required
+                  class="js-enter-submit"
+                  data-form-id="edit-parent-form-<%= parent.id %>"
+                ><%= parent.content %></textarea>
+                <button type="submit">저장</button>
+                <a href="/notes/<%= note.id %>">취소</a>
+              </form>
+            <% } else { %>
+              <!-- 수정 폼이 아닐 때(일반 댓글 표시) -->
+              <div class="comment-main">
+                <p><strong><%= parent.author %>:</strong> <%= parent.content %></p>
+                <small><em><%= new Date(parent.created_at).toLocaleString('ko-KR') %></em></small>
+                <% if (user && user.user_id === parent.user_id) { %>
+                  <span class="comment-actions">
+                    <!-- 수정 버튼: 클릭 시 페이지가 ?editCommentId=<id>로 리로드됨 -->
+                    <a href="/notes/<%= note.id %>?editCommentId=<%= parent.id %>#comment-<%= parent.id %>">수정</a>
+                    <form action="/notes/<%= note.id %>/comments/<%= parent.id %>" method="POST" style="display:inline;">
+                      <input type="hidden" name="_method" value="DELETE">
+                      <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
+                    </form>
+                  </span>
+                <% } %>
+                <% if (user) { %>
+                  <button class="reply-toggle-btn" data-parent-id="<%= parent.id %>">답글 쓰기</button>
+                <% } %>
+              </div>
+            <% } %>
+
+            <!-- 2) 대댓글 리스트 렌더링 -->
+            <% if (childrenByParent[parent.id]) { %>
+              <ul class="nested-comments-list" style="margin-left: 2rem; margin-top: 1rem;">
+                <% childrenByParent[parent.id].forEach(child => { %>
+                  <li id="comment-<%= child.id %>" class="comment-item child-comment" style="margin-bottom: 1rem;">
+
+                    <!-- 대댓글 수정 분기 -->
+                    <% if (editCommentId === child.id) { %>
+                      <form
+                        id="edit-child-form-<%= child.id %>"
+                        action="/notes/<%= note.id %>/comments/<%= child.id %>"
+                        method="POST"
+                      >
+                        <input type="hidden" name="_method" value="PUT">
+                        <!-- 수정용 textarea에도 동일하게 처리 -->
+                        <textarea
+                          name="content"
+                          rows="2"
+                          required
+                          class="js-enter-submit"
+                          data-form-id="edit-child-form-<%= child.id %>"
+                        ><%= child.content %></textarea>
+                        <button type="submit">저장</button>
+                        <a href="/notes/<%= note.id %>">취소</a>
+                      </form>
+                    <% } else { %>
+                      <p><strong><%= child.author %>:</strong> <%= child.content %></p>
+                      <small><em><%= new Date(child.created_at).toLocaleString('ko-KR') %></em></small>
+                      <% if (user && user.user_id === child.user_id) { %>
+                        <span class="comment-actions">
+                          <a href="/notes/<%= note.id %>?editCommentId=<%= child.id %>#comment-<%= child.id %>">수정</a>
+                          <form action="/notes/<%= note.id %>/comments/<%= child.id %>" method="POST" style="display:inline;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
+                          </form>
+                        </span>
+                      <% } %>
+                    <% } %>
+
+                  </li>
+                <% }) %>
+              </ul>
+            <% } %>
+
+            <!-- 3) 대댓글 작성 폼(숨김) -->
+            <% if (user) { %>
+              <form
+                id="reply-form-<%= parent.id %>"
+                action="/notes/<%= note.id %>/comments"
+                method="POST"
+                class="new-reply-form"
+                style="display: none; margin-left: 2rem; margin-top: 0.5rem;"
+              >
+                <input type="hidden" name="parentId" value="<%= parent.id %>">
+                <!-- textarea에 동일한 클래스와 data-form-id를 설정 -->
+                <textarea
+                  name="content"
+                  rows="2"
+                  placeholder="답글을 입력하세요"
+                  required
+                  class="js-enter-submit"
+                  data-form-id="reply-form-<%= parent.id %>"
+                ></textarea>
+                <button type="submit">등록</button>
+                <button type="button" class="cancel-reply-btn" data-parent-id="<%= parent.id %>">취소</button>
+              </form>
+            <% } %>
+
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p>아직 댓글이 없습니다.</p>
+    <% } %>
+
+    <!-- 최상위 댓글 작성 폼은 그대로 두면 됩니다 -->
+    <% if (user) { %>
+      <form id="new-comment-form" action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form" style="margin-top: 2rem;">
+        <h4>새 댓글 작성</h4>
+        <!-- textarea에 클래스 및 data-form-id 지정 -->
+        <textarea
+          name="content"
+          rows="3"
+          placeholder="댓글을 입력하세요"
+          required
+          class="js-enter-submit"
+          data-form-id="new-comment-form"
+        ></textarea>
+        <button type="submit">등록</button>
+      </form>
+    <% } else { %>
+      <p>댓글을 작성하려면 <a href="/auth/login">로그인</a>이 필요합니다.</p>
+    <% } %>
+
+  </section>
+
+
+      <a href="/">목록으로 돌아가기</a>
+    </div>
+
+    <div class="right-panel">
+      <!-- 다운로드 박스 -->
+      <div class="download-box">
+        <h3>다운로드</h3>
+          <a id="downloadLink" href="#" class="download-btn" data-note-id="<%= note.id %>" data-filename = "<%= file.stored_name %>">
+            PDF 다운로드
+          </a>
+        <div id="fileInfo" class="file-info">
+          파일명: <%= file.file_name %> <br>
+          용량: <%= file.file_size %></span> <br>
+          업로드: 
+          <%= note.created_at.getFullYear() %>/
+          <%= (note.created_at.getMonth() + 1).toString().padStart(2, '0') %>/
+          <%= note.created_at.getDate().toString().padStart(2, '0') %>
+        </div>
+      </div>
+
+      <!-- 좋아요 & 다운로드 수 -->
+      <div class="like-download-stats">
+      <!-- <% console.log(note); %> -->
+        <button id="likeBtn" data-note-id="<%= note.id %>" style="margin-bottom: 10px;">
+          👍 좋아요 (<span id="likeCount" style="color: aliceblue;"><%= note.like_count %></span>)
+        </button>
+        <p>📥 다운로드 수: <span id="downloadCount"><%= note.download_count || 0 %></span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF 사진 로드 관련 -->
+  <script>
+    window.pdfUrl = "<%= file.file_path %>";
+  </script>
+  <script type = "module" src ="/js/pdf_viewer.js"></script>
+
+  <script>
+    // 좋아요 카운팅
+    document.getElementById("likeBtn").addEventListener("click", async function () {
+      const noteId = this.dataset.noteId;
+
+      try {
+        const res = await fetch(`/notes/${noteId}/like`, { method: 'POST' });
+        const result = await res.json();
+
+        if(res.status === 401) {
+          alert(result.message);
+          return;
+        }
+
+        if (res.status === 200) { // 좋아요 처리 완료
+          const countSpan = document.getElementById("likeCount");
+          countSpan.textContent = parseInt(countSpan.textContent) + 1;
+          alert(result.message);
+        }
+
+        else {
+          alert(result.message);
+        }
+
+      } catch (e) {
+        console.error("좋아요 에러:", e);
+        alert("좋아요 처리 중 오류가 발생했습니다.");
+      }
+    });
+  </script>
+  
+  <script>
+    // 답글 쓰기 버튼 클릭 시 대응하는 hidden form을 보이도록/숨기도록
+    document.querySelectorAll('.reply-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parentId = btn.dataset.parentId;
+        const form = document.getElementById(`reply-form-${parentId}`);
+        form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none';
+      });
+    });
+
+    // 답글 취소 버튼 클릭 시 폼을 숨김
+    document.querySelectorAll('.cancel-reply-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parentId = btn.dataset.parentId;
+        const form = document.getElementById(`reply-form-${parentId}`);
+        form.style.display = 'none';
+      });
+    });
+  </script>
+
+  <script>
+    // 다운로드 카운팅 & 파일 다운로드
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("downloadLink").addEventListener("click", async function(e) {
+        e.preventDefault();
+
+        const noteId = this.dataset.noteId;
+        const stored_name = this.dataset.filename;
+
+        try {
+          const updateDownload_log_res = await fetch(`/files/download-log/${noteId}`, { method: 'POST' });
+          const updateDownload_log_result = await updateDownload_log_res.json();
+
+          if(updateDownload_log_res.status === 401 || updateDownload_log_res.status === 404 || !updateDownload_log_res.ok) {
+            alert(updateDownload_log_result.message);
+            return;
+          }
+
+          alert(updateDownload_log_result.message);
+
+          const link = document.createElement('a');
+          link.href = `/files/download/${stored_name}`; // downloadController => /files/download/:stored_name으로 GET 요청
+          link.download = '';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        
+          // 다운로드 카운팅 +1 올리기
+          const countSpan = document.getElementById("downloadCount");
+          const currentCount = parseInt(countSpan.textContent) || 0;
+          countSpan.textContent = currentCount + 1;
+        
+        } catch(e) {
+          console.log(e);
+          alert("다운로드 처리 중 오류");
+        }
+      });
+    });
+  </script>
+</body>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // .js-enter-submit 클래스를 가진 모든 textarea에 keydown 이벤트를 달아줍니다.
+      document.querySelectorAll('.js-enter-submit').forEach(textarea => {
+        textarea.addEventListener('keydown', e => {
+          if (e.key === 'Enter') {
+            // Ctrl+Enter는 줄바꿈(기본 동작) 그대로
+            if (e.ctrlKey) {
+              return;
+            }
+            // Enter 단독: 기본 줄바꿈 방지 후 해당 폼 제출
+            e.preventDefault();
+            const formId = textarea.dataset.formId;
+            const form = document.getElementById(formId);
+            if (form) form.submit();
+          }
+        });
+      });
+    });
+  </script>
+
+<% if(typeof(alertMessage) != 'undefined') { %>
+  <script>
+    alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
+  </script>
+<% } %>
+
+</html>
