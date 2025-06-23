@@ -192,6 +192,18 @@ ADD CONSTRAINT fk_comments_parent
     REFERENCES comments(id)
     ON DELETE CASCADE;
 
+-- 채팅방 생성
+CREATE TABLE `chat_rooms` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `owner_id` varchar(100) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `created_by` varchar(50) DEFAULT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `created_by` (`created_by`),
+  CONSTRAINT `chat_rooms_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`)
+);
+
 ## 채팅 메세지 -- 이 두가지만 추가가
 CREATE TABLE chat_messages (
   id INT AUTO_INCREMENT PRIMARY KEY,
