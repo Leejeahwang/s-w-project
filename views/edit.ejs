@@ -7,11 +7,12 @@
   <title>노트 수정</title>
 </head>
 <body>
-  <h2>노트 수정</h2>
   <form method="POST" action="/notes/<%= note.id %>/edit" enctype="multipart/form-data">
-    <p>제목: <input type="text" name="title" value="<%= note.title %>" required /></p>
-    <p>내용: <textarea name="summary" placeholder="요약" required><%= note.summary %></textarea></p>
-    <p>이수 구분:
+    <p>제목 
+      <input type="text" name="title" value="<%= note.title %>" required />
+    </p>
+
+    <p>이수구분
       <select name="category">
         <% categories.forEach(c => { %>
           <option value="<%= c.name %>" <%= c.name === note.category ? "selected" : "" %>>
@@ -20,7 +21,8 @@
         <% }) %>
       </select>
     </p>
-    <p>과목:
+
+    <p>과목
       <select name="subject">
         <% subjects.forEach(s => { %>
           <option value="<%= s.name %>" <%= s.name === note.subject ? "selected" : "" %>>
@@ -29,7 +31,8 @@
         <% }) %>
       </select>
     </p>
-    <p>학년:
+
+    <p>학년
       <select name="year">
         <% years.forEach(y => { %>
           <option value="<%= y.name %>" <%= y.name === note.year ? "selected" : "" %>>
@@ -38,7 +41,8 @@
         <% }) %>
       </select>
     </p>
-    <p>학기:
+
+    <p>학기
       <select name="semester">
         <% semesters.forEach(sm => { %>
           <option value="<%= sm.name %>" <%= sm.name === note.semester ? "selected" : "" %>>
@@ -47,16 +51,126 @@
         <% }) %>
       </select>
     </p>
-    <p>교수명: <br>
-      <input name="professor"  placeholder="교수명"  value="<%= note.professor %>"  />
+
+    <p>교수명 <br>
+      <input name="professor"  placeholder="교수명을 입력하세요" value="<%= note.professor %>" required/>
     </p>
-    <p>파일 업로드: 
+
+    <p>파일 업로드
       <span class="pdf-bar">(pdf)</span> <br>
       <input type="file" id="file" name="file" accept=".pdf">
     </p>
-    <button type="submit">수정</button>
+
+    <!-- 본문 작성 도구 모음 -->
+    <div class="editor-toolbar">
+                
+      <div class="editor-separator"></div>
+                
+      <button type="button" class="editor-btn" onclick="formatText('bold')"><b>B</b></button>
+      <button type="button" class="editor-btn" onclick="formatText('italic')"><i>I</i></button>
+      <button type="button" class="editor-btn" onclick="formatText('underline')"><u>U</u></button>
+      <button type="button" class="editor-btn" onclick="formatText('strikeThrough')">S</button>
+                
+      <div class="editor-separator"></div>
+                
+      <button type="button" class="editor-btn" onclick="formatText('justifyLeft')">≡</button>
+      <button type="button" class="editor-btn" onclick="formatText('justifyCenter')">≣</button>
+      <button type="button" class="editor-btn" onclick="formatText('justifyRight')">≢</button>
+                
+      <div class="editor-separator"></div>
+                
+      <button type="button" class="editor-btn" onclick="formatText('insertUnorderedList')">• List</button>
+      <button type="button" class="editor-btn" onclick="formatText('insertOrderedList')">1. List</button>
+                
+      <div class="editor-separator"></div>
+                
+      <button type="button" class="editor-btn" onclick="insertLink()">🔗</button>
+      <button type="button" class="editor-btn" onclick="insertImage()">🖼️</button>
+      <button type="button" class="editor-btn" onclick="insertTable()">⊞</button>
+      <button type="button" class="editor-btn" onclick="formatText('removeFormat')">Clear</button>
+    </div>
+
+    <!-- 텍스트 구역 -->
+    <textarea name="summary" id="summaryTextarea" style="display: none;"></textarea>
+
+    <!-- 본문 작성 -->
+    <div class="editor-content" contenteditable="true" id="editor" name="summary">
+      
+    </div>
+
+
+    <button type="submit">수정하기</button>
   </form>
 
   <a href="/notes/<%= note.id %>">노트로 돌아가기</a>
 </body>
+
+<script>
+  // 텍스트 포맷팅 함수
+  function formatText(command) {
+    document.execCommand(command, false, null);
+    document.getElementById('editor').focus();
+  }
+
+  // 링크 삽입
+  function insertLink() {
+    const url = prompt('링크 URL을 입력하세요:');
+    if (url) {
+      document.execCommand('createLink', false, url);
+    }
+    document.getElementById('editor').focus();
+  }
+
+  // 이미지 삽입
+  function insertImage() {
+    const url = prompt('이미지 URL을 입력하세요:');
+    if (url) {
+      document.execCommand('insertImage', false, url);
+    }
+      document.getElementById('editor').focus();
+  }
+
+  // 테이블 삽입
+  function insertTable() {
+    const rows = prompt('행 수를 입력하세요:', '2');
+    const cols = prompt('열 수를 입력하세요:', '2');
+            
+    if (rows && cols) {
+      let tableHTML = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+      for (let i = 0; i < parseInt(rows); i++) {
+        tableHTML += '<tr>';
+        for (let j = 0; j < parseInt(cols); j++) {
+          tableHTML += '<td style="padding: 8px; border: 1px solid #ccc;">&nbsp;</td>';
+        }
+        tableHTML += '</tr>';
+      }
+      tableHTML += '</table>';
+                
+      document.execCommand('insertHTML', false, tableHTML);
+    }
+    document.getElementById('editor').focus();
+  }
+
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const editorContent = document.getElementById('editor').innerHTML;
+    document.getElementById('summaryTextarea').value = editorContent;
+  })
+
+  // 에디터 초기화
+  document.getElementById('editor').addEventListener('click', function() {
+    if (this.innerText.trim() === '여기에 내용을 입력하세요...') {
+      this.innerHTML = '';
+    }
+  });
+
+  // 폼 제출 시 에디터 내용 포함
+  // document.querySelector('form').addEventListener('submit', function(e) {
+  //   e.preventDefault();
+  //   const editorContent = document.getElementById('editor').innerHTML;
+  //   console.log('에디터 내용:', editorContent);
+  //   alert('작성이 완료되었습니다!');
+  // });
+</script>
+
+
 </html>

@@ -14,213 +14,488 @@
 
 /* 기본 설정 */
 body {
-  font-family: 'GmarketSansMedium', sans-serif;
+  font-family: 'GmarketSansMedium', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   margin: 0;
-  padding: 40px;
-  background-color: #f8f9fa;
+  padding: 30px;
+  background-color: #f4f6f9;
   color: #333;
+  line-height: 1.6;
 }
 
 .container {
   display: flex;
-  gap: 24px;
+  gap: 30px;
   flex-wrap: wrap;
   align-items: flex-start;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* 좌측 패널 */
 .left-panel {
   flex: 2.5;
-  min-width: 360px;
+  min-width: 400px;
 }
 
 /* 우측 패널 전체 스타일 */
 .right-panel {
   flex: 1;
-  min-width: 280px;
-  background-color: #ffffff;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  min-width: 320px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafe 100%);
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(33, 150, 243, 0.1);
   height: fit-content;
   position: sticky;
   top: 30px;
   display: flex;
   flex-direction: column;
   gap: 30px;
+  border: 1px solid #e8eef5;
 }
 
 /* 다운로드 박스 */
 .download-box {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 20px;
+  border-bottom: 1px solid #e8eef5;
+  padding-bottom: 25px;
+  position: relative;
+}
+
+.download-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
 }
 
 .download-box h3 {
-  margin-top: 0;
-  font-size: 1.2em;
-  color: #1976d2;
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #2196f3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.download-box h3::before {
+  content: '📥';
+  font-size: 22px;
 }
 
 .download-btn {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 10px 16px;
-  background-color: #3ec642;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
   color: white;
   text-decoration: none;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
   font-family: inherit;
 }
 
 .download-btn:hover {
-  background-color: #218838;
+  background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
 }
 
 .file-info {
-  margin-top: 12px;
-  font-size: 0.9em;
+  margin-top: 20px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  font-size: 14px;
   color: #555;
-  line-height: 1.6;
+  line-height: 1.8;
+  border-left: 3px solid #2196f3;
 }
 
 /* 좋아요 & 다운로드 통계 */
 .like-download-stats {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
 }
 
-.like-download-stats form {
-  margin: 0;
-}
-
+/* 좋아요 버튼 */
 #likeBtn {
-  padding: 10px 14px;
-  background-color: #1976d2;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
   color: white;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 10px rgba(33, 150, 243, 0.4);
   font-family: inherit;
 }
-
 #likeBtn:hover {
-  background-color: #1259a1;
+  background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+}
+
+.like-download-stats p {
+  margin: 0;
+  padding: 12px 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+  border-left: 3px solid #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 #likeCount, #downloadCount {
-  color: #333;
+  color: #2196f3;
+  font-weight: bold;
 }
-
 
 /* 노트 본문 */
 article {
-  background-color: white;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
   padding: 30px;
-  margin: 0 auto 30px;
-  max-width: 700px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin: 0 0 20px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8eef5;
+  position: relative;
+  overflow: hidden;
+}
+
+article::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
 }
 
 article h2 {
-  margin-top: 0;
-  font-size: 1.5em;
-  color: #1976d2;
+  margin: 0 0 15px 0;
+  font-size: 28px;
+  font-weight: bold;
+  color: #2196f3;
+  text-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
 }
 
 article p {
-  margin: 10px 0;
-  font-size: 1em;
+  margin: 6px 0;
+  font-size: 16px;
+  color: #495057;
+  padding: 4px 0;
 }
 
+article p:first-of-type {
+  font-weight: 600;
+}
+
+/* PDF 캔버스 스타일링 */
 #pdf-canvas {
   max-width: 100%;
-  width: 3000px;
+  width: 100%;
   height: auto;
   display: block;
-  margin-bottom: 20px;
+  margin: 30px 0;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8eef5;
+  background: #ffffff;
 }
 
+/* 요약 정보 박스 */
 article div {
-  margin-top: 15px;
-  padding: 10px;
-  background-color: #f1f1f1;
+  margin-top: 25px;
+  padding: 20px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
   border-left: 4px solid #2196f3;
+  font-size: 15px;
+  line-height: 1.7;
+  position: relative;
+}
+
+article div::before {
+  content: '📝';
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 18px;
+  opacity: 0.7;
 }
 
 article small {
   display: block;
-  margin-top: 20px;
-  font-size: 0.85em;
-  color: #777;
+  margin-top: 30px;
+  padding-top: 20px;
+  font-size: 14px;
+  color: #6c757d;
+  border-top: 1px solid #e8eef5;
 }
 
 /* 수정/삭제 버튼 */
 article + div {
   text-align: right;
-  max-width: 700px;
-  margin: 0 auto 30px;
-  font-family: inherit;
+  margin: 0 0 30px 0;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+article + div a,
+article + div button,
+article + div form {
+  display: inline-flex !important;
+  margin: 0 !important;
+}
+
+article + div form {
+  display: inline-flex !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 article + div a,
 article + div button {
-  display: inline-block;
-  background-color: #1976d2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #6c757d 0%, #8a9198 100%);
   color: white;
-  padding: 8px 14px;
+  padding: 10px 16px;
   border: none;
   text-decoration: none;
-  font-size: 0.95em;
-  line-height: 1.4;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  margin-left: 8px;
-  vertical-align: middle;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+  font-family: inherit;
+
+  min-width: 80px !important;
+  height: 40px !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
 }
 
-article + div button:hover,
-article + div a:hover {
-  background-color: #135ba1;
+article + div a:hover,
+article + div button:hover {
+  background: linear-gradient(135deg, #545b62 0%, #6c757d 100%);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
 }
 
 /* 댓글 영역 */
 .comments {
-  max-width: 700px;
-  margin: 0 auto;
-  background-color: #ffffff;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
   padding: 25px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8eef5;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 댓글 수정 폼 버튼들 */
+.comments form button,
+.comments form a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  margin: 5px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: inherit;
+  min-width: 70px;
+  text-align: center;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.form-buttons button,
+.form-buttons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 0 !important;
+  color: white;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 70px;
+  height: 36px;
+  box-sizing: border-box;
+}
+
+/* 저장 버튼 */
+.comments form button[type="submit"] {
+  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.comments form button[type="submit"]:hover {
+  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+/* 취소 링크 */
+.comments form a {
+  background: linear-gradient(135deg, #6c757d 0%, #8a9198 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+.comments form a:hover {
+  background: linear-gradient(135deg, #545b62 0%, #6c757d 100%);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+}
+
+.comments::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
 }
 
 .comments h3 {
-  margin-top: 0;
-  font-size: 1.3em;
-  border-bottom: 2px solid #ddd;
+  margin: 0 0 15px 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #2196f3;
+  border-bottom: 2px solid #e8eef5;
   padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comments h3::before {
+  content: '💬';
+  font-size: 24px;
 }
 
 .comments ul {
   list-style: none;
-  padding-left: 0;
-  margin: 20px 0;
+  padding: 0;
+  margin: 15px 0;
 }
 
 .comments li {
-  margin-bottom: 14px;
-  padding: 10px;
-  background-color: #f7f7f7;
-  border-radius: 8px;
+  margin-bottom: 12px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-left: 3px solid #2196f3;
+  transition: all 0.3s ease;
+}
+
+.comments li:hover {
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.1);
 }
 
 .comments li strong {
-  color: #1976d2;
+  color: #2196f3;
+  font-weight: bold;
 }
 
 .comments li em {
   display: block;
-  margin-top: 4px;
-  font-size: 0.8em;
-  color: #999;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.comment-actions {
+  margin-top: 10px !important;
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  flex-direction: row !important;
+}
+
+.comment-actions form {
+  display: inline-flex !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-direction: row !important;
+}
+
+/* 모든 댓글 액션 버튼 스타일 강제 통일 */
+.comment-actions a,
+.comment-actions button,
+.comment-actions form button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+    
+  /* border-radius 완전히 제거 */
+  border-radius: 0 !important;
+  -webkit-border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
+    
+  /* 색상 강제 통일 - 모두 회색으로 */
+  background: #6c757d !important;
+  background-image: none !important;
+  color: white !important;
+    
+  text-decoration: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  font-family: inherit !important;
+    
+  /* 크기 강제 통일 */
+  min-width: 70px !important;
+  height: 36px !important;
+  width: auto !important;
+  text-align: center !important;
+  font-weight: 600 !important;
+  box-sizing: border-box !important;
+    
+  /* 위치 강제 고정 */
+  float: none !important;
+  position: static !important;
+  margin: 0 !important;
+  vertical-align: top !important;
+}
+
+.comment-actions a:hover,
+.comment-actions button:hover,
+.comment-actions form button:hover {
+  background: linear-gradient(135deg, #545b62 0%, #6c757d 100%);
+  
+}
+
+.comment-actions form > button {
+  border-radius: 0 !important;
+  background-image: none !important;
+}
+
+.comment-actions * {
+  box-shadow: none !important;
 }
 
 /* 댓글 작성 폼 */
@@ -230,45 +505,81 @@ article + div a:hover {
   flex-direction: column;
 }
 
+.comments h4 {
+  margin: 0 0 10px 0;
+  color: #2196f3;
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .comments textarea {
   resize: vertical;
-  min-height: 80px;
-  padding: 10px;
-  font-size: 1em;
-  border: 1px solid #ccc;
+  min-height: 100px;
+  padding: 15px;
+  font-size: 15px;
+  border: 2px solid #e8eef5;
   font-family: inherit;
+  line-height: 1.6;
+  transition: border-color 0.3s ease;
+}
+
+.comments textarea:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
 .comments button {
-  margin-top: 10px;
+  margin-top: 15px;
   align-self: flex-end;
-  background-color: #2196f3;
+  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
   color: white;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border: none;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
   font-family: inherit;
 }
 
 .comments button:hover {
-  background-color: #6fb7f2;
+  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
 }
 
 /* 로그인 유도 문구 */
 .comments p a {
-  color: #1976d2;
+  color: #2196f3;
   font-weight: bold;
+  text-decoration: none;
+}
+
+.comments p a:hover {
+  text-decoration: underline;
 }
 
 /* 목록 돌아가기 */
 a[href="/"] {
-  display: block;
-  text-align: center;
-  margin-top: 25px;
-  color: #1976d2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 30px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #6c757d 0%, #8a9198 100%);
+  color: white;
   text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+a[href="/"]::before {
+  font-size: 16px;
 }
 
 a[href="/"]:hover {
-  text-decoration: underline;
+  background: linear-gradient(135deg, #545b62 0%, #6c757d 100%);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
 }
