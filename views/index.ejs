@@ -432,5 +432,13 @@
 
   </script>
 
+<% if(typeof(alertMessage) != 'undefined') { %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
+    });
+  </script>
+<% } %>
+
 </body>
 </html>

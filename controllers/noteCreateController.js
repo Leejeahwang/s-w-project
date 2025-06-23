@@ -82,7 +82,7 @@ exports.uploadNote = async (req, res) => {
             `UPDATE users SET point = point + 100 WHERE user_id = ?`, [u.user_id]
         );
 
-        req.session.alertMessage = `100P가 적립되었습니다!`;
+        req.session.alertMessage = `파일 업로드 성공!\n100P가 적립되었습니다!`;
         res.redirect('/');
     } catch (err) {
         console.log(err);
@@ -91,7 +91,7 @@ exports.uploadNote = async (req, res) => {
             return res.redirect('/');
         }
         else {
-            req.session.alertMessage = '파일 업로드중'
+            req.session.alertMessage = '파일 업로드중 오류';
             return res.status(400).json({ message: "파일 업로드중 오류" });
         }
     }

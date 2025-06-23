@@ -43,7 +43,10 @@ exports.deleteRoom = async (req, res, next) => {
     if (room.created_by !== currentUser) {
       return res.status(403).send('방 생성자만 삭제할 수 있습니다.');
     }
+
     await db.promise().query('DELETE FROM chat_rooms WHERE id = ?', [roomId]);
+    await db.promise().query('DELETE FROM canvas_history where room_id = ?', [roomId]);
+
     res.redirect('/chat');
   } catch (err) {
     next(err);
@@ -52,8 +55,8 @@ exports.deleteRoom = async (req, res, next) => {
 
 exports.enterRoom = async (req, res, next) => {
   try {
-    const roomId       = req.params.roomId;
-    const [rows]       = await db.promise().query(
+    const roomId = req.params.roomId;
+    const [rows] = await db.promise().query(
       'SELECT * FROM chat_rooms WHERE id = ?', [roomId]
     );
     if (rows.length === 0) return res.status(404).send('방을 찾을 수 없습니다.');

@@ -7,7 +7,7 @@ function isAuthenticated(req, res, next) {
   res.redirect('/auth/login');
 }
 
-// 채팅방 목록
+// 채팅방 목록 (/chat)
 router.get('/', isAuthenticated, chatCtrl.listRooms);
 
 // 채팅방 생성 폼

@@ -202,8 +202,38 @@
       }
     });
 
-    socket.on("initDrawing", (history) => {
-      history.forEach(data => socket.emit("drawing", data)); // 재전송
+    socket.on('initDrawing', (history) => {
+      history.forEach(data => {
+        // 위의 switch와 동일하게 처리
+        switch (data.type) {
+          case 'beginPath':
+            ctx.beginPath();
+            ctx.moveTo(data.x, data.y);
+            break;
+          case 'stroke':
+            ctx.strokeStyle = data.color;
+            ctx.lineWidth = data.lineWidth;
+            ctx.lineTo(data.x, data.y);
+            ctx.stroke();
+            break;
+          case 'endPath':
+            ctx.closePath();
+            break;
+          case 'clear':
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.querySelectorAll(".text-box").forEach(box => box.remove());
+            break;
+          case 'text':
+            ctx.font = "16px sans-serif";
+            ctx.fillStyle = data.color;
+            data.text.split("\n").forEach((line, i) => {
+              ctx.fillText(line, data.x, data.y + i * 20);
+            });
+            break;
+          default:
+            break;
+        }
+      });
     });
 
     document.getElementById("chat-form").addEventListener("submit", (e) => {
