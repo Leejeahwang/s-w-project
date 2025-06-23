@@ -34,6 +34,7 @@
           </div>
           <div class="flex flex-wrap gap-2 mt-2 lg:mt-0">
             <button onclick="setMode('draw')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">그리기</button>
+            <button onclick="setMode('erase')" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600">지우개</button>
             <button onclick="setMode('text')" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">텍스트</button>
             <button onclick="saveTextToCanvas()" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">텍스트 고정</button>
             <button onclick="clearCanvas()" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">초기화</button>
@@ -75,6 +76,7 @@
     const socket = io();
     const roomId = "<%= room.id %>";
     const user = "<%= user.user_id %>";
+    let cursor;
     socket.emit('joinRoom', roomId);
 
     const canvas = document.getElementById("canvas");
@@ -84,33 +86,73 @@
     ctx.lineCap = "round";
 
     canvas.addEventListener("mousedown", (e) => {
+      const { x, y } = getCanvasCoords(e);
       if (mode === "draw") {
         drawing = true;
         ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
-        socket.emit('drawing', { roomId, type: 'beginPath', x: e.offsetX, y: e.offsetY, color: color(), lineWidth: width() });
+        ctx.moveTo(x, y);
+        socket.emit('drawing', { roomId, type: 'beginPath', x, y, color: color(), lineWidth: width() });
+      } else if (mode === "erase") {
+        drawing = true;
       } else if (mode === "text") {
-        createTextBox(e.offsetX, e.offsetY);
+        createTextBox(e.clientX - wrapper.offsetLeft, e.clientY - wrapper.offsetTop); // 커서는 여전히 client 좌표로
       }
     });
-
-    canvas.addEventListener("mousemove", (e) => {
-      if (drawing && mode === "draw") {
-        ctx.strokeStyle = color();
-        ctx.lineWidth = width();
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-        socket.emit('drawing', { roomId, type: 'stroke', x: e.offsetX, y: e.offsetY, color: color(), lineWidth: width() });
-      }
-    });
-
+    
+    
     canvas.addEventListener("mouseup", () => {
       if (drawing && mode === "draw") {
         drawing = false;
         socket.emit('drawing', { roomId, type: 'endPath' });
+      } else if (drawing && mode === "erase") {
+        drawing = false;
       }
     });
 
+    canvas.addEventListener("mouseenter", () => {
+      if (!cursor) {
+        cursor = document.createElement("div");
+        cursor.className = "cursor-indicator";
+        document.body.appendChild(cursor);
+      }
+    });
+    
+    canvas.addEventListener("mouseleave", () => {
+      if (cursor) {
+        cursor.remove();
+        cursor = null;
+      }
+    });
+    
+    canvas.addEventListener("mousemove", (e) => {
+      const size = parseInt(width());
+      const { x, y } = getCanvasCoords(e); // 캔버스 내 그리기 좌표
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+    
+      if (cursor) {
+        cursor.style.width = `${size}px`;
+        cursor.style.height = `${size}px`;
+        cursor.style.left = `${clientX}px`;   // client 기준으로 위치 설정
+        cursor.style.top = `${clientY}px`;
+        cursor.style.borderColor = "black";
+      }
+    
+      if (drawing && mode === "draw") {
+        ctx.strokeStyle = color();
+        ctx.lineWidth = size;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        socket.emit('drawing', { roomId, type: 'stroke', x, y, color: color(), lineWidth: size });
+      } else if (drawing && mode === "erase") {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        socket.emit('drawing', { roomId, type: 'erase', x, y, size });
+      }
+    });
     function color() {
       return document.getElementById("colorPicker").value;
     }
