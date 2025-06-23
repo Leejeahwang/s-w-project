@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="stylesheet" href="/style/detail_style.css">
-  <title>노트 상세</title>
+  <title>노트 상세 - NoteHub</title>
 </head>
 <body>
   <div class="container">
@@ -14,128 +15,133 @@
         <p>과목명: <%= note.subject %></p>
         <p>교수명: <%= note.professor %></p>
         <p>카테고리: <%= note.category %></p>
+        
+        <!-- PDF 표시 영역 -->
         <canvas id="pdf-canvas" width="400"></canvas>
+        
+        <!-- 요약 정보 -->
         <div><%= note.summary %></div>
+        
         <small>
           작성자: <%= note.authorName %> /
           작성시간: <%= note.created_at.getFullYear() %>/<%= (note.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= note.created_at.getDate().toString().padStart(2,'0') %> <%= note.created_at.toLocaleTimeString('ko-KR') %>
         </small>
       </article>
 
+      <!-- 수정/삭제 버튼 -->
       <% if (user && note.user_id === user.user_id) { %>
         <div>
-          <a href="/notes/<%= note.id %>/edit">수정</a>
-          <form method="POST" action="/notes/<%= note.id %>/delete" style="display:inline;">
+          <a href="/notes/<%= note.id %>/edit">✏️ 수정</a>
+          <form method="POST" action="/notes/<%= note.id %>/delete">
             <input type="hidden" name="_method" value="DELETE">
-            <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+            <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?');">🗑️ 삭제</button>
           </form>
         </div>
       <% } %>
   
-  <section class="comments">
-      <h3>댓글 (<%= comments ? comments.length : 0 %>)</h3>
+      <!-- 댓글 섹션 -->
+      <section class="comments">
+        <h3>댓글 (<%= comments ? comments.length : 0 %>)</h3>
 
-      <% if (comments && comments.length > 0) { %>
-        <ul class="comments-list">
-          <% comments.forEach(c => { %>
-            <li class="comment-item">
-              <% if (editCommentId === c.id) { %>
-                <!-- 인라인 댓글 수정 폼 -->
-                 <!-- ★ EDITED at 2025-05-23 -->
+        <% if (comments && comments.length > 0) { %>
+          <ul class="comments-list">
+            <% comments.forEach(c => { %>
+              <li class="comment-item">
+                <% if (editCommentId === c.id) { %>
+                  <!-- 댓글 수정 폼 -->
                   <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST">
-                    <!-- method-override를 body에서 읽도록 hidden 필드 추가 -->
                     <input type="hidden" name="_method" value="PUT">
                     <textarea name="content" rows="3" required><%= c.content %></textarea>
-                    <button type="submit">저장</button>
-                    <a href="/notes/<%= note.id %>">취소</a>
+                    <div class="form-buttons">
+                      <a href="/notes/<%= note.id %>">❌ 취소</a>
+                      <button type="submit">💾 저장</button>
+                    </div>
                   </form>
-              <% } else { %>
-                <!-- 일반 댓글 표시 -->
-                <p><strong><%= c.author %>:</strong> <%= c.content %></p>
-                <small>
-                  <em><%= new Date(c.created_at).toLocaleString('ko-KR') %></em>
-                </small>
+                <% } else { %>
+                  <!-- 일반 댓글 표시 -->
+                  <p><strong><%= c.author %>:</strong> <%= c.content %></p>
+                  <small>
+                    <em><%= new Date(c.created_at).toLocaleString('ko-KR') %></em>
+                  </small>
 
-                <% /* 수정/삭제 버튼: 로그인 & 작성자 본인만 */ %>
-                <% if (user && user.user_id === c.user_id) { %>
-                  <span class="comment-actions">
-                    <a
-                      href="/notes/<%= note.id %>?editCommentId=<%= c.id %>"
-                    >수정</a>
-                     <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST" style="display:inline">
-                        <!-- 여기에도 hidden 필드로 DELETE 지정 -->
+                  <!-- 댓글 수정/삭제 버튼 -->
+                  <% if (user && user.user_id === c.user_id) { %>
+                    <div class="comment-actions">
+                      <a href="/notes/<%= note.id %>?editCommentId=<%= c.id %>">수정</a>
+                      <form action="/notes/<%= note.id %>/comments/<%= c.id %>" method="POST">
                         <input type="hidden" name="_method" value="DELETE">
                         <button onclick="return confirm('댓글을 정말 삭제하시겠습니까?')">삭제</button>
-                     </form>
-                  </span>
+                      </form>
+                    </div>
+                  <% } %>
                 <% } %>
-              <% } %>
-            </li>
-          <% }) %>
-        </ul>
-      <% } else { %>
-        <p>아직 댓글이 없습니다.</p>
-      <% } %>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요! 💭</p>
+        <% } %>
 
-      <% /* 새 댓글 작성 폼 */ %>
-      <% if (user) { %>
-        <form action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form">
-          <h4>새 댓글 작성</h4>
-          <textarea
-            name="content"
-            rows="3"
-            placeholder="댓글을 입력하세요"
-            required
-          ></textarea>
-          <button type="submit">등록</button>
-        </form>
-      <% } else { %>
-        <p>
-          댓글을 작성하려면
-          <a href="/auth/login">로그인</a>이 필요합니다.
-        </p>
-      <% } %>
-    </section>
+        <!-- 새 댓글 작성 폼 -->
+        <% if (user) { %>
+          <form action="/notes/<%= note.id %>/comments" method="POST" class="new-comment-form">
+            <h4>새 댓글 작성</h4>
+            <textarea
+              name="content"
+              rows="3"
+              placeholder="댓글을 입력하세요..."
+              required
+            ></textarea>
+            <button type="submit">💬 댓글 등록</button>
+          </form>
+        <% } else { %>
+          <p>
+            댓글을 작성하려면
+            <a href="/auth/login">로그인</a>이 필요합니다.
+          </p>
+        <% } %>
+      </section>
 
+      <!-- 목록으로 돌아가기 -->
       <a href="/">목록으로 돌아가기</a>
     </div>
 
+    <!-- 우측 패널 -->
     <div class="right-panel">
       <!-- 다운로드 박스 -->
       <div class="download-box">
         <h3>다운로드</h3>
-          <a id="downloadLink" href="#" class="download-btn" data-note-id="<%= note.id %>" data-filename = "<%= file.stored_name %>">
-            PDF 다운로드
-          </a>
+        <a id="downloadLink" href="#" class="download-btn" data-note-id="<%= note.id %>" data-filename="<%= file.stored_name %>">
+          📄 PDF 다운로드
+        </a>
         <div id="fileInfo" class="file-info">
-          파일명: <%= file.file_name %> <br>
-          용량: <%= file.file_size %></span> <br>
-          업로드: 
+          <strong>파일명:</strong> <%= file.file_name %><br>
+          <strong>용량:</strong> <%= file.file_size %><br>
+          <strong>업로드:</strong> 
           <%= note.created_at.getFullYear() %>/
           <%= (note.created_at.getMonth() + 1).toString().padStart(2, '0') %>/
           <%= note.created_at.getDate().toString().padStart(2, '0') %>
         </div>
       </div>
 
-      <!-- 좋아요 & 다운로드 수 -->
+      <!-- 좋아요 & 다운로드 통계 -->
       <div class="like-download-stats">
-      <!-- <% console.log(note); %> -->
-        <button id="likeBtn" data-note-id="<%= note.id %>" style="margin-bottom: 10px;">
-          👍 좋아요 (<span id="likeCount" style="color: aliceblue;"><%= note.like_count %></span>)
+        <button id="likeBtn" data-note-id="<%= note.id %>">
+          👍 좋아요 (<span id="likeCount"><%= note.like_count %></span>)
         </button>
         <p>📥 다운로드 수: <span id="downloadCount"><%= note.download_count || 0 %></span></p>
       </div>
     </div>
   </div>
 
-  <!-- PDF 사진 로드 관련 -->
+  <!-- PDF 관련 스크립트 -->
   <script>
     window.pdfUrl = "<%= file.file_path %>";
   </script>
-  <script type = "module" src ="/js/pdf_viewer.js"></script>
+  <script type="module" src="/js/pdf_viewer.js"></script>
 
+  <!-- 좋아요 기능 -->
   <script>
-    // 좋아요 카운팅
     document.getElementById("likeBtn").addEventListener("click", async function () {
       const noteId = this.dataset.noteId;
 
@@ -148,13 +154,11 @@
           return;
         }
 
-        if (res.status === 200) { // 좋아요 처리 완료
+        if (res.status === 200) {
           const countSpan = document.getElementById("likeCount");
           countSpan.textContent = parseInt(countSpan.textContent) + 1;
           alert(result.message);
-        }
-
-        else {
+        } else {
           alert(result.message);
         }
 
@@ -165,8 +169,8 @@
     });
   </script>
 
+  <!-- 다운로드 기능 -->
   <script>
-    // 다운로드 카운팅 & 파일 다운로드
     document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("downloadLink").addEventListener("click", async function(e) {
         e.preventDefault();
@@ -186,30 +190,30 @@
           alert(updateDownload_log_result.message);
 
           const link = document.createElement('a');
-          link.href = `/files/download/${stored_name}`; // downloadController => /files/download/:stored_name으로 GET 요청
+          link.href = `/files/download/${stored_name}`;
           link.download = '';
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
         
-          // 다운로드 카운팅 +1 올리기
+          // 다운로드 카운팅 업데이트
           const countSpan = document.getElementById("downloadCount");
           const currentCount = parseInt(countSpan.textContent) || 0;
           countSpan.textContent = currentCount + 1;
         
         } catch(e) {
           console.log(e);
-          alert("다운로드 처리 중 오류");
+          alert("다운로드 처리 중 오류가 발생했습니다.");
         }
       });
     });
   </script>
+
+  <!-- 알림 메시지 -->
+  <% if(typeof(alertMessage) != 'undefined') { %>
+    <script>
+      alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
+    </script>
+  <% } %>
 </body>
-
-<% if(typeof(alertMessage) != 'undefined') { %>
-  <script>
-    alert("<%= alertMessage.replace(/\n/g, '\\n') %>");
-  </script>
-<% } %>
-
 </html>

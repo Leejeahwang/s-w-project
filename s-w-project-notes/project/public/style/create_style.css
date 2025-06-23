@@ -12,125 +12,319 @@
     font-weight: bold;
 }
 
-/* 전체 페이지 기본 설정 */
+/* 전체 페이지 설정 */
 body {
-  font-family: 'GmarketSansMedium', sans-serif;
+  font-family: 'GmarketSansMedium', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   margin: 0;
-  padding: 40px;
-  background-color: #f8f9fa;
-  color: #333;
-}
-
-/* 폼 전체 영역 */
-form {
-  max-width: 600px;
-  margin: 0 auto;
-  background-color: #ffffff;
   padding: 30px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #f4f6f9 0%, #e8eef5 100%);
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
 }
 
-/* 폼 안 각 항목 */
+/* 폼 컨테이너 */
+form {
+  max-width: 800px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8eef5;
+  position: relative;
+  overflow: hidden;
+}
+
+form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
+}
+
+/* 각 폼 항목 */
 form p {
-  margin-bottom: 20px;
-  font-weight: 500;
+  margin-bottom: 25px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #2196f3;
   font-family: inherit;
 }
 
-/* 입력 박스, 셀렉트 공통 스타일 */
-input[type="text"], select, input[name="professor"] {
+/* 텍스트 입력 & 셀렉트 박스 공통 스타일 */
+input[type="text"], 
+select, 
+input[name="professor"] {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
+  padding: 14px 16px;
+  border: 2px solid #e8eef5;
+  border-radius: 10px;
   box-sizing: border-box;
-  font-size: 0.85em;
-  margin-top: 6px;
+  font-size: 15px;
+  margin-top: 8px;
   font-family: inherit;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* 텍스트 작성 도구 */
-.editor-toolbar {
-  border: 1px solid #ccc;
-  border-bottom: none;
-  background-color: #f5f5f5;
-  padding: 8px;
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
+input[type="text"]:focus, 
+select:focus, 
+input[name="professor"]:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+  background: #ffffff;
 }
 
-.editor-btn {
-  background: none;
-  border: 1px solid transparent;
-  padding: 4px 8px;
+/* 셀렉트 박스 특별 스타일 */
+select {
   cursor: pointer;
-  font-size: 12px;
-  border: 2px;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+  appearance: none;
 }
 
-.editor-btn:hover {
-  background-color: #e0e0e0;
-  border-color: #ccc;
-}
-
-.editor-btn.activer {
-  background-color: #d0d0d0;
-  background-color: #999;
-}
-
-.editor-separator {
-  width: 1px;
-  background-color: #ccc;
-  margin: 0 5px;
-}
-
-.editor-content {
-  border: 1px solid #ccc;
-  min-height: 200px;
-  padding: 10px;
-  background-color: white;
+/* 파일 업로드 */
+input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed #e8eef5;
+  margin-top: 8px;
   font-family: inherit;
   font-size: 14px;
-  line-height: 1.5;
-  outline: none;
-  color: #999;
-}
-
-.editor-content:focus {
-  border-color: #1976d2;
-}
-
-/* 게시 버튼 */
-button[type="submit"] {
-  width: 100%;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  padding: 12px;
-  font-size: 1em;
-  font-family: inherit;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-top: 20px;
+  transition: all 0.3s ease;
 }
 
-button[type="submit"]:hover {
-  background-color: #6fb7f2;
+input[type="file"]:hover {
+  border-color: #2196f3;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
 }
 
 .pdf-bar {
-  color: #969696;
+  color: #6c757d;
+  font-size: 13px;
+  font-weight: normal;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #e8eef5;
 }
 
-/* 목록 돌아가기 링크 */
-a {
+/* 에디터 툴바 */
+.editor-toolbar {
+  border: 2px solid #e8eef5;
+  border-bottom: none;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.editor-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid #e8eef5;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  font-family: inherit;
+  min-width: 36px;
+  text-align: center;
+}
+
+.editor-btn:hover {
+  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+  border-color: #2196f3;
+  color: white;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.editor-btn.active {
+  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+  border-color: #1976d2;
+  color: white;
+}
+
+.editor-separator {
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(180deg, #e8eef5 0%, #d6d9dc 100%);
+  margin: 0 4px;
+}
+
+/* 에디터 본문 */
+.editor-content {
+  border: 2px solid #e8eef5;
+  border-top: none;
+  min-height: 300px;
+  padding: 20px;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+  outline: none;
+  color: #495057;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.editor-content:focus {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+}
+
+.editor-content p {
+  margin: 0 0 16px 0;
+}
+
+.editor-content:empty::before {
+  content: '내용을 입력하세요...';
+  color: #adb5bd;
+  font-style: italic;
+}
+
+/* 에디터 내 요소 스타일 */
+.editor-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+  border: 1px solid #e8eef5;
+  overflow: hidden;
+}
+
+.editor-content table td {
+  padding: 12px;
+  border: 1px solid #e8eef5;
+  background: #ffffff;
+}
+
+.editor-content table th {
+  padding: 12px;
+  border: 1px solid #e8eef5;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  font-weight: 600;
+}
+
+.editor-content a {
+  color: #2196f3;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.editor-content a:hover {
+  border-bottom-color: #2196f3;
+}
+
+.editor-content img {
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 12px 0;
+}
+
+.editor-content ul, .editor-content ol {
+  padding-left: 24px;
+  margin: 16px 0;
+}
+
+.editor-content li {
+  margin-bottom: 8px;
+}
+
+/* 제출 버튼 */
+button[type="submit"] {
+  width: 100%;
+  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 30px;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+
+button[type="submit"]:hover {
+  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+
+/* 돌아가기 링크 */
+a[href^="/notes/"] {
+  display: block;
+  text-align: center;
+  margin: 25px auto 0 auto;
+  color: #2196f3;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+
+a[href^="/notes/"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+a[href^="/notes/"]:hover::after {
+  left: 100%;
+}
+
+/* 기타 링크 */
+a:not([href^="/notes/"]) {
   display: block;
   text-align: center;
   margin-top: 25px;
-  color: #1976d2;
+  color: #2196f3;
   text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
 }
 
-a:hover {
+a:not([href^="/notes/"]):hover {
+  color: #1976d2;
   text-decoration: underline;
 }

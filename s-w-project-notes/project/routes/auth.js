@@ -61,3 +61,34 @@ access token이 만료되면 다시 41번라인으로 돌아가서 직접 수정
 그리고 .env에서 access token 다시 설정해주고 서버 껐다가 실행해야 합니다
 아니면 만료된 토큰값이라고 떠요
 */
+
+// 비밀번호 찾기 페이지 표시
+router.get('/forgot-password', (req, res) => {
+    res.render('forgot_password', { 
+        error: null, 
+        success: null 
+    });
+});
+
+// 비밀번호 찾기 처리
+router.post('/forgot-password', async (req, res) => {
+    const { id, studentId } = req.body;
+    
+    try {
+        // 여기에 사용자 확인 로직 추가
+        // 예시: 데이터베이스에서 사용자 찾기
+        
+        res.render('forgot_password', {
+            error: null,
+            success: '임시 비밀번호가 발급되었습니다.'
+        });
+        
+    } catch (error) {
+        res.render('forgot_password', {
+            error: '서버 오류가 발생했습니다.',
+            success: null
+        });
+    }
+});
+
+module.exports = router;
