@@ -3,14 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>마이페이지</title>
-  <style>
-    .hidden { display: none; }
-    .section { margin-bottom: 2rem; }
-    .section h2 button {
-      margin-left: 1rem;
-      padding: 0.2rem 0.5rem;
-    }
-  </style>
+  <link rel="stylesheet" href="/style/mypage_style.css">
 </head>
 <body>
   <% if (alertMessage) { %>
@@ -19,51 +12,54 @@
     </script>
   <% } %>
   <h1>마이페이지</h1>
-  <section>
-    <h2>회원 정보</h2>
-    <ul>
-      <li>아이디: <%= user.user_id %></li>
-      <li>이름: <%= user.name %></li>
-      <li>학번: <%= user.studentId %></li>
-      <li>학년: <%= user.grade %></li>
-      <li>포인트: <%= user.point %>P</li>
-      <li>게시한 노트 수: <%= stats.noteCount %></li>
-      <li>작성한 댓글 수: <%= stats.commentCount %></li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>회원정보 수정</h2>
-    <button type="button" id="toggle-update">수정하기</button>
-    <form id="update-form" method="POST" action="/mypage?_method=PUT" class="hidden">
-      <label>현재 비밀번호:<input type="password" name="currentPassword" required></label><br>
-      <label>새 이름:<input type="text" name="newName" value="<%= user.name %>"></label><br>
-      <label>새 비밀번호:<input type="password" name="newPassword" placeholder="변경 시만 입력"></label><br>
-      <label>학년:<input type="text" name="grade" value="<%= user.grade %>" required></label><br>
-      <button type="submit">저장하기</button>
-    </form>
-  </section>
-
+  <div class="container">
+    <section>
+        <h2>회원 정보</h2>
+        <ul>
+        <li>아이디: <%= user.user_id %></li>
+        <li>이름: <%= user.name %></li>
+        <li>학번: <%= user.studentId %></li>
+        <li>학년: <%= user.grade %></li>
+        <li>포인트: <%= user.point %>P</li>
+        <li>게시한 노트 수: <%= stats.noteCount %></li>
+        <li>작성한 댓글 수: <%= stats.commentCount %></li>
+        </ul>
+    </section>
+  </div>
+  <div class="container">
+    <section>
+        <h2>회원정보 수정</h2>
+        <button type="button" id="toggle-update" class="btn btn-primary">수정하기</button>
+        <form id="update-form" method="POST" action="/mypage?_method=PUT" class="hidden">
+        <label>현재 비밀번호:<input type="password" name="currentPassword" required></label><br>
+        <label>새 이름:<input type="text" name="newName" value="<%= user.name %>"></label><br>
+        <label>새 비밀번호:<input type="password" name="newPassword" placeholder="변경 시만 입력"></label><br>
+        <label>학년:<input type="text" name="grade" value="<%= user.grade %>" required></label><br>
+        <button type="submit" class="btn btn-primary">저장하기</button>
+        </form>
+    </section>
+  </div>
   <!-- 회원 탈퇴 섹션 -->
-  <section class="section" id="delete-section">
-    <h2>회원 탈퇴</h2>
-    <button type="button" id="toggle-delete">탈퇴하기</button>
+  <div class="container">
+    <section class="section" id="delete-section">
+        <h2>회원 탈퇴</h2>
+        <button type="button" id="toggle-delete" class="btn btn-danger">탈퇴하기</button>
 
-    <!-- 기본에는 숨김 -->
-    <form id="delete-form"
-          method="POST"
-          action="/mypage?_method=DELETE"
-          class="hidden"
-          onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
-      <label>
-        현재 비밀번호 확인:
-        <input type="password" name="currentPassword" required>
-      </label><br>
-      <button type="submit">탈퇴 확정</button>
-    </form>
-  </section>
-
-  <a href="/">돌아가기</a>
+        <!-- 기본에는 숨김 -->
+        <form id="delete-form"
+            method="POST"
+            action="/mypage?_method=DELETE"
+            class="hidden"
+            onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
+        <label>
+            현재 비밀번호 확인:
+            <input type="password" name="currentPassword" required>
+        </label><br>
+        <button type="submit" class="btn btn-danger">탈퇴 확정</button>
+        </form>
+    </section>
+  </div>
+  <a class="back-link" href="/">←메인 돌아가기</a>
 
   <script>
     document.getElementById('toggle-update').addEventListener('click', () => {

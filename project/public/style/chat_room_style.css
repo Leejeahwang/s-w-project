@@ -1,0 +1,222 @@
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'GmarketSans';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'GmarketSansMedium', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  min-height: 100vh;
+  color: #333;
+}
+
+/* 2. 컨테이너 카드 */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  padding: 32px;
+  margin-top: 40px;
+  box-sizing: border-box;
+}
+
+/* 3. 헤더 */
+h2 {
+  font-family: 'GmarketSans', sans-serif;
+  font-size: 2rem;
+  color: #764ba2;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* 4. 방 메타 정보 */
+.room-meta {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+/* 5. 삭제 버튼 */
+#deleteRoomBtn {
+  display: block;
+  margin: 0 auto 32px;
+  font-family: 'GmarketSans', sans-serif;
+  font-size: 0.9rem;
+  background-color: #764ba2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+#deleteRoomBtn:hover {
+  background-color: #5a2a86;
+}
+
+/* 6. 레이아웃 그리드 */
+.grid-wrapper {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 24px;
+}
+
+/* 7. 툴바 스타일 */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  background: #fafafa;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+}
+.toolbar button {
+  font-family: 'GmarketSansMedium';
+  background: #764ba2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.toolbar button:hover {
+  background: #5a2a86;
+}
+
+/* 8. 캔버스 래퍼 */
+#canvasWrapper {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+  height: 600px;
+}
+#canvasWrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 9. 채팅박스 */
+.chat-box {
+  background: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  padding: 16px;
+}
+.chat-box h3 {
+  font-family: 'GmarketSans', sans-serif;
+  margin-bottom: 8px;
+  color: #764ba2;
+}
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#messages li {
+  margin-bottom: 8px;
+  display: flex;
+}
+#messages li .bubble {
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 80%;
+  font-size: 0.9rem;
+}
+#messages li.text-right .bubble { background: #e1bee7; margin-left: auto; }
+#messages li.text-left  .bubble { background: #f3e5f5; margin-right: auto; }
+
+/* 10. 채팅 입력 */
+#chat-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+#chat-form input {
+  flex: 1;
+  border: 1px solid #d1d9e6;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: 'GmarketSansMedium';
+}
+#chat-form button {
+  background: #764ba2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#chat-form button:hover {
+  background: #5a2a86;
+}
+
+/* 11. 참여자 목록 */
+.participants {
+  background: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  padding: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.participants h3 {
+  font-family: 'GmarketSans', sans-serif;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 8px;
+  color: #764ba2;
+}
+.participants ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.participants li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+.participants .kick-btn {
+  background: #e57373;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.participants .kick-btn:hover {
+  background: #d32f2f;
+}

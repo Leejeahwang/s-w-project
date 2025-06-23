@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>비밀번호 재설정</title>
+  <link rel="stylesheet" href="/style/reset_style.css">
 </head>
 <body>
   <h1>비밀번호 재설정</h1>
@@ -10,10 +11,12 @@
     <p style="color:red"><%= error %></p>
   <% } %>
   <form method="POST" action="/auth/reset">
-    <label>새 비밀번호: <input type="password" name="newPassword" required></label><br>
-    <label>비밀번호 확인: <input type="password" name="confirmPassword" required></label><br>
+    <label>새 비밀번호 <input type="password" name="newPassword" required></label><br>
+    <label>비밀번호 확인 <input type="password" name="confirmPassword" required></label><br>
     <button type="submit">비밀번호 변경</button>
   </form>
-  <p><a href="/auth/login">로그인으로 돌아가기</a></p>
+  <p class="link-row">
+  <a href="/auth/login">로그인으로 돌아가기</a>
+  </p>
 </body>
 </html>

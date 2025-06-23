@@ -1,0 +1,163 @@
+body {
+  background-color: #f0f2f5;
+  font-family: 'Noto Sans KR', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+/* 컨테이너 */
+.container, .content {
+  max-width: 500px;
+  margin: 3rem auto;
+  padding: 2rem 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 페이지 헤더 */
+h1 {
+  text-align: center;
+  color: #1a73e8;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+/* 섹션 제목과 토글 버튼 */
+section {
+  margin-bottom: 2rem;
+}
+section h2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  color: #1a73e8;
+  margin-bottom: 1rem;
+}
+section h2 button {
+  background-color: #1a73e8;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+section h2 button:hover {
+  background-color: #1666c1;
+}
+
+/* 리스트 스타일 */
+ul.stats {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ul.stats li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e8eef5;
+  font-size: 1rem;
+}
+ul.stats li:last-child {
+  border-bottom: none;
+}
+
+/* 폼 레이블 & 입력 */
+form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+form input[type="text"],
+form input[type="password"] {
+  box-sizing: border-box;  
+  width: 100%;             
+  max-width: 100%;  
+  padding: 0.75rem;
+  margin-top: 0.3rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccd0d5;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: #fafafa;
+  transition: border-color 0.2s;
+}
+form input[type="text"]:focus,
+form input[type="password"]:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+/* 제출 버튼 */
+form button[type="submit"],
+section form button {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #1a73e8;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0.5rem;
+}
+form button[type="submit"]:hover,
+section form button:hover {
+  background-color: #1666c1;
+}
+
+/* 링크 스타일 */
+a.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+a.back-link:hover {
+  text-decoration: underline;
+}
+
+/* 숨김 처리 */
+.hidden {
+  display: none;
+}
+
+/* —— 공통 버튼 —— */
+.btn {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  border: none;
+  font-family: inherit;
+}
+
+/* —— 기본 파란 버튼 —— */
+.btn-primary {
+  background-color: #3B82F6;   /* Tailwind의 blue-500 */
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background-color: #2563EB;   /* blue-600 */
+  transform: translateY(-1px);
+}
+
+/* —— 위험(탈퇴) 빨간 버튼 —— */
+.btn-danger {
+  background-color: #EF4444;   /* red-500 */
+  color: #ffffff;
+}
+.btn-danger:hover {
+  background-color: #DC2626;   /* red-600 */
+  transform: translateY(-1px);
+}

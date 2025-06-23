@@ -1,16 +1,23 @@
-<h2>채팅방 목록</h2>
-<a href="/chat/create">방 만들기</a>
-<ul>
-  <% rooms.forEach(room => { %>
-    <li>
-      <a href="/chat/<%= room.id %>"><%= room.name %></a>
-      - 만든이: <%= room.creator %>
-      <% if (room.creator === user.user_id) { %>
-        <form action="/chat/<%= room.id %>/delete" method="POST" style="display:inline;">
-          <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
-        </form>
-      <% } %>
-    </li>
-  <% }) %>
-</ul>
-<a href="/">돌아가기</a>
+<link rel="stylesheet" href="/style/chat_index_style.css">
+<div class="container">
+  <h2>채팅방 목록</h2>
+  <a href="/chat/create" class="button">방 만들기</a>
+  <ul class="room-list">
+    <% rooms.forEach(room => { %>
+      <li class="room-card">
+        <div class="room-info">
+          <a href="/chat/<%= room.id %>" class="room-link">
+            <%= room.name %>
+          </a>
+          <div class="room-meta">
+            방장: <strong><%= room.creator %></strong>
+            / 생성일: <%= new Date(room.createdAt).toLocaleString('ko-KR') %>
+          </div>
+        </div>
+        <!-- 삭제 버튼 등 기존 코드 유지 -->
+      </li>
+    <% }) %>
+  </ul>
+  <a href="/" class="back-link">← 메인 페이지로 돌아가기</a>
+</div>
+

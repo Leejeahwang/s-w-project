@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>비밀번호 찾기</title>
+  <link rel="stylesheet" href="/style/forgot_style.css">
 </head>
 <body>
   <h1>비밀번호 찾기</h1>
@@ -10,9 +11,9 @@
     <p style="color:red"><%= error %></p>
   <% } %>
   <form method="POST" action="/auth/forgot">
-    <label>아이디: <input name="id" required></label><br>
-    <label>이름: <input name="name" required></label><br>
-    <label>학번: <input name="studentId" required></label><br>
+    <label>아이디&nbsp; <input name="id" required></label><br>
+    <label>&nbsp;&nbsp;&nbsp;이름&nbsp; <input name="name" required></label><br>
+    <label>&nbsp;&nbsp;&nbsp;학번&nbsp; <input name="studentId" required></label><br>
     <button type="submit">본인 인증</button>
   </form>
   <p><a href="/auth/login">로그인으로 돌아가기</a></p>

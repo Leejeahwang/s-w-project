@@ -3,11 +3,15 @@ const db = require('../db');
 exports.listRooms = async (req, res, next) => {
   try {
     const [rooms] = await db.promise().query(`
-      SELECT r.*, u.user_id AS creator
-      FROM chat_rooms r
-      JOIN users u ON r.created_by = u.user_id
-      ORDER BY r.created_at DESC
-    `);
+    SELECT
+      r.id,
+      r.name,
+      r.created_by        AS creator,
+      r.created_at        AS createdAt
+    FROM chat_rooms r
+    JOIN users u ON r.created_by = u.user_id
+    ORDER BY r.created_at DESC
+  `);
     res.render('chat/index', { user: req.session.user, rooms });
   } catch (err) {
     next(err);
@@ -23,8 +27,8 @@ exports.createRoom = async (req, res, next) => {
     const { name } = req.body;
     const userId = req.session.user.user_id;
     await db.promise().query(
-      'INSERT INTO chat_rooms (name, created_by) VALUES (?, ?)',
-      [name, userId]
+      'INSERT INTO chat_rooms (name, owner_id, created_by) VALUES (?, ?, ?)',
+      [name, userId, userId]
     );
     res.redirect('/chat');
   } catch (err) {
