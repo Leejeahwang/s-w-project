@@ -14,6 +14,7 @@ const commentRouter = require('./routes/comments');
 const todoRouter = require('./routes/todos');
 const pointshopRouter = require('./routes/pointshop');
 const chatRouter = require('./routes/chat');
+const mypageRouter = require('./routes/mypage');
 
 const app = express();
 const server = http.createServer(app); // ★ Express 앱을 기반으로 HTTP 서버 생성
@@ -54,6 +55,7 @@ app.use('/notes/:id/comments', commentRouter);
 app.use('/todo', todoRouter);
 app.use('/pointshop', pointshopRouter);
 app.use('/chat', chatRouter);
+app.use('/mypage', mypageRouter);
 
 // 404 핸들러
 app.use((req, res) => res.status(404).send('페이지를 찾을 수 없습니다.'));

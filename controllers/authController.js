@@ -115,3 +115,62 @@ exports.getKakaoToken = async (req, res) => {
     res.status(500).send('Access Token 요청 실패');
   }
 };
+
+// GET /auth/forgot — 본인 인증 폼
+exports.forgotRender = (req, res) => {
+  res.render('forgot', { error: null });
+};
+
+// POST /auth/forgot — 인증 처리
+exports.forgot = async (req, res, next) => {
+  const { id, name, studentId } = req.body;
+  try {
+    const [[user]] = await db.promise().query(
+      'SELECT user_id FROM users WHERE user_id = ? AND name = ? AND studentId = ?',
+      [id, name, studentId]
+    );
+    if (!user) {
+      return res.render('forgot', { error: '일치하는 회원 정보가 없습니다.' });
+    }
+    // 세션에 인증된 아이디 저장
+    req.session.resetUser = user.user_id;
+    return res.redirect('/auth/reset');
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GET /auth/reset — 새 비밀번호 폼
+exports.resetRender = (req, res) => {
+  if (!req.session.resetUser) {
+    return res.redirect('/auth/forgot');
+  }
+  res.render('reset', { error: null });
+};
+
+// POST /auth/reset — 비밀번호 변경 처리
+exports.reset = async (req, res, next) => {
+  const userId        = req.session.resetUser;
+  const { newPassword, confirmPassword } = req.body;
+
+  if (!userId) {
+    return res.redirect('/auth/forgot');
+  }
+  if (newPassword !== confirmPassword) {
+    return res.render('reset', { error: '비밀번호 확인이 일치하지 않습니다.' });
+  }
+
+  try {
+    await db.promise().query(
+      'UPDATE users SET password = ? WHERE user_id = ?',
+      [newPassword, userId]
+    );
+    // 세션에서 제거
+    delete req.session.resetUser;
+    // 완료 알림 후 로그인 페이지로
+    req.session.alertMessage = '비밀번호가 성공적으로 변경되었습니다.';
+    return res.redirect('/auth/login');
+  } catch (err) {
+    next(err);
+  }
+};

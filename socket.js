@@ -1,5 +1,6 @@
 const sharedSession = require('express-socket.io-session');
 const db = require('./db');
+const roomUsers = {};
 
 module.exports = (io, sessionMiddleware) => {
   // 세션 미들웨어 공유 설정
@@ -19,6 +20,14 @@ module.exports = (io, sessionMiddleware) => {
 
     socket.on('joinRoom', async (roomId) => {
       socket.join(roomId);
+      if (!roomUsers[roomId]) {
+        roomUsers[roomId] = new Set();
+      }
+    
+      roomUsers[roomId].add(user.user_id);
+    
+      io.to(roomId).emit("updateUserList", Array.from(roomUsers[roomId]));
+
       // DB에서 roomId에 해당하는 모든 event_data를 시간 순으로 가져오기
       const [rows] = await db.promise().query(
         'SELECT event_data FROM canvas_history WHERE room_id = ? ORDER BY created_at ASC',
@@ -54,6 +63,12 @@ module.exports = (io, sessionMiddleware) => {
     });
 
     socket.on('disconnect', () => {
+      for (const [roomId, users] of Object.entries(roomUsers)) {
+        if (users.has(user.user_id)) {
+          users.delete(user.user_id);
+          io.to(roomId).emit("updateUserList", Array.from(users));
+        }
+      }
       console.log('사용자 퇴장:', user, socket.id);
     });
   });
