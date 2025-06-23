@@ -1,5 +1,16 @@
-<h2>채팅방 만들기</h2>
-<form method="POST">
-  <input name="name" placeholder="방 제목 입력" required />
-  <button type="submit">생성</button>
-</form>
+<link rel="stylesheet" href="/style/chat_create_style.css">
+
+<div class="container">
+  <h2 class="page-title">채팅방 만들기</h2>
+  <form action="/chat/create" method="POST" class="chat-create-form">
+    <input
+      type="text"
+      name="name"
+      class="chat-input"
+      placeholder="방 제목을 입력하세요"
+      required
+    />
+    <button type="submit" class="chat-submit">생성</button>
+  </form>
+  <a href="/chat" class="back-link">← 목록으로 돌아가기</a>
+</div>
