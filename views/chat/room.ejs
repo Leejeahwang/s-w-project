@@ -15,6 +15,14 @@
     #canvasWrapper {
       position: relative;
     }
+    .cursor-indicator {
+      position: absolute;
+      border: 2px solid black;
+      border-radius: 9999px;
+      pointer-events: none;
+      z-index: 50;
+      transform: translate(-50%, -50%);
+    }
   </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -30,7 +38,7 @@
             <label class="text-sm font-medium">색상</label>
             <input type="color" id="colorPicker" class="border rounded" />
             <label class="text-sm font-medium">선굵기</label>
-            <input type="range" id="lineWidth" min="1" max="20" value="2" class="w-32" />
+            <input type="range" id="lineWidth" min="1" max="60" value="2" class="w-32" />
           </div>
           <div class="flex flex-wrap gap-2 mt-2 lg:mt-0">
             <button onclick="setMode('draw')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">그리기</button>
