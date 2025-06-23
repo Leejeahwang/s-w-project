@@ -13,6 +13,13 @@
     <label for="loginPw">비밀번호</label>
     <input id="loginPw" type="password" name="pw" required />
 
+      <!-- alert 메시지 출력 (비밀번호 변경 완료 등) -->
+    <% if (alert) { %>
+      <p style="color: green; font-weight: bold; margin-bottom: 1rem;">
+        <%= alert %>
+      </p>
+    <% } %>
+
     <% if (error) { %>
       <div class="error-box"><%= error %></div>
     <% } %>
@@ -20,7 +27,7 @@
   </form>
 
   <p class="link-row">
-    <a href="">비밀번호 찾기</a>
+    <a href="/auth/forgot">비밀번호 찾기</a>
     <span class="divider">|</span>
     <a href="/auth/signup">회원가입</a>
   </p>
