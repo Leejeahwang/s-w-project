@@ -3,7 +3,11 @@ const db = require('../db');
 exports.listRooms = async (req, res, next) => {
   try {
     const [rooms] = await db.promise().query(`
-      SELECT r.*, u.user_id AS creator
+      SELECT
+        r.id,
+        r.name,
+        r.created_by        AS creator,
+        r.created_at        AS createdAt
       FROM chat_rooms r
       JOIN users u ON r.created_by = u.user_id
       ORDER BY r.created_at DESC
