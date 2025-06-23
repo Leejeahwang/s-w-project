@@ -217,6 +217,17 @@
       document.addEventListener("mouseup", () => { isDragging = false; });
     }
 
+    function getCanvasCoords(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+    
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+    }
+
     socket.on("drawing", (data) => {
       ctx.strokeStyle = data.color;
       ctx.lineWidth = data.lineWidth;
@@ -261,6 +272,13 @@
           case 'endPath':
             ctx.closePath();
             break;
+          case 'erase':
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(data.x, data.y, data.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+          break;
           case 'clear':
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             document.querySelectorAll(".text-box").forEach(box => box.remove());
