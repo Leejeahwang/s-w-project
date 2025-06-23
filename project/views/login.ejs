@@ -7,18 +7,21 @@
   <title>로그인</title>
 </head>
 <body>
+  <div class="top-wrapper">
+      <!-- noteHub 로고 -->
+      <div class="logo">
+        <a href="/">
+          <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+        </a>
+      </div>
+    </div>
+
   <form method="POST" action="/auth/login">
+
     <label for="loginId">아이디</label>
     <input id="loginId" type="text" name="id" required />
     <label for="loginPw">비밀번호</label>
     <input id="loginPw" type="password" name="pw" required />
-
-      <!-- alert 메시지 출력 (비밀번호 변경 완료 등) -->
-    <% if (alert) { %>
-      <p style="color: green; font-weight: bold; margin-bottom: 1rem;">
-        <%= alert %>
-      </p>
-    <% } %>
 
     <% if (error) { %>
       <div class="error-box"><%= error %></div>
@@ -31,5 +34,8 @@
     <span class="divider">|</span>
     <a href="/auth/signup">회원가입</a>
   </p>
+  <p class="link-row">
+    <a href="/">돌아가기</a>
+  </p>
 </body>
-</html>
+</html> 

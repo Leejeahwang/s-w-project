@@ -29,12 +29,24 @@ body {
 /* 상단 헤더 */
 header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 15px 30px;
   background-color: #f4f6f9;
   border-bottom: 1px solid #e0e0e0e0;
   font-size: 14px;
+  position: relative;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 header span {
@@ -48,38 +60,31 @@ header a {
   text-decoration: none;
   font-size: 14px;
   vertical-align: middle; 
-  line-height: 1;          /* 또는 1.2, 전체 통일 */
+  line-height: 1;
 }
 
 header a:hover {
   text-decoration: underline;
 }
 
-/* 사이드바 토글 버튼튼 */
+/* 사이드바 토글 버튼 */
 #toggle {
-  position: fixed;
-  top: 15px;
-  left: 20px;
   background-color: #2196f3;
   color: white;
-  padding: 10px 15px;
+  padding: 8px 12px;
   font-size: 14px;
   cursor: pointer;
-  z-index: 1001;
-  transition: left 0.3s ease;
-}
-
-/* 사이드바가 열렸을 때 버튼 위치 조정 */
-#sidebar.active ~ #toggle {
-  left: 420px;
+  border: none;
+  /* border-radius: 4px; */
+  transition: background-color 0.3s ease;
 }
 
 #toggle:hover {
   text-decoration: underline;
 }
 
-/* 사이드바 오버레이 (근데 지금 작동 안 함) */
-.sider-overlay {
+/* 사이드바 오버레이 */
+.sidebar-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -101,8 +106,8 @@ header a:hover {
 #sidebar {
   position: fixed;
   top: 0;
-  left: -450px; /* 숨겨진 상태 */
-  width: 400px; /* 이 사이즈가 제일 적당한 듯 (나머지는 튀어나옴) */ 
+  left: -450px;
+  width: 400px;
   height: 100%;
   background-color: #fff;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -112,11 +117,11 @@ header a:hover {
 }
 
 #sidebar.active {
-  left: 0; /* 슬라이드 인 */
+  left: 0;
 }
 
 /* 사이드바 헤더 */
-.sider-header {
+.sidebar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -126,7 +131,7 @@ header a:hover {
   color: white;
 }
 
-.sider-header h4 {
+.sidebar-header h4 {
   margin: 0;
   font-size: 20px;
 }
@@ -168,6 +173,7 @@ header a:hover {
   width: 90%;
   padding: 12px;
   border: 2px solid #ddd;
+  /* border-radius: 4px; */
   font-size: 14px;
   margin-bottom: 20px;
   font-family: inherit;
@@ -185,7 +191,7 @@ header a:hover {
   margin-bottom: 20px;
   padding: 10px;
   background-color: #f8f9fa;
-  border-radius: 5px;
+  /* border-radius: 5px; */
   font-size: 12px;
 }
 
@@ -214,6 +220,7 @@ header a:hover {
   margin-bottom: 8px;
   background-color: #fff;
   border: 1px solid #eee;
+  /* border-radius: 4px; */
   transition: all 0.3s ease;
 }
 
@@ -224,7 +231,7 @@ header a:hover {
 .todo-item.completed {
   opacity: 0.7;
   background-color: #f8f9fa;
-  }
+}
 
 .todo-item.removing {
   opacity: 0;
@@ -244,7 +251,7 @@ header a:hover {
   background: none;
   font-size: 14px;
   padding: 5px;
-  border-radius: 3px;
+  /* border-radius: 3px; */
   font-family: inherit;
 }
 
@@ -262,6 +269,7 @@ header a:hover {
   background-color: #dc3545;
   color: white;
   border: none;
+  /* border-radius: 4px; */
   padding: 5px 10px;
   font-family: inherit;
   cursor: pointer;
@@ -277,6 +285,7 @@ header a:hover {
   background-color: #6c757d;
   color: white;
   border: none;
+  /* border-radius: 4px; */
   padding: 10px;
   cursor: pointer;
   margin-top: 15px;
@@ -285,8 +294,6 @@ header a:hover {
 .clear-completed:hover {
   background-color: #5a6268;
 }
-
-/* */
 
 /* 상단 헤더 분류선 */
 header .divider {
@@ -328,20 +335,23 @@ header .divider {
 .search-area {
   padding: 0;
   background-color: #f4f6f9;
+  margin-bottom: 40px;
+  font-family: inherit;
 }
 
 .search-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
   border: 3px solid #2196f3;
+  /* border-radius: 8px; */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   background-color: white;
+  font-family: inherit;
 }
 
 .search-wrapper input[type="text"] {
@@ -353,6 +363,7 @@ header .divider {
   outline: none;
   box-sizing: border-box;
   background-color: white;
+  font-family: inherit;
 }
 
 .search-wrapper input::placeholder {
@@ -382,32 +393,174 @@ header .divider {
   fill: #2196f3;
 }
 
+/* 좋아요 랭킹 스타일 */
+.like-ranking {
+  background: linear-gradient(135deg, #6bb8f8 0%, #a0cff5 50%, #ddf0ff 100%);
+  border: none !important;
+  /* border-radius: 12px; */
+  padding: 25px;
+  margin-bottom: 50px;
+  box-shadow: 0 8px 10px rgba(33, 150, 243, 0.3);
+  position: relative;
+  overflow: hidden;
+}
 
-/* 필터 부분 */
-/* 필터 폼 전체 영역 */
-.filter-form {
-  background-color: #f4f6f9;
-  padding: 10px 30px 30px;
+.like-ranking::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.like-ranking h4 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.like-ranking h4::before {
+  content: '🔥';
+  font-size: 20px;
+  animation: flame 2s ease-in-out infinite alternate;
+}
+
+@keyframes flame {
+  0% { transform: scale(1) rotate(-2deg); }
+  100% { transform: scale(1.1) rotate(2deg); }
+}
+
+.like-ranking ol {
   margin: 0;
-  border-bottom: 1px solid #e0e0e0e0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ranking;
+}
+
+.like-ranking li {
+  counter-increment: ranking;
+  margin-bottom: 12px;
+  background: #f4f6f9;
+  border-radius: 8px;
+  padding: 12px 15px;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.like-ranking li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.2);
+  background: white;
+}
+
+.like-ranking li::before {
+  content: counter(ranking);
+  position: absolute;
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(33, 150, 243, 0.4);
+}
+
+.like-ranking li:nth-child(1)::before {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
+  box-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);
+}
+
+.like-ranking li:nth-child(2)::before {
+  background: linear-gradient(135deg, #90a4ae 0%, #b0bec5 100%);
+  box-shadow: 0 2px 6px rgba(144, 164, 174, 0.4);
+}
+
+.like-ranking li:nth-child(3)::before {
+  background: linear-gradient(135deg, #8d6e63 0%, #a1887f 100%);
+  box-shadow: 0 2px 6px rgba(141, 110, 99, 0.4);
+}
+
+.like-ranking a {
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 25px;
+  display: inline-block;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.like-ranking a:hover {
+  color: #2196f3;
+  text-decoration: none;
+}
+
+.like-ranking li .like-count {
+  color: #666;
+  font-size: 12px;
+  margin-left: 8px;
+  background: rgba(33, 150, 243, 0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+  display: inline-block;
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+/* 필터 폼 스타일 개선 */
+.filter-form {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafe 100%);
+  border: 1px solid #e3f2fd;
+  /* border-radius: 12px; */
+  padding: 25px;
+  margin-bottom: 50px;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
 }
 
 /* 필터 form 내부 배치 */
 .filter-form form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  max-width: 1300px;
-  margin: 0 auto;
+  gap: 25px;
+  max-width: 100%;
+  margin: 0;
 }
 
 .filter-section {
   display: flex;
-  gap: 20px 32px;
+  gap: 20px;
   align-items: flex-end;
-  justify-content: center;
   flex-wrap: wrap;
-  margin-top: 30px;
   font-size: 14px;
 }
 
@@ -416,21 +569,24 @@ header .divider {
   align-items: flex-end;
   gap: 20px;
   flex-wrap: wrap;
+  flex: 1;
+  font-family: inherit;
 }
 
 .button-group {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  gap: 12px;
+  align-items: flex-end;
+  font-family: inherit;
 }
 
 .filter-section label {
   display: flex;
   flex-direction: column;
   color: #333;
-  font-weight: bold;
+  font-weight: 600;
+  gap: 8px;
   position: relative;
-  padding-right: 10px;
 }
 
 .filter-form select,
@@ -438,64 +594,86 @@ header .divider {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-size: 14px;
-  border: 2px solid #2196f3;
+  border: 2px solid #e3f2fd;
+  /* border-radius: 8px; */
   background-color: white;
-  background-image: url("data:image/svg+xml,%3Csvg%20viewBox='0%200%20140%20140'%20xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon%20points='70,100%2040,60%20100,60'%20fill='%23007bff'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg%20viewBox='0%200%20140%20140'%20xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon%20points='70,100%2040,60%20100,60'%20fill='%232196f3'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 10px;
-  min-width: 140px;
-  height: 36px;
+  background-position: right 12px center;
+  background-size: 12px;
+  min-width: 150px;
+  height: 42px;
   box-sizing: border-box;
   cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.05);
 }
 
 .filter-form select:focus,
 .filter-form input[type="text"]:focus {
   outline: none;
   border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.filter-form select:hover,
+.filter-form input[type="text"]:hover {
+  border-color: #42a5f5;
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.1);
 }
 
 .filter-form button {
-  padding: 8px 16px;
+  padding: 10px 20px;
   font-size: 14px;
-  height: 36px;
-  background-color: #2196f3;
+  height: 42px;
+  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
   color: white;
   border: none;
+  /* border-radius: 8px; */
   cursor: pointer;
   font-family: inherit;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
 }
 
 .filter-form button:hover {
-  background-color: #6fb7f2;
+  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+  /* box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4); */
 }
 
 /* 노트 추가 링크 */
 .filter-form a {
-  padding: 8px 16px;
+  padding: 10px 20px;
   font-size: 14px;
-  height: 36px;
-  background-color: #3ec642;
+  height: 42px;
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
   color: white;
   border: none;
+  /* border-radius: 8px; */
   cursor: pointer;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   box-sizing: border-box;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
 }
 
 .filter-form a:hover {
-  background-color: #218838;
+  background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%);
+  /* box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); */
 }
 
 .main-content {
@@ -507,48 +685,68 @@ header .divider {
 
 /* 노트 목록 영역 */
 .notes {
-  margin-top: 30px;
+  margin-top: 40px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  padding: 20px 10px;
-  
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 0;
 }
 
 .notes > p {
   text-align: center;
-  color:#888;
+  color: #888;
   font-size: 16px;
   margin: 50px 0;
+  grid-column: 1 / -1;
 }
 
-/* 노트 카드 스타일 */
+/* 노트 카드 스타일 개선 */
 .note-card {
-  background-color: white;
-  padding: 20px;
-  margin: 0 auto 20px auto;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0e0;
-  transition: box-shadow 0.2s ease;
-  max-width: 800px;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+  padding: 25px;
+  /* border-radius: 12px; */
+  border: 1px solid #e8eef5;
+  transition: all 0.3s ease;
   text-align: left;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.note-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.note-card:hover::before {
+  transform: scaleX(1);
 }
 
 .note-card:hover {
-  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(33, 150, 243, 0.15);
+  border-color: #bbdefb;
 }
 
 .note-card h3 {
-  margin: 0 0 10px 0;
+  margin: 0 0 15px 0;
   font-size: 18px;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .note-card h3 a {
   color: #333;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .note-card h3 a:hover {
@@ -556,17 +754,38 @@ header .divider {
 }
 
 .note-card p {
-  margin: 8px 0;
+  margin: 10px 0;
   font-size: 14px;
   color: #666;
-  line-height: 1.4;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.note-card p:first-of-type::before {
+  content: '📚';
+  font-size: 16px;
+}
+
+.note-card p:nth-of-type(2)::before {
+  content: '👨‍🏫';
+  font-size: 16px;
 }
 
 .note-card small {
   display: block;
-  margin-top: 15px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f4f8;
   font-size: 12px;
   color: #999;
+  line-height: 1.4;
+}
+
+.note-card small::before {
+  content: '✍️';
+  margin-right: 5px;
 }
 
 /* ToDO 리스트 */
@@ -577,7 +796,7 @@ header .divider {
   background: #007bff;
   color: white;
   padding: 12px;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   cursor: pointer;
   font-size: 13px;
   z-index: 1000;

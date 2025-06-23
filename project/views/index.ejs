@@ -10,89 +10,75 @@
   <!-- 상단 컨테이너 부분 -->
   <div class="up-container">
     <header>
+      <!-- ToDo 버튼 -->
+      <div class="header-left">
+        <div id="toggle">☰ ToDo 리스트</div>
+      </div>
+      
+      <!-- 사용자 정보 및 링크들 (오른쪽 정렬) -->
+      <div class="header-right">
+        <% if (user) { %>
+          <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
+          <a href="/auth/logout">로그아웃</a>
+          <span class="divider">|</span>
+          <a href="/notes/new">자료 등록</a>
+          <span class="divider">|</span>
+          <a href="/chat">공유 노트</a>
+          <span class="divider">|</span>
+          <a href="/pointshop">포인트 샵</a>
+          <span class="divider">|</span>
+          <a href="/mypage">마이페이지</a>
+        <% } else { %>
+          <a href="/auth/login">로그인</a>
+          <a href="/auth/signup">회원가입</a>
+          <span class="divider">|</span>
+          <a href="/chat">공유 노트</a>
+          <span class="divider">|</span>
+          <a href="/pointshop">포인트 샵</a>
+          <span class="divider">|</span>
+          <a href="/mypage">마이페이지</a>
+        <% } %>
+      </div>
 
       <!-- 사이드바 오버레이 -->
       <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-      <!-- 사이드 바 토글 버튼 -->
-      <div id="toggle">☰ ToDo 리스트
-    
-        <!-- 사이드바 본체 -->
-        <div id="sidebar">
-
-          <!-- 사이드바 헤더 -->
-          <div class="sidebar-header">
-            <h4>ToDo List</h4>
-            <button class="close-btn" id="close-sidebar"></button>
-          </div>
-
-          <!-- 사이드바 내용 -->
-          <div class="sidebar-content">
-            <div class="todo-input-section">
-              <h4>새 할 일 추가</h4>
-              <input type="text" id="todo-input" class="todo-input" placeholder="할 일을 입력하고 Enter를 누르세요!">
-            </div>
-
-            <!-- todo 통계 -->
-            <div class="todo-stats">
-              <span id="total-count">전체: 0개</span>
-              <span id="completed-count">완료: 0개</span>
-              <span id="remaining-count">남은 일: 0개</span>
-            </div>
-
-            <!-- todo 목록 -->
-            <div class="todo-list" id="todo-list">
-              <div class="empty-state" id="empty-state">
-                아직 할 일이 없습니다. <br>
-                위에서 할 일을 추가해보세요!
-              </div>
-            </div>
-
-            <!-- 완료된 항목 일괄 삭제 -->
-            <button class="clear-completed" id="clear-completed" style="display:none;">완료된 항목 일괄 삭제제</button>
-          </div>
-          
+      <!-- 사이드바 본체 -->
+      <div id="sidebar">
+        <!-- 사이드바 헤더 -->
+        <div class="sidebar-header">
+          <h4>ToDo List</h4>
+          <button class="close-btn" id="close-sidebar"></button>
         </div>
-      
+
+        <!-- 사이드바 내용 -->
+        <div class="sidebar-content">
+          <div class="todo-input-section">
+            <h4>새 할 일 추가</h4>
+            <input type="text" id="todo-input" class="todo-input" placeholder="할 일을 입력하고 Enter를 누르세요!">
+          </div>
+
+          <!-- todo 통계 -->
+          <div class="todo-stats">
+            <span id="total-count">전체: 0개</span>
+            <span id="completed-count">완료: 0개</span>
+            <span id="remaining-count">남은 일: 0개</span>
+          </div>
+
+          <!-- todo 목록 -->
+          <div class="todo-list" id="todo-list">
+            <div class="empty-state" id="empty-state">
+              아직 할 일이 없습니다. <br>
+              위에서 할 일을 추가해보세요!
+            </div>
+          </div>
+
+          <!-- 완료된 항목 일괄 삭제 -->
+          <button class="clear-completed" id="clear-completed" style="display:none;">완료된 항목 일괄 삭제</button>
+        </div>
       </div>
-
-      <% if (user) { %>
-        <span>안녕하세요, <%= user.user_id %>님 / 현재 회원님의 포인트: <%= user.point %>P</span>
-        <a href="/auth/logout">로그아웃</a>
-        <span class="divider">|</span>
-
-        <a href="/notes/new">자료 등록</a>
-        <span class="divider">|</span>
-        <a href="/chat">채팅</a>
-        <span class="divider">|</span>
-        <a href="/pointshop">포인트 샵</a>
-        <span class="divider">|</span>
-
-        <a href="/mypage">마이페이지</a>
-
-      <% } else { %>
-        <a href="/auth/login">로그인</a>
-        <span class="divider">|</span>
-        <a href="/auth/signup">회원가입</a>
-        <span class="divider">|</span>
-        
-        <a href="/pointshop">포인트샵</a>
-        <span class="divider">|</span>
-        
-        <a href="/mypage">마이페이지</a>
-      <% } %>
     </header>
-
   </div>
-
-  <!-- 왼쪽 컨테이너 부분 -->
-  <div class="left-container">
-  </div>
-
-  <!-- 오른쪽 컨테이너 부분 -->
-  <div class="right-container">
-  </div>
-
 
   <!-- 중앙 구역 -->
   <div class="center-container">
@@ -108,7 +94,7 @@
         </div>
       </div>
 
-      <!-- 검색창, filter-form 외부에 위치-->
+      <!-- 검색창 -->
       <div class="search-area">
         <form method="GET" action="/">
           <!-- 검색 영역 -->
@@ -123,17 +109,17 @@
         </form>
       </div>
 
-      <!-- 좋아요 랭킹 -->
-      <aside class="like-ranking" style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
-        <h4> 🔥 좋아요 랭킹</h4>
+      <!-- 좋아요 랭킹 (새로운 디자인) - 3등까지만 표시 -->
+      <aside class="like-ranking">
+        <h4>좋아요 랭킹</h4>
         <% if (likeRanking.length === 0) { %>
-          <p>데이터 없음</p>
+          <p style="color: rgba(255, 255, 255, 0.8); text-align: center; margin: 20px 0;">데이터 없음</p>
         <% } else { %>
           <ol>
-            <% likeRanking.forEach(item => { %>
+            <% likeRanking.slice(0, 3).forEach(item => { %>
               <li>
                 <a href="/notes/<%= item.id %>"><%= item.title %></a>
-                (<%= item.like_count %>개)
+                <span class="like-count"><%= item.like_count %>개</span>
               </li>
             <% }) %>
           </ol>
@@ -182,16 +168,16 @@
                 </select>
               </label>
             </div>
-          </div>
 
-          <!-- 버튼 그룹 -->
-          <div class="button-group">
-            <button type="submit">필터 적용</button>
+            <!-- 버튼 그룹 -->
+            <div class="button-group">
+              <button type="submit">필터 적용</button>
 
-            <!-- 노트 추가 noteRouer /notes/new -->
-            <% if (user) { %>
-              <a href="/notes/new">자료 등록</a>
-            <% } %>
+              <!-- 노트 추가 -->
+              <% if (user) { %>
+                <a href="/notes/new">자료 등록</a>
+              <% } %>
+            </div>
           </div>
         </form>
       </section>
@@ -251,7 +237,7 @@
     // 로컬 스토리지에 데이터 저장
     function saveTodos() {
       localStorage.setItem('todos', JSON.stringify(todos));
-    }+
+    }
 
     // 통계 업데이트
     function updateStats() {
@@ -387,7 +373,6 @@
     function openSidebar() {
       sidebar.classList.add('active');
       overlay.classList.add('active');
-      toggle.style.left = '470px';
       document.body.style.overflow = 'hidden'; // 스크롤 방지
     }
 
@@ -395,7 +380,6 @@
     function closeSidebar() {
       sidebar.classList.remove('active');
       overlay.classList.remove('active');
-      toggle.style.left = '20px';
       document.body.style.overflow = 'auto'; // 스크롤 복원
     }
 
@@ -431,7 +415,6 @@
       }
     });
 
-
     // Enter로 새 ToDo 추가
     todoInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -448,7 +431,6 @@
       loadTodos();
       renderTodos();
     });
-
 
   </script>
 

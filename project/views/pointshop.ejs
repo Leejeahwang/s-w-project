@@ -2,21 +2,22 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>포인트 샵</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>포인트 샵 - NoteHub</title>
   <link rel="stylesheet" href="/style/pointshop_style.css">
 </head>
 <body>
   <div class="shop-container">
-    <h2 class="shop-title">🎁 포인트 샵</h2>
+    <h2 class="shop-title">포인트 샵</h2>
 
     <div class="point-info">
-      안녕하세요, <strong><%= user.user_id %></strong>님 <br>
+      안녕하세요, <strong><%= user.user_id %></strong>님<br>
       현재 보유 포인트: <strong><%= user.point %>P</strong>
     </div>
 
     <div class="item-list">
       <div class="item">
-        <h4>☕ 컴포즈 기프티콘</h4>
+        <h4>컴포즈 기프티콘</h4>
         <p>아이스 아메리카노 1잔 / 300P</p>
         <form action="/pointshop/buy" method="POST">
           <input type="hidden" name="item" value="caffee">
@@ -25,7 +26,7 @@
       </div>
 
       <div class="item">
-        <h4>🍦 베스킨라빈스 기프티콘</h4>
+        <h4>베스킨라빈스 기프티콘</h4>
         <p>파인트 아이스크림 / 1000P</p>
         <form action="/pointshop/buy" method="POST">
           <input type="hidden" name="item" value="icecream">
@@ -34,21 +35,19 @@
       </div>
 
       <div class="item">
-        <h4>🐔 BBQ 기프트킨</h4>
-        <p>황올반 + 양념반 + 콜라 1.25L 기프티콘 / 2500P</p>
+        <h4>BBQ 기프티킨</h4>
+        <p>황올반 + 양념반 + 콜라 1.25L<br>기프티콘 / 2500P</p>
         <form action="/pointshop/buy" method="POST">
           <input type="hidden" name="item" value="chicken">
           <button type="submit">구매하기</button>
         </form>
       </div>
-
     </div>
+    
     <a href="/">다시 돌아가기</a>
   </div>
 
-  <!-- 빨간줄이 떠도 정상 작동하는듯합니다 -->
-  <!-- 거슬리는 분들은 아래 링크 참고 -->
-  <!-- https://4sii.tistory.com/301 -->
+  <!-- 알림 메시지 -->
   <% if (alertMessage) { %>
     <script>
       window.onload = function () {
