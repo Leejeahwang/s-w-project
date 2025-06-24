@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/style/forgot_style.css">
+  <title>비밀번호 찾기</title>
+</head>
+<body>
+  <div class="top-wrapper">
+    <!-- noteHub 로고 -->
+    <div class="logo">
+      <a href="/">
+        <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+      </a>
+    </div>
+    <h1>비밀번호 찾기</h1>
+    
+    <form method="POST" action="/auth/forgot">
+      <% if (error) { %>
+        <div class="error-box"><%= error %></div>
+      <% } %>
+      
+      <label>아이디</label>
+      <input type="text" name="id" required>
+      
+      <label>이름</label>
+      <input type="text" name="name" required>
+      
+      <label>학번</label>
+      <input type="text" name="studentId" required>
+      
+      <button type="submit">본인 인증</button>
+      
+    
+    </form>
+  </div>
+  <div class="link-row">
+    <a href="/auth/login">로그인으로 돌아가기</a>
+  </div>
+</body>
+</html>

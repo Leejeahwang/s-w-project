@@ -213,7 +213,7 @@ article p:first-of-type {
 article div {
   margin-top: 25px;
   padding: 20px;
-  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  background: linear-gradient(135deg, #e3f2fd );
   border-left: 4px solid #2196f3;
   font-size: 15px;
   line-height: 1.7;
@@ -221,7 +221,6 @@ article div {
 }
 
 article div::before {
-  content: '📝';
   position: absolute;
   top: 15px;
   right: 15px;

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/style/mypage_style.css">
+  <title>마이페이지</title>
+</head>
+<body>
+  <% if (alertMessage) { %>
+    <script>
+      alert('<%= alertMessage %>');
+    </script>
+  <% } %>
+  <h1>마이페이지</h1>
+  <section>
+    <h2>회원 정보</h2>
+    <ul>
+      <li>아이디: <%= user.user_id %></li>
+      <li>이름: <%= user.name %></li>
+      <li>학번: <%= user.studentId %></li>
+      <li>학년: <%= user.grade %></li>
+      <li>포인트: <%= user.point %>P</li>
+      <li>게시한 노트 수: <%= stats.noteCount %></li>
+      <li>작성한 댓글 수: <%= stats.commentCount %></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>회원정보 수정</h2>
+    <button type="button" id="toggle-update">수정하기</button>
+    <form id="update-form" method="POST" action="/mypage?_method=PUT" class="hidden">
+      <label>현재 비밀번호:<input type="password" name="currentPassword" required></label><br>
+      <label>새 이름:<input type="text" name="newName" value="<%= user.name %>"></label><br>
+      <label>새 비밀번호:<input type="password" name="newPassword" placeholder="변경 시만 입력"></label><br>
+      <label>학년:<input type="text" name="grade" value="<%= user.grade %>" required></label><br>
+      <button type="submit">저장하기</button>
+    </form>
+  </section>
+
+  <!-- 회원 탈퇴 섹션 -->
+  <section class="section" id="delete-section">
+    <h2>회원 탈퇴</h2>
+    <button type="button" id="toggle-delete">탈퇴하기</button>
+
+    <!-- 기본에는 숨김 -->
+    <form id="delete-form"
+          method="POST"
+          action="/mypage?_method=DELETE"
+          class="hidden"
+          onsubmit="return confirm('정말 탈퇴하시겠습니까?');">
+      <label>
+        현재 비밀번호 확인:
+        <input type="password" name="currentPassword" required>
+      </label><br>
+      <button type="submit">탈퇴 확정</button>
+    </form>
+  </section>
+
+  <a href="/">돌아가기</a>
+
+  <script>
+    document.getElementById('toggle-update').addEventListener('click', () => {
+      document.getElementById('update-form').classList.toggle('hidden');
+    });
+    document.getElementById('toggle-delete').addEventListener('click', () => {
+      document.getElementById('delete-form').classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>

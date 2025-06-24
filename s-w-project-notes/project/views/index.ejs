@@ -23,16 +23,20 @@
           <span class="divider">|</span>
           <a href="/notes/new">자료 등록</a>
           <span class="divider">|</span>
-          <a href="/canvas">공유 노트</a>
+          <a href="/chat">공유 노트</a>
           <span class="divider">|</span>
           <a href="/pointshop">포인트 샵</a>
+          <span class="divider">|</span>
+          <a href="/mypage">마이페이지</a>
         <% } else { %>
           <a href="/auth/login">로그인</a>
           <a href="/auth/signup">회원가입</a>
           <span class="divider">|</span>
-          <a href="/canvas">공유 노트</a>
+          <a href="/chat">공유 노트</a>
           <span class="divider">|</span>
           <a href="/pointshop">포인트 샵</a>
+          <span class="divider">|</span>
+          <a href="/mypage">마이페이지</a>
         <% } %>
       </div>
 
@@ -105,96 +109,106 @@
         </form>
       </div>
 
-      <!-- 좋아요 랭킹 (새로운 디자인) - 3등까지만 표시 -->
-      <aside class="like-ranking">
-        <h4>좋아요 랭킹</h4>
-        <% if (likeRanking.length === 0) { %>
-          <p style="color: rgba(255, 255, 255, 0.8); text-align: center; margin: 20px 0;">데이터 없음</p>
-        <% } else { %>
-          <ol>
-            <% likeRanking.slice(0, 3).forEach(item => { %>
-              <li>
-                <a href="/notes/<%= item.id %>"><%= item.title %></a>
-                <span class="like-count"><%= item.like_count %>개</span>
-              </li>
-            <% }) %>
-          </ol>
-        <% } %>
-      </aside>
+      <!-- 메인 컨텐츠 영역 -->
+      <div class="main-layout">
+        <!-- 중앙 컨텐츠 -->
+        <div class="main-content">
+          <!-- 필터 폼 부분 -->
+          <section class="filter-form">
+            <form method="GET" action="/">
+              <div class="filter-section">
+                <!-- 드롭다운 필터 -->
+                <div class="filter-left">
+                  <label>이수구분
+                    <select name="category">
+                      <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
+                      <% categories.forEach(c => { %>
+                        <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
+                      <% }) %>
+                    </select>
+                  </label>
+                      
+                  <label>과목
+                    <select name="subject">
+                      <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
+                      <% subjects.forEach(s => { %>
+                        <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
+                      <% }) %>
+                    </select>
+                  </label>
+                      
+                  <label>학년
+                    <select name="year">
+                      <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
+                      <% years.forEach(y => { %>
+                        <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
+                      <% }) %>
+                    </select>
+                  </label>
+                      
+                  <label>학기
+                    <select name="semester">
+                      <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
+                      <% semesters.forEach(sm => { %>
+                        <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
+                      <% }) %>
+                    </select>
+                  </label>
+                </div>
 
-      <!-- 필터 폼 부분 -->
-      <section class="filter-form">
-        <form method="GET" action="/">
-          <div class="filter-section">
-            <!-- 드롭다운 필터 -->
-            <div class="filter-left">
-              <label>이수구분
-                <select name="category">
-                  <option value="전체" <%= (!filters.category || filters.category === '전체') ? 'selected' : '' %>>전체</option>
-                  <% categories.forEach(c => { %>
-                    <option value="<%= c.name %>" <%= filters.category === c.name ? 'selected' : '' %>><%= c.name %></option>
-                  <% }) %>
-                </select>
-              </label>
-                  
-              <label>과목
-                <select name="subject">
-                  <option value="전체" <%= (!filters.subject || filters.subject === '전체') ? 'selected' : '' %>>전체</option>
-                  <% subjects.forEach(s => { %>
-                    <option value="<%= s.name %>" <%= filters.subject === s.name ? 'selected' : '' %>><%= s.name %></option>
-                  <% }) %>
-                </select>
-              </label>
-                  
-              <label>학년
-                <select name="year">
-                  <option value="전체" <%= (!filters.year || filters.year === '전체') ? 'selected' : '' %>>전체</option>
-                  <% years.forEach(y => { %>
-                    <option value="<%= y.name %>" <%= filters.year === y.name ? 'selected' : '' %>><%= y.name %></option>
-                  <% }) %>
-                </select>
-              </label>
-                  
-              <label>학기
-                <select name="semester">
-                  <option value="전체" <%= (!filters.semester || filters.semester === '전체') ? 'selected' : '' %>>전체</option>
-                  <% semesters.forEach(sm => { %>
-                    <option value="<%= sm.name %>" <%= filters.semester === sm.name ? 'selected' : '' %>><%= sm.name %></option>
-                  <% }) %>
-                </select>
-              </label>
-            </div>
+                <!-- 버튼 그룹 -->
+                <div class="button-group">
+                  <button type="submit">필터 적용</button>
 
-            <!-- 버튼 그룹 -->
-            <div class="button-group">
-              <button type="submit">필터 적용</button>
+                  <!-- 노트 추가 -->
+                  <% if (user) { %>
+                    <a href="/notes/new">자료 등록</a>
+                  <% } %>
+                </div>
+              </div>
+            </form>
+          </section>
 
-              <!-- 노트 추가 -->
-              <% if (user) { %>
-                <a href="/notes/new">자료 등록</a>
-              <% } %>
-            </div>
+          <!-- 노트 목록 -->
+          <section class="notes">
+            <% if (notes.length === 0) { %>
+              <p>표시할 노트가 없습니다.</p>
+            <% } else { %>
+              <% notes.forEach(n => { %>
+                <article class="note-card">
+                  <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
+                  <p>과목: <%= n.subject %></p>
+                  <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
+                  <small>
+                    작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
+                  </small>
+                </article>
+                <% }) %>
+            <% } %>
+          </section>
+        </div>
+
+        <!-- 오른쪽 사이드바 -->
+        <aside class="right-sidebar">
+          <!-- 좋아요 랭킹 (기존 위치에서 이동) -->
+          <div class="like-ranking">
+            <h4>좋아요 랭킹</h4>
+            <% if (likeRanking.length === 0) { %>
+              <p style="color: rgba(255, 255, 255, 0.8); text-align: center; margin: 20px 0;">데이터 없음</p>
+            <% } else { %>
+              <ol>
+                <% likeRanking.slice(0, 3).forEach(item => { %>
+                  <li>
+                    <a href="/notes/<%= item.id %>"><%= item.title %></a>
+                    <span class="like-count"><%= item.like_count %>개</span>
+                  </li>
+                <% }) %>
+              </ol>
+            <% } %>
           </div>
-        </form>
-      </section>
+        </aside>
+      </div>
 
-      <!-- 노트 목록 -->
-      <section class="notes">
-        <% if (notes.length === 0) { %>
-          <p>표시할 노트가 없습니다.</p>
-        <% } else { %>
-          <% notes.forEach(n => { %>
-            <article class="note-card">
-              <h3><a href="/notes/<%= n.id %>"><%= n.title %></a></h3>
-              <p>과목: <%= n.subject %></p>
-              <p>교수: <%= n.professor %> | 이수구분: <%= n.category %></p>
-              <small>
-                작성자: <%= n.authorName %> / 작성시간: <%= n.created_at.getFullYear() %>/<%= (n.created_at.getMonth()+1).toString().padStart(2,'0') %>/<%= n.created_at.getDate().toString().padStart(2,'0') %> <%= n.created_at.toLocaleTimeString('ko-KR') %>
-              </small>
-            </article>
-            <% }) %>
-        <% } %>
-      </section>
     </div>
 
   </div>

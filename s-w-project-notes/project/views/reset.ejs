@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="/style/reset_style.css">
+  <title>비밀번호 재설정</title>
+</head>
+<body>
+  <div class="top-wrapper">
+    <!-- noteHub 로고 -->
+    <div class="logo">
+      <a href="/">
+        <img src="/images/notehub-high-resolution-logo-transparent (1).png" alt="NoteHub로고"> 
+      </a>
+    </div>
+    
+    <h1>비밀번호 재설정</h1>
+    
+    <form method="POST" action="/auth/reset">
+      <% if (error) { %>
+        <div class="error-box"><%= error %></div>
+      <% } %>
+      
+      <label>새 비밀번호</label>
+      <input type="password" name="newPassword" required>
+      
+      <label>비밀번호 확인</label>
+      <input type="password" name="confirmPassword" required>
+      
+      <button type="submit">비밀번호 변경</button>
+      
+    
+    </form>
+  </div>
+  <div class="link-row">
+    <a href="/auth/login">로그인으로 돌아가기</a>
+  </div>
+</body>
+</html>

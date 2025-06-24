@@ -33,12 +33,6 @@
   height: 50px;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-} 
-
 /* 전체 기본 설정 */
 body {
   font-family: 'GmarketSansMedium', sans-serif;
@@ -52,20 +46,30 @@ body {
   min-height: 100vh;
 }
 
+h1 {
+    margin: 0 0 -5px 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #2196f3;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+}
+
 /* 폼 컨테이너 */
 form {
-  background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
-  padding: 40px 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e8eef5;
-  width: 360px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  position: relative;
-  margin-top: 30px;
-  overflow: hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    padding: 40px 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8eef5;
+    width: 360px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    margin-top: 30px;
+    overflow: hidden;
+    border-radius: 0;
 }
 
 form::before {
@@ -80,32 +84,31 @@ form::before {
 
 /* 라벨 */
 label {
-  font-weight: 600;
-  margin-bottom: -10px;
-  font-size: 15px;
-  color: #2196f3;
-  font-family: inherit;
+    font-weight: 600;
+    margin-bottom: -10px;
+    font-size: 15px;
+    color: #2196f3;
+    font-family: inherit;
 }
 
 /* 입력 필드 */
-input[type="text"],
-input[type="password"] {
-  padding: 14px 16px;
-  border: 2px solid #e8eef5;
-  margin-bottom: 15px;
-  font-size: 15px;
-  font-family: inherit;
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+input {
+    padding: 14px 16px;
+    border: 2px solid #e8eef5;
+    margin-bottom: 15px;
+    font-size: 15px;
+    font-family: inherit;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-radius: 0;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
-  outline: none;
-  border-color: #2196f3;
-  box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
-  background: #ffffff;
+input:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+    background: #ffffff;
 }
 
 /* 에러 메시지 */
@@ -121,27 +124,30 @@ input[type="password"]:focus {
   text-align: center;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(211, 47, 47, 0.1);
+  margin-bottom: 20px;
+  border-radius: 0;
 }
 
 /* 버튼 */
-button[type="submit"] {
-  padding: 16px 24px;
-  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
-  color: white;
-  border: none;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: inherit;
-  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-  position: relative;
-  overflow: hidden;
+button {
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
 }
 
-button[type="submit"]:hover {
-  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
-  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+button:hover {
+    background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
 }
 
 /* 하단 하이퍼링크 */
@@ -155,8 +161,7 @@ button[type="submit"]:hover {
   border-top: 1px solid #e8eef5;
 }
 
-.link-row a,
-.link-row .divider {
+.link-row a {
   display: inline-block;
   vertical-align: middle;
   margin: 0 8px;
@@ -169,10 +174,4 @@ button[type="submit"]:hover {
 .link-row a:hover {
   color: #2196f3;
   text-decoration: underline;
-}
-
-.link-row .divider {
-  color: #bbb;
-  font-weight: normal;
-  font-size: 14px;
 }
