@@ -27,15 +27,70 @@ exports.createNote = async (req, res, next) => {
     }
 }
 
-// 새 노트 업로드  (POST /notes/upload)
-exports.uploadNote = async (req, res) => {
-    if (!req.session.user) return res.redirect('/login');
+// 노트 상세 페이지 렌더링 (GET /notes/:id)
+exports.getNoteById = async (req, res, next) => {
+  try {
+    const noteId = req.params.id;
+    const editCommentId = parseInt(req.query.editCommentId, 10) || null;
+    const alertMessage = req.session.alertMessage;
+    delete req.session.alertMessage;
 
-    const { title, summary, category, subject, year, semester, professor } = req.body;
-    const uploadedFile = req.file;
+    const [[note]] = await db.promise().query(
+      `SELECT n.id, n.title, n.subject, n.professor, n.category, n.summary, n.like_count, n.download_count,
+              n.user_id, u.user_id AS authorName, n.created_at
+       FROM notes n 
+       JOIN users u 
+       ON n.user_id = u.user_id
+       WHERE n.id = ?`,
+      [noteId]
+    );
+    if (!note) return res.status(404).send('노트를 찾을 수 없습니다.');
 
-    try {
-        const u = req.session.user;
+    const [[file]] = await db.promise().query(
+      `SELECT f.file_name, f.stored_name, f.file_path, f.file_size
+       FROM files f
+       JOIN notes n
+       ON n.id = f.note_id
+       WHERE n.id = ?`,
+       [req.params.id]
+    )
+
+    const [comments] = await db.promise().query(
+      `SELECT c.id, c.content, c.created_at, c.user_id, c.parent_id, u.user_id AS author
+       FROM comments c 
+       JOIN users u 
+       ON c.user_id = u.user_id
+       WHERE c.note_id = ? 
+       ORDER BY c.created_at ASC`,
+      [req.params.id]
+    );
+
+    // 파일 사이즈 포맷팅 함수
+    const formatBytes = size => {
+      if (size < 1024) return `${size} B`;
+      if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+      return `${(size / 1024 / 1024).toFixed(1)} MB`;
+    };
+
+    res.render('detail', { note,
+                           comments,
+                           editCommentId,
+                           file: {
+                              file_name: file.file_name,
+                              stored_name: file.stored_name,
+                              file_path: file.file_path,
+                              file_size: formatBytes(file.file_size)},
+                            user: req.session.user,
+                            alertMessage });
+  } catch (e) { next(e); }
+}
+
+exports.uploadNote = async (req, res, next) => {
+  if (!req.session.user) return res.redirect('/login');
+  const { title, summary, category, subject, year, semester, professor } = req.body;
+  const uploadedFile = req.file;
+  try {
+    const u = req.session.user;
 
         // 바이러스 검사 (clamscan.exe 사용)
         // WSL 활용
@@ -43,11 +98,11 @@ exports.uploadNote = async (req, res) => {
         const windowPath = uploadedFile.path;
         const wslPath = '/mnt/' + windowPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, drive) => drive.toLowerCase());
 
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve, rejects) => {
             exec(`wsl clamscan "${wslPath}"`, (error, stdout, stderr) => {
                 if(error) {
                     console.error("ClamAV 검사 오류: ", stderr || stdout);
-                    return reject(new Error("ClamAV 검사 중 오류 발생 또는 감염 파일입니다."));
+                    return rejects(new Error("ClamAV 검사 중 오류 발생 또는 감염 파일입니다."));
                 }
 
                 if(stdout.includes('Infected files: 0')) {
@@ -59,40 +114,56 @@ exports.uploadNote = async (req, res) => {
                     return reject(new Error('악성 코드가 포함된 파일입니다.'));
                 }
             });
-        });
+        });    
 
-        // notes 테이블에 INSERT
-        const [noteResult] = await db.promise().query(
-            'INSERT INTO notes (user_id, title, summary, category, subject, year, semester, professor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [u.user_id, title, summary, category, subject, year, semester, professor]
-        );
-        const noteId = noteResult.insertId;
-
-        // files 테이블에 INSERT
-        if(uploadedFile) {
-            await db.promise().query(
-                `INSERT INTO files (note_id, file_name, stored_name, file_path, file_size, uploaded_at)
-                VALUES (?, ?, ?, ?, ?, NOW())`,
-                [noteId, uploadedFile.originalname, uploadedFile.filename, '/files/' + uploadedFile.filename, uploadedFile.size]
-            );
-        }
-
-        // 노트 업로드시 100P 적립
-        await db.promise().query(
-            `UPDATE users SET point = point + 100 WHERE user_id = ?`, [u.user_id]
-        );
-
-        req.session.alertMessage = `파일 업로드 성공!\n100P가 적립되었습니다!`;
-        res.redirect('/');
-    } catch (err) {
-        console.log(err);
-        if(err.message === '악성 코드가 포함된 파일입니다.' || err.message === 'ClamAV 검사 중 오류 발생 또는 감염 파일입니다.') {
-            req.session.alertMessage = '업로드하신 파일에 악성 코드가 포함되어 있어 업로드가 차단되었습니다.';
-            return res.redirect('/');
-        }
-        else {
-            req.session.alertMessage = '파일 업로드중 오류';
-            return res.status(400).json({ message: "파일 업로드중 오류" });
-        }
+    // ───────────────────────────────────────────────────
+    // 1) 과목(subject) 자동 추가 로직
+    const subj = subject.trim();
+    const [[exists]] = await db.promise().query(
+      'SELECT 1 FROM subjects WHERE name = ?',
+      [subj]
+    );
+    if (!exists) {
+      await db.promise().query(
+        'INSERT INTO subjects (name) VALUES (?)',
+        [subj]
+      );
     }
-}
+    // ───────────────────────────────────────────────────
+
+    // 2) notes 테이블에 삽입
+    const [noteResult] = await db.promise().query(
+      `INSERT INTO notes 
+         (user_id, title, summary, category, subject, year, semester, professor)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [u.user_id, title, summary, category, subj, year, semester, professor]
+    );
+    const noteId = noteResult.insertId;
+
+    // 3) files 테이블에 삽입 (기존 로직)
+    if (uploadedFile) {
+      await db.promise().query(
+        `INSERT INTO files 
+           (note_id, file_name, stored_name, file_path, file_size, uploaded_at)
+         VALUES (?, ?, ?, ?, ?, NOW())`,
+        [
+          noteId,
+          uploadedFile.originalname,
+          uploadedFile.filename,
+          '/files/' + uploadedFile.filename,
+          uploadedFile.size
+        ]
+      );
+    }
+
+    // 4) 포인트 적립 및 리다이렉트
+    await db.promise().query(
+      'UPDATE users SET point = point + 100 WHERE user_id = ?',
+      [u.user_id]
+    );
+    req.session.alertMessage = '100P가 적립되었습니다!';
+    res.redirect('/');
+  } catch (err) {
+    next(err);
+  }
+};

@@ -568,14 +568,12 @@ header .divider {
   display: flex;
   align-items: flex-end;
   gap: 20px;
-  flex-wrap: wrap;
   flex: 1;
   font-family: inherit;
 }
 
 .button-group {
   display: flex;
-  gap: 12px;
   align-items: flex-end;
   font-family: inherit;
 }
@@ -632,7 +630,7 @@ header .divider {
   background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
   color: white;
   border: none;
-  /* border-radius: 8px; */
+  margin: 0 20px 0 0;
   cursor: pointer;
   font-family: inherit;
   font-weight: 600;
@@ -676,11 +674,25 @@ header .divider {
   /* box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); */
 }
 
-.main-content {
-  max-width: 1200px;
+.main-layout {
+  display: block;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 30px 20px;
-  text-align: center;
+  margin-bottom: 50px;
+}
+
+.main-content {
+  min-height: 400px;
+  width: 100%;
+}
+
+.right-sidebar {
+  position: fixed;
+  left: calc(50% + 420px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 280px;
+  z-index: 500;
 }
 
 /* 노트 목록 영역 */

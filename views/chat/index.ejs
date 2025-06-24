@@ -1,15 +1,278 @@
-<h2>채팅방 목록</h2>
-<a href="/chat/create">방 만들기</a>
-<ul>
-  <% rooms.forEach(room => { %>
-    <li>
-      <a href="/chat/<%= room.id %>"><%= room.name %></a>
-      - 만든이: <%= room.creator %>
-      <% if (room.creator === user.user_id) { %>
-        <form action="/chat/<%= room.id %>/delete" method="POST" style="display:inline;">
-          <button type="submit" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
-        </form>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>채팅방 목록</title>
+  <style>
+    /* 폰트 정의 */
+    @font-face {
+        font-family: 'GmarketSansMedium';
+        src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    /* 기본 설정 */
+    body {
+      font-family: 'GmarketSansMedium', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    /* 컨테이너 */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* 헤더 스타일 */
+    h2 {
+      color: #2196f3;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #2196f3 0%, #42a5f5 100%);
+    }
+
+    /* 방 만들기 버튼 */
+    .create-room-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .create-room-btn::before {
+      content: '➕';
+      margin-right: 8px;
+      font-size: 14px;
+    }
+
+    .create-room-btn:hover {
+      background: linear-gradient(135deg, #388e3c 0%, #4caf50 100%);
+      box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+    }
+
+    /* 채팅방 목록 */
+    .room-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .room-item {
+      background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+      margin-bottom: 15px;
+      padding: 20px 25px;
+      border: 1px solid #e8eef5;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .room-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .room-item:hover::before {
+      transform: scaleX(1);
+    }
+
+    .room-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
+      border-color: #bbdefb;
+    }
+
+    /* 방 이름 링크 */
+    .room-link {
+      color: #2196f3;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 600;
+      margin-right: 15px;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .room-link::before {
+      content: '🏠';
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .room-link:hover {
+      color: #1976d2;
+    }
+
+    /* 만든이 정보 */
+    .room-creator {
+      color: #666;
+      font-size: 14px;
+      margin-left: 10px;
+      position: relative;
+    }
+
+    .room-creator::before {
+      content: '👤';
+      margin-right: 5px;
+      font-size: 12px;
+    }
+
+    /* 방 정보 컨테이너 */
+    .room-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .room-details {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* 삭제 버튼 */
+    .delete-form {
+      display: inline-block;
+      margin-left: 15px;
+    }
+
+    .delete-btn {
+      background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+    }
+
+    .delete-btn::before {
+      content: '🗑️';
+      margin-right: 4px;
+      font-size: 10px;
+    }
+
+    .delete-btn:hover {
+      background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4);
+    }
+
+    /* 빈 목록 스타일 */
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 60px 20px;
+      font-size: 16px;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+      border: 1px solid #e8eef5;
+      margin-top: 20px;
+    }
+
+    .empty-state::before {
+      content: '💬';
+      display: block;
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    /* 나가기 버튼 */
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: linear-gradient(135deg, #6c757d 0%, #95a5a6 100%);
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    .back-btn::before {
+      content: '← ';
+      margin-right: 8px;
+    }
+    .back-btn:hover {
+      background: linear-gradient(135deg, #5a6268 0%, #6c757d 100%);
+    }
+  
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>채팅방 목록</h2>
+    <a href="/chat/create" class="create-room-btn">방 만들기</a>
+    <a href="/" class="back-btn">나가기</a>
+  
+    <ul class="room-list">
+      <% if (rooms.length === 0) { %>
+        <div class="empty-state">
+          아직 생성된 채팅방이 없습니다.<br>
+          새로운 채팅방을 만들어보세요!
+        </div>
+      <% } else { %>
+        <% rooms.forEach(room => { %>
+          <li class="room-item">
+            <div class="room-info">
+              <div class="room-details">
+                <a href="/chat/<%= room.id %>" class="room-link"><%= room.name %></a>
+                <span class="room-creator">만든이: <%= room.creator %></span>
+              </div>
+              <% if (room.creator === user.user_id) { %>
+                <form action="/chat/<%= room.id %>/delete" method="POST" class="delete-form">
+                  <button type="submit" class="delete-btn" onclick="return confirm('정말 삭제하시겠습니까?')">삭제</button>
+                </form>
+              <% } %>
+            </div>
+          </li>
+        <% }) %>
       <% } %>
-    </li>
-  <% }) %>
-</ul>
+    </ul>
+  </div>
+</body>
+</html>

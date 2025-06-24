@@ -4,7 +4,9 @@ const qs = require('querystring');
 
 // 로그인 화면 렌더링 (GET /auth/login)
 exports.login_rendering = (req, res) => {
-  res.render('login', { user: req.session.user, error: null });
+  const alert = req.session.alertMessage;
+  delete req.session.alertMessage;
+  res.render('login', { user: null, error: null, alert });
 }
 
 // 로그인 처리 (POST /auth/login)
@@ -24,12 +26,13 @@ exports.login = async (req, res) => {
 
     return res.render('login', { 
       user: null, 
-      error: '아이디 또는 비밀번호가 일치하지 않습니다.' 
+      error: '아이디 또는 비밀번호가 일치하지 않습니다.', 
+      alert: null  
     });
 
   } catch (e) {
     console.error('Login error:', e);
-    res.render('login', { user: null, error: '로그인 중 오류가 발생했습니다.' });
+    res.render('login', { user: null, error: '로그인 중 오류가 발생했습니다.', alert: null});
   }
 };
 
@@ -47,9 +50,9 @@ exports.signup = async (req, res) => {
       [id, pw, name, studentId, grade, 100]
     );
 
-    await db.promise().query(
-      'INSERT INTO todos (user_id, content) VALUES (?, ?)', [id, '']
-    );
+    // await db.promise().query(
+    //   'INSERT INTO todos (user_id, content) VALUES (?, ?)', [id, '']
+    // );
 
     res.redirect('/auth/login');
 

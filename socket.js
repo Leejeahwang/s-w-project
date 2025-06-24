@@ -57,9 +57,15 @@ module.exports = (io, sessionMiddleware) => {
       socket.to(roomId).emit('drawing', data);
     });
 
-    socket.on('chat message', (msg) => {
+    socket.on('chat message', (data) => {
+      const { roomId, msg } = data;
+
       console.log(`${user.user_id} 님이 보낸 메시지:`, msg);
-      io.emit('chat message', { user: user.user_id, message: msg }); // 사용자 이름이 포함한 메세지 전송
+
+      io.to(roomId).emit('chat message', {
+        user: user.user_id,
+        message: msg
+      });
     });
 
     socket.on('disconnect', () => {

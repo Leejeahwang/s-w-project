@@ -49,10 +49,25 @@ exports.editNote = async (req, res, next) => {
         if (!orig || orig.user_id !== req.session.user.user_id) return res.redirect('/notes/' + noteId);
 
         const { title, summary, category, subject, year, semester, professor } = req.body;
+
+        // ───────────────────────────────────────────────────
+        // 1) 과목(subject) 자동 추가 로직
+        const subj = subject.trim();
+        const [[exists]] = await db.promise().query(
+        'SELECT 1 FROM subjects WHERE name = ?',
+        [subj]
+        );
+        if (!exists) {
+        await db.promise().query(
+            'INSERT INTO subjects (name) VALUES (?)',
+            [subj]
+        );
+        }
+        // ───────────────────────────────────────────────────
     
         await db.promise().query(
             'UPDATE notes SET title=?, summary=?, category=?, subject=?, year=?, semester=?, professor=?, created_at=NOW() WHERE id=?',
-            [title, summary, category, subject, year, semester, professor, noteId]);
+            [title, summary, category, subj,  year, semester, professor, noteId]);
 
         // 수정할 파일이 있으면
         if (uploadedFile) {

@@ -5,69 +5,529 @@
   <title><%= room.name %> 채팅방</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <style>
-    .text-box {
-      position: absolute;
-      background-color: rgba(255, 255, 255, 0.7);
-      border: 1px solid #ccc;
-      padding: 4px;
-      resize: none;
+    /* 폰트 정의 */
+    @font-face {
+        font-family: 'GmarketSansMedium';
+        src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+        font-weight: normal;
+        font-style: normal;
     }
-    #canvasWrapper {
+
+    /* 기본 설정 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'GmarketSansMedium', sans-serif;
+      background-color: #f4f6f9;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* 컨테이너 */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* 헤더 */
+    .page-header {
+      text-align: center;
+      margin-bottom: 30px;
       position: relative;
     }
+
+    .page-header h2 {
+      color: #2196f3;
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    .page-header h2::before {
+      content: '💬';
+      margin-right: 10px;
+      font-size: 28px;
+    }
+
+    .page-header h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, #2196f3 0%, #42a5f5 100%);
+    }
+
+    /* 뒤로가기 버튼 */
+    .back-btn {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: linear-gradient(135deg, #6c757d 0%, #95a5a6 100%);
+      color: white;
+      padding: 10px 16px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(108, 117, 125, 0.3);
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .back-btn::before {
+      content: '← ';
+      margin-right: 6px;
+    }
+
+    .back-btn:hover {
+      background: linear-gradient(135deg, #5a6268 0%, #6c757d 100%);
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+    }
+
+    /* 메인 레이아웃 */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 25px;
+      align-items: start;
+    }
+
+    /* 그림판 영역 */
+    .canvas-section {
+      background: white;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .canvas-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
+    }
+
+    /* 툴바 */
+    .toolbar {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafe 100%);
+      border: 1px solid #e3f2fd;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.05);
+      position: sticky;
+      top: 20px;
+      z-index: 10;
+    }
+
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .toolbar-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toolbar label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .toolbar input[type="color"] {
+      width: 40px;
+      height: 35px;
+      border: 2px solid #e3f2fd;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+
+    .toolbar input[type="color"]:hover {
+      border-color: #2196f3;
+    }
+
+    .toolbar input[type="range"] {
+      width: 120px;
+      accent-color: #2196f3;
+    }
+
+    .toolbar-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar button {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-draw { background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%); color: white; }
+    .btn-text { background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); color: white; }
+    .btn-save { background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%); color: white; }
+    .btn-clear { background: linear-gradient(135deg, #f44336 0%, #e57373 100%); color: white; }
+
+    .toolbar button:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 캔버스 */
+    .canvas-wrapper {
+      position: relative;
+      border: 3px solid #e3f2fd;
+      background: white;
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.1);
+      height: 500px;
+      overflow: hidden;
+    }
+
+    #canvas {
+      width: 800px;
+      height: 500px;
+      cursor: crosshair;
+    }
+
+    .text-box {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 2px dashed #2196f3;
+      padding: 8px;
+      min-width: 120px;
+      min-height: 40px;
+      cursor: move;
+      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+    }
+
+    .text-box textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    /* 사이드바 */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: sticky;
+      top: 20px;
+    }
+
+    /* 채팅 영역 */
+    .chat-section {
+      background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+      border: 1px solid #e8eef5;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      height: 450px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #4caf50 0%, #66bb6a 100%);
+    }
+
+    .chat-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #f0f4f8;
+      background: rgba(76, 175, 80, 0.05);
+    }
+
+    .chat-header h3 {
+      color: #4caf50;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .chat-header h3::before {
+      content: '💬';
+      margin-right: 8px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      background: white;
+      list-style: none;
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .chat-message {
+      margin-bottom: 12px;
+      display: flex;
+    }
+
+    .chat-message.own {
+      justify-content: flex-end;
+    }
+
+    .message-bubble {
+      max-width: 80%;
+      padding: 10px 14px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+
+    .message-bubble.own {
+      background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+      color: white;
+      border-radius: 18px 18px 4px 18px;
+    }
+
+    .message-bubble.other {
+      background: #f0f4f8;
+      color: #333;
+      border-radius: 18px 18px 18px 4px;
+      border: 1px solid #e8eef5;
+    }
+
+    .chat-input-area {
+      padding: 15px;
+      border-top: 1px solid #f0f4f8;
+      background: rgba(33, 150, 243, 0.02);
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 2px solid #e3f2fd;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.3s ease;
+      outline: none;
+    }
+
+    .chat-input:focus {
+      border-color: #2196f3;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    }
+
+    .chat-send {
+      background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .chat-send:hover {
+      background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+    }
+
+    /* 참여자 목록 */
+    .users-section {
+      background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+      border: 1px solid #e8eef5;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      max-height: 280px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .users-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+    }
+
+    .users-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #f0f4f8;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      background: rgba(255, 152, 0, 0.05);
+      user-select: none;
+    }
+
+    .users-header:hover {
+      background: rgba(255, 152, 0, 0.1);
+    }
+
+    .users-header h3 {
+      color: #ff9800;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .users-header h3::before {
+      content: '👥';
+      margin-right: 8px;
+    }
+
+    .users-list {
+      padding: 15px;
+      background: white;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .user-item {
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .user-item.current-user {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-color: #2196f3;
+      font-weight: 600;
+    }
+
+    .user-item:hover {
+      background: #e9ecef;
+      transform: translateX(3px);
+    }
+
   </style>
 </head>
-<body class="bg-gray-100 font-sans">
-  <div class="max-w-7xl mx-auto p-6 space-y-6">
-    <h2 class="text-3xl font-bold text-gray-800"><%= room.name %> 채팅방</h2>
+<body>
+  <div class="container">
+    <!-- 헤더 -->
+    <div class="page-header">
+      <h2><%= room.name %></h2>
+            <a href="/chat"
+     class="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 z-50">나가기</a>
 
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-      <!-- 🎨 그림판 (3/4) -->
-      <div class="lg:col-span-3 space-y-4">
+    </div>
+
+    <div class="main-layout">
+      <!-- 그림판 영역 -->
+      <div class="canvas-section">
         <!-- 툴바 -->
-        <div class="flex flex-wrap items-center justify-between bg-white p-3 rounded-lg shadow-md sticky top-6 z-10">
-          <div class="flex gap-4 items-center">
-            <label class="text-sm font-medium">색상</label>
-            <input type="color" id="colorPicker" class="border rounded" />
-            <label class="text-sm font-medium">선굵기</label>
-            <input type="range" id="lineWidth" min="1" max="20" value="2" class="w-32" />
+        <div class="toolbar">
+          <div class="toolbar-row">
+            <div class="toolbar-group">
+              <label>색상</label>
+              <input type="color" id="colorPicker" />
+            </div>
+            <div class="toolbar-group">
+              <label>선굵기</label>
+              <input type="range" id="lineWidth" min="1" max="20" value="2" />
+            </div>
           </div>
-          <div class="flex flex-wrap gap-2 mt-2 lg:mt-0">
-            <button onclick="setMode('draw')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">그리기</button>
-            <button onclick="setMode('text')" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">텍스트</button>
-            <button onclick="saveTextToCanvas()" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">텍스트 고정</button>
-            <button onclick="clearCanvas()" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">초기화</button>
+          <div class="toolbar-row">
+            <div class="toolbar-buttons">
+              <button onclick="setMode('draw')" class="btn-draw">🖊️ 그리기</button>
+              <button onclick="setMode('text')" class="btn-text">📝 텍스트</button>
+              <button onclick="saveTextToCanvas()" class="btn-save">💾 텍스트 고정</button>
+              <button onclick="setMode('erase')" class="btn-erase">🩹 지우개</button>
+              <button onclick="clearCanvas()" class="btn-clear">🗑️ 초기화</button>
+            </div>
           </div>
         </div>
 
         <!-- 캔버스 -->
-        <div id="canvasWrapper" class="relative border rounded-xl shadow bg-white h-[700px] overflow-hidden">
-          <canvas id="canvas" width="1000" height="700" class="w-full h-full"></canvas>
+        <div id="canvasWrapper" class="canvas-wrapper">
+          <canvas id="canvas" width="800" height="500"></canvas>
         </div>
       </div>
 
-      <!-- 💬 채팅 + 유저 목록 -->
-      <div class="lg:col-span-1 space-y-4">
+      <!-- 사이드바 -->
+      <div class="sidebar">
         <!-- 채팅 -->
-        <div class="flex flex-col h-[500px] bg-white rounded-xl shadow-md p-4">
-          <h3 class="text-xl font-semibold text-gray-700 mb-2">채팅</h3>
-          <ul id="messages" class="flex-1 overflow-y-auto space-y-2 text-sm border-t pt-2 pr-2"></ul>
-          <form id="chat-form" class="flex mt-4 gap-2">
-            <input id="msgInput" autocomplete="off" placeholder="메시지 입력..." class="flex-1 border px-3 py-2 rounded-md" />
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">전송</button>
-          </form>
+        <div class="chat-section">
+          <div class="chat-header">
+            <h3>채팅</h3>
+          </div>
+          <ul id="messages" class="chat-messages"></ul>
+          <div class="chat-input-area">
+            <form id="chat-form" class="chat-form">
+              <input id="msgInput" class="chat-input" autocomplete="off" placeholder="메시지 입력..." />
+              <button type="submit" class="chat-send">전송</button>
+            </form>
+          </div>
         </div>
 
         <!-- 참여자 목록 -->
-        <div class="bg-white rounded-xl shadow-md p-4 max-h-[300px] overflow-y-auto transition-all duration-300">
-          <h3 id="userListToggle" class="text-xl font-semibold text-gray-700 cursor-pointer select-none mb-2">
-            참여자 <span class="text-sm text-gray-400 ml-1">(클릭하여 숨기기)</span>
-          </h3>
-          <ul id="userList" class="space-y-1 text-sm text-gray-800"></ul>
+        <div class="users-section">
+          <div class="users-header" id="userListToggle">
+            <h3>
+              참여자
+              <span id="toggleText">(클릭하여 숨기기)</span>
+            </h3>
+          </div>
+          <ul id="userList" class="users-list"></ul>
         </div>
       </div>
     </div>
   </div>
+
 
   <!-- 🔌 Script -->
   <script src="/socket.io/socket.io.js"></script>
@@ -82,6 +542,44 @@
     const wrapper = document.getElementById("canvasWrapper");
     let drawing = false, mode = "draw";
     ctx.lineCap = "round";
+      // ─────────────────────────────────────
+  // 1) 그리기 로직 분리 함수 추가
+  function handleDrawing(data) {
+    ctx.strokeStyle = data.color;
+    ctx.lineWidth   = data.lineWidth;
+    switch (data.type) {
+      case "beginPath":
+        ctx.beginPath();
+        ctx.moveTo(data.x, data.y);
+        break;
+      case "stroke":
+        ctx.lineTo(data.x, data.y);
+        ctx.stroke();
+        break;
+      case 'erase':
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(data.x, data.y, data.size/2, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        break;  
+      case "endPath":
+        ctx.closePath();
+        break;
+      case "clear":
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.querySelectorAll(".text-box").forEach(b => b.remove());
+        break;
+      case "text":
+        ctx.font      = "16px sans-serif";
+        ctx.fillStyle = data.color;
+        data.text.split("\n").forEach((line, i) =>
+          ctx.fillText(line, data.x, data.y + i * 20)
+        );
+        break;
+    }
+  }
+  // ─────────────────────────────────────
 
     canvas.addEventListener("mousedown", (e) => {
       if (mode === "draw") {
@@ -89,9 +587,14 @@
         ctx.beginPath();
         ctx.moveTo(e.offsetX, e.offsetY);
         socket.emit('drawing', { roomId, type: 'beginPath', x: e.offsetX, y: e.offsetY, color: color(), lineWidth: width() });
-      } else if (mode === "text") {
+      } 
+      else if (mode === "erase") {
+      drawing = true;
+      }
+      else if (mode === "text") {
         createTextBox(e.offsetX, e.offsetY);
       }
+      
     });
 
     canvas.addEventListener("mousemove", (e) => {
@@ -102,10 +605,25 @@
         ctx.stroke();
         socket.emit('drawing', { roomId, type: 'stroke', x: e.offsetX, y: e.offsetY, color: color(), lineWidth: width() });
       }
-    });
+      else if (drawing && mode === "erase") {
+        // CSS→캔버스 내부 좌표 변환
+        const x = e.offsetX, y = e.offsetY;
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, parseInt(width(), 10) / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
 
+        socket.emit('drawing', {
+          roomId,
+          type: 'erase',
+          x, y,
+          size: parseInt(width(), 10)
+        });
+      }
+    });
     canvas.addEventListener("mouseup", () => {
-      if (drawing && mode === "draw") {
+      if (drawing) {
         drawing = false;
         socket.emit('drawing', { roomId, type: 'endPath' });
       }
@@ -176,65 +694,18 @@
     }
 
     socket.on("drawing", (data) => {
-      ctx.strokeStyle = data.color;
-      ctx.lineWidth = data.lineWidth;
-      switch (data.type) {
-        case "beginPath":
-          ctx.beginPath();
-          ctx.moveTo(data.x, data.y);
-          break;
-        case "stroke":
-          ctx.lineTo(data.x, data.y);
-          ctx.stroke();
-          break;
-        case "endPath":
-          ctx.closePath();
-          break;
-        case "clear":
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          document.querySelectorAll(".text-box").forEach(b => b.remove());
-          break;
-        case "text":
-          ctx.font = "16px sans-serif";
-          ctx.fillStyle = data.color;
-          data.text.split("\n").forEach((line, i) => ctx.fillText(line, data.x, data.y + i * 20));
-          break;
-      }
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      handleDrawing(parsed);
     });
 
-    socket.on('initDrawing', (history) => {
-      history.forEach(data => {
-        // 위의 switch와 동일하게 처리
-        switch (data.type) {
-          case 'beginPath':
-            ctx.beginPath();
-            ctx.moveTo(data.x, data.y);
-            break;
-          case 'stroke':
-            ctx.strokeStyle = data.color;
-            ctx.lineWidth = data.lineWidth;
-            ctx.lineTo(data.x, data.y);
-            ctx.stroke();
-            break;
-          case 'endPath':
-            ctx.closePath();
-            break;
-          case 'clear':
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.querySelectorAll(".text-box").forEach(box => box.remove());
-            break;
-          case 'text':
-            ctx.font = "16px sans-serif";
-            ctx.fillStyle = data.color;
-            data.text.split("\n").forEach((line, i) => {
-              ctx.fillText(line, data.x, data.y + i * 20);
-            });
-            break;
-          default:
-            break;
-        }
-      });
+  socket.on("initDrawing", (history) => {
+    history.forEach(eventData => {
+      const parsed = typeof eventData === "string"
+        ? JSON.parse(eventData)
+        : eventData;
+      handleDrawing(parsed);
     });
+  });
 
     document.getElementById("chat-form").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -248,10 +719,13 @@
     socket.on("chat message", (data) => {
       const li = document.createElement("li");
       li.className = data.user === user ? "text-right" : "text-left";
+
       const bubble = document.createElement("div");
       bubble.className = `inline-block px-3 py-2 rounded-lg max-w-[80%] ${data.user === user ? 'bg-blue-100' : 'bg-gray-200'}`;
-      bubble.textContent = `${data.user}: ${data.message.msg}`;
-      li.appendChild(풍선껌);
+      
+      bubble.textContent = `${data.user}: ${data.message}`;
+      li.appendChild(bubble);
+
       const list = document.getElementById("messages");
       list.appendChild(li);
       list.scrollTop = list.scrollHeight;

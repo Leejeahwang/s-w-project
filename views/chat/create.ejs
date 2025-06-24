@@ -1,5 +1,241 @@
-<h2>채팅방 만들기</h2>
-<form method="POST">
-  <input name="name" placeholder="방 제목 입력" required />
-  <button type="submit">생성</button>
-</form>
+<style>
+  /* 폰트 정의 */
+  @font-face {
+      font-family: 'GmarketSansMedium';
+      src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+  }
+
+  /* 기본 설정 */
+  body {
+    font-family: 'GmarketSansMedium', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f9;
+    color: #333;
+  }
+
+  /* 컨테이너 */
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  /* 헤더 스타일 */
+  h2 {
+    color: #2196f3;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+  }
+
+  h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #2196f3 0%, #42a5f5 100%);
+  }
+
+  /* 폼 컨테이너 */
+  .create-form {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafe 100%);
+    border: 1px solid #e3f2fd;
+    padding: 40px;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.08);
+    position: relative;
+    overflow: hidden;
+    margin-top: 30px;
+  }
+
+  .create-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2196f3 0%, #42a5f5 50%, #64b5f6 100%);
+  }
+
+  /* 폼 내부 */
+  .form-group {
+    margin-bottom: 30px;
+  }
+
+  .form-label {
+    display: block;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-size: 16px;
+    position: relative;
+  }
+
+  .form-label::before {
+    content: '💬';
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  /* 입력 필드 */
+  .form-input {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 16px;
+    border: 2px solid #e3f2fd;
+    background-color: white;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.05);
+    box-sizing: border-box;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+    background-color: #fafffe;
+  }
+
+  .form-input:hover {
+    border-color: #42a5f5;
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.1);
+  }
+
+  .form-input::placeholder {
+    color: #aaa;
+    font-style: italic;
+  }
+
+  /* 제출 버튼 */
+  .submit-btn {
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 18px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn::before {
+    content: '🚀';
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  .submit-btn:hover {
+    background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+  }
+
+  /* 버튼 그룹 */
+  .button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .cancel-btn {
+    flex: 1;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6c757d 0%, #95a5a6 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cancel-btn::before {
+    content: '↩️';
+    margin-right: 8px;
+    font-size: 14px;
+  }
+
+  .cancel-btn:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #6c757d 100%);
+    box-shadow: 0 6px 15px rgba(108, 117, 125, 0.4);
+  }
+
+  /* 성공/에러 메시지 */
+  .message {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+  }
+
+  .message.success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .message.success::before {
+    content: '✅';
+    margin-right: 8px;
+  }
+
+  .message.error {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+
+  .message.error::before {
+    content: '❌';
+    margin-right: 8px;
+  }
+
+
+
+</style>
+
+<div class="container">
+  <h2>채팅방 만들기</h2>
+
+  <form method="POST" class="create-form">
+    <div class="form-group">
+      <label class="form-label">방 제목</label>
+      <input
+        name="name"
+        class="form-input"
+        placeholder="방 제목을 입력해주세요"
+        required
+      />
+    </div>
+
+    <div class="button-group">
+      <button type="submit" class="submit-btn">생성</button>
+      <a href="/chat" class="cancel-btn">취소</a>
+    </div>
+  </form>
+</div>

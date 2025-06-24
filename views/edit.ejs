@@ -22,14 +22,14 @@
       </select>
     </p>
 
-    <p>과목
-      <select name="subject">
-        <% subjects.forEach(s => { %>
-          <option value="<%= s.name %>" <%= s.name === note.subject ? "selected" : "" %>>
-            <%= s.name %>
-          </option>
-        <% }) %>
-      </select>
+    <p>과목:
+      <input
+        type="text"
+        name="subject"
+        placeholder="과목명을 입력하세요"
+        value="<%= note.subject %>"
+        required
+      />
     </p>
 
     <p>학년
